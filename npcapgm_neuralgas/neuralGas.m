@@ -6,7 +6,7 @@ if isOpen
 end;
 matlabpool open local 12;
 load sampleData;
-
+if 1 ~= 1
 %load initDataTransHMMtoHCRF
 %paramsData.weightsPerSequence = ones(1,128) ;
 %paramsData.factorSeqWeights = 1;
@@ -26,7 +26,7 @@ if USETRAIN == 1
 k_1 = 1;
 k_2 = 1;
 countNeuron = 999999999999;
-epohs = 50;
+epohs = 350;
 dataTrainForClass = cell(size(dataTrainRaw,1),1);
 for i=1:size(dataTrain,1)  
     u = size(dataTrain{i},2);
@@ -53,7 +53,7 @@ end;
 load modelNeuronGas;
 mM = 0;
 while mM < size(cellNetGas{1}.traceData,2)
-  mM = mM+1;
+  mM = mM+10;
   if mM > size(cellNetGas{1}.traceData,2)
      break; 
   end
@@ -233,29 +233,34 @@ for i =1:size(labelTest,1)
 end;
 calculateQuality(arrayLabelDetect,arrayLabelTrue,size(arrayLL,1));
 
-globDifAllLogLike = 0;
-for seqI=1:size(arrayLL,2)
-    for classI=1:size(arrayLL,1)
-        sumAllLogLike = 0;
-        for i =1:size(arrayLL,1)
-            if i ~= classI
-                sumAllLogLike = sumAllLogLike +  exp(arrayLL(i,seqI));
-            end;
-        end;
-        sumAllLogLike = sumAllLogLike;
-        difAllLogLike = 0;
-    %     for i =1:size(arrayLL,1)
-    %         val = arrayLL(i,j)1
-    %         difAllLogLike = difAllLogLike +  (val - sumAllLogLike);  
-    %     end;
-        val = arrayLL(classI,seqI);
-        difAllLogLike = val - log(sumAllLogLike);
-        %globDifAllLogLike = difAllLogLike;
-        globDifAllLogLike = globDifAllLogLike + difAllLogLike;
-    end;
+loglist(mM) = arrayLL(1,1);
+
 end;
- globDifAllLogLike
- mmi(mM) = globDifAllLogLike;
+save('loglist.mat', 'loglist','-v7.3');
+end;
+load loglist
+loglist(~loglist) = -100;
+sumAllLogLike = 0;
+for i =1:size(loglist,2)            
+    sumAllLogLike = sumAllLogLike +  exp(loglist(i));            
+end;    
+for modelI=1:size(loglist,2)
+%for classI=1:size(arrayLL,1)
+    classDifAllLogLike = 0;
+   % for seqI=1:size(arrayLL,2)       
+                  
+       % val = arrayLL(classI,seqI);
+       val = loglist(modelI);
+       
+        logSum = log(sumAllLogLike);
+        difAllLogLike = val - logSum;        
+       % classDifAllLogLike = classDifAllLogLike + (-1)*difAllLogLike;
+    %end;
+    %globDifAllLogLike(classI) = classDifAllLogLike;
+%end;
+% resMMI = sum(globDifAllLogLike) / length(globDifAllLogLike)
+  resMMI = difAllLogLike;
+  mmi(modelI) = resMMI;
 end;
  [vaM in] = max(mmi);
  plot(mmi);
