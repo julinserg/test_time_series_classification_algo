@@ -1,5 +1,10 @@
 clc;
-clear;
+clear all;
+isOpen = matlabpool('size') > 0;
+if isOpen
+   matlabpool close; 
+end;
+matlabpool open local 12;
 load sampleData;
 
 %load initDataTransHMMtoHCRF
@@ -20,8 +25,8 @@ CountNet = [10 12];
 if USETRAIN == 1
 k_1 = 1;
 k_2 = 1;
-countNeuron = 200000;
-epohs = 400;
+countNeuron = 999999999999;
+epohs = 50;
 dataTrainForClass = cell(size(dataTrainRaw,1),1);
 for i=1:size(dataTrain,1)  
     u = size(dataTrain{i},2);
@@ -33,56 +38,26 @@ end;
 cellNetGas = cell(size(dataTrainRaw,1),1);
 errorNeuralGas = cell(size(dataTrainRaw,1),1);
 
-for i=1:size(dataTrainForClass,1)
+parfor i=1:size(dataTrainForClass,1)
   D = dataTrainForClass{i};
-  netGas = gngExt(D',countNeuron,epohs); 
-  %traceData=netGas.traceData;
-  
-%   loglikMax = trainParamsEstimation(traceData{1}.M,{dataTrainRaw{i,:}});  
-%   for j=2:length(traceData)
-%       neuralGasMap = traceData{j};
-%       loglik = trainParamsEstimation(neuralGasMap.M,{dataTrainRaw{i,:}});
-%       if loglik > loglikMax
-%         loglikMax = loglik;
-%         neuralGasMapMax = neuralGasMap;
-%       end;
-%   end;
-%   loglikMax = trainParamsEstimation(traceData{1}.M,{dataTrainRaw{i,:}});
-%   flag = 0;
-%   maxI = 1;
-%   a = 1;
-%   b = length(traceData);
-%  while a<b
-%    j =  fix((b-a)/2);  
-%    index = a+j;
-%    neuralGasMap = traceData{index};
-%    loglik = trainParamsEstimation(neuralGasMap.M,{dataTrainRaw{i,:}});
-%    index
-%    if loglik >= loglikMax
-%        loglikMax = loglik;
-%        neuralGasMapMax = neuralGasMap;
-%        flag = 1;
-%        maxI = index;
-%        a = index+1;
-%    else
-%        b = index;      
-% %        if flag == 1
-% %            netGas.codeBook = neuralGasMapMax;
-% %        end;
-%    end;
-%   end;
-  i
- % netGas.codeBook = neuralGasMapMax.M;
- sizeNe = size(netGas.linkMatrix,1)
- % all = length(traceData);
- 
-  netGas.traceData = [];
+  netGas = gngExt(D',countNeuron,epohs);
+%   for kk=1:size(netGas.traceData)
+%       netGas.traceData{1,kk}.D = [];
+%       netGas.traceData{1,kk}.linkMatrix = [];
+%   end;  
   cellNetGas{i} = netGas;
 end;
-save('modelNeuronGas.mat', 'cellNetGas');
+save('modelNeuronGas.mat', 'cellNetGas','-v7.3');
 end;
 %%
 load modelNeuronGas;
+mM = 0;
+while mM < size(cellNetGas{1}.traceData,2)
+  mM = mM+1;
+  if mM > size(cellNetGas{1}.traceData,2)
+     break; 
+  end
+  clear('Probability','arrayLL','arrayLabelDetect','arrayLabelTrue');
 % %% вычисляем матрицу B (матрицу выходов) для каждого класса
 % outputs = sim(net_class1,dataTrain_class1);
 % hits = sum(outputs,2);
@@ -109,8 +84,10 @@ load modelNeuronGas;
 % weights_class1 = net_class1.iw{1,1};
 % weights_class2 = net_class2.iw{1,1};
 Probability = cell(size(cellNetGas,1),1);
-for i=1:size(cellNetGas,1);
-    sizeW = size(cellNetGas{i}.codeBook,1);
+parfor i=1:size(cellNetGas,1);
+    t = cellNetGas{i};
+    w = t.traceData{1,mM}.M;
+    sizeW = size(w,1);
     Probability{i}.A = repmat(0,sizeW,sizeW);
     Probability{i}.At = repmat(0,sizeW,1);
 end;
@@ -121,7 +98,9 @@ end;
 for i=1:size(dataTrainRaw,1)
     for j=1:size(dataTrainRaw,2)
         %for k=1:size(dataTrainRaw{i,j},2)-1            
-            w= cellNetGas{i}.codeBook;
+            %w= cellNetGas{i}.codeBook;
+            t = cellNetGas{i};
+            w = t.traceData{1,mM}.M;
             p = dataTrainRaw{i,j};
             [S,R11] = size(w);
             [R2,Q] = size(p);
@@ -139,7 +118,7 @@ for i=1:size(dataTrainRaw,1)
                 pp = array(1,k);
                 qq = array(1,k+1);
                 Probability{i}.A(pp,qq) = Probability{i}.A(pp,qq) + 1;
-                Probability{i}.At(pp)  = Probability{i}.At(pp) + 1;
+                Probability{i}.At(pp) =  Probability{i}.At(pp) + 1;
             end;
 %             pp = vec2ind(pr);              
 %             pr = sim(cellNetKox{i},dataTrainRaw{i,j}(:,k+1));
@@ -154,37 +133,34 @@ end;
 %     logA = normalizeLogspace(Probability{i}.A);
 %     Probability{i}.A = exp(logA);
 % end;
-val = 0.01;
 for i=1:size(Probability,1)
-    for j =1:size(Probability{i}.A,2)
-        if Probability{i}.At(j) ~= 0
-          %Probability{i}.A(j,:) = Probability{i}.A(j,:) ./Probability{i}.At(j);
-          vecSumDir = repmat(val,1,size(Probability{i}.A,2));
-          Probability{i}.A(j,:) = (Probability{i}.A(j,:)+vecSumDir) ./ (Probability{i}.At(j)+(val*size(Probability{i}.A,2)));
-        else
-          vecSumDir = repmat(val,1,size(Probability{i}.A,2));
-          Probability{i}.A(j,:) = vecSumDir ./ (val*size(Probability{i}.A,2));
-        end;
-%         sumRow = sum(Probability{i}.A(:,j));
-%         if sumRow ~= 0
-%             devide = Probability{i}.A(:,j) ./ sumRow;
-%         end;
-%         devide(~devide) = 0.00001;
-%         Probability{i}.A(:,j) = devide;
-        
-    end;
-%     minVal = 1;
-%     for m=1:size(Probability{i}.A,1)
-%         for n = 1:size(Probability{i}.A,2)
-%             if Probability{i}.A(m,n) < minVal && Probability{i}.A(m,n) ~= 0
-%                minVal = Probability{i}.A(m,n);  
-%             end;
-%         end;
-%     end;
-   % Probability{i}.A(~Probability{i}.A) = 0.0000001;
+     for j=1:size(Probability{i}.A,2)
+         if Probability{i}.At(j) ~= 0
+            Probability{i}.A(j,:) = Probability{i}.A(j,:) ./  Probability{i}.At(j);
+         end;
+%        sumRow = sum(Probability{i}.A(:,j));
+%        if sumRow ~= 0
+%            devide = Probability{i}.A(:,j) ./ sumRow;
+%        end;
+%        %devide = Probability{i}.A(:,j);
+        %devide(~devide) = 0.000001;
+        %Probability{i}.A(:,j) = devide;
+     end;
      %Probability{i}.A = ones(size(Probability{i}.A,2),size(Probability{i}.A,2));
-    %logA = normalizeLogspace(Probability{i}.A);
-    %Probability{i}.A = exp(logA);
+      Probability{i}.A(~Probability{i}.A) = 0.0000001;  
+%     %logA = normalizeLogspace(Probability{i}.A);
+%     %Probability{i}.A = exp(logA);
+%     linkMatrix = cellNetGas{i}.linkMatrix;
+%     for j=1:size(linkMatrix,1)
+%        for t=1:size(linkMatrix,2)
+%            if linkMatrix(j,t) ~= -1
+%               Probability{i}.A(j,t) = 1;
+%            else
+%               Probability{i}.A(j,t) = 0.0001;  
+%            end;
+%        end;
+%     end;
+    
 end;
 % logA1 = normalizeLogspace(A_1);
 % A_1 = exp(logA1);
@@ -193,7 +169,8 @@ end;
 %A_1(~A_1) = 0.000001;
 %A_2(~A_2) = 0.000001;
 %% тест
-dataTest =  getTestDataOnTest(1);
+%dataTest =  getTestDataOnTest(1);
+dataTest = getTrainData(1);
 for i=1:size(dataTest,1)
     for j=1:size(dataTest,2)       
         labelTest{i,j}(1,1) = i-1; 
@@ -203,13 +180,17 @@ end;
 index = 1;
 for i = 1:size(dataTest,1)
   for j = 1:size(dataTest,2)
+     
     for m = 1:size(cellNetGas,1)
-       w= cellNetGas{m}.codeBook;
-       p = dataTest{i,j};
-       [S,R11] = size(w);
-       [R2,Q] = size(p);
-       z = zeros(S,Q);
-       w = w';
+       %w= cellNetGas{m}.codeBook;
+        t = cellNetGas{i};
+         p = dataTest{i,j};
+        w = t.traceData{1,mM}.M;
+        [S,R11] = size(w);
+        [R2,Q] = size(p);
+      	z = zeros(S,Q);
+        w = w';       
+      
        copies = zeros(1,Q);
        for ii=1:S
          z(ii,:) = sum((w(:,ii+copies)-p).^2,1);
@@ -252,113 +233,31 @@ for i =1:size(labelTest,1)
 end;
 calculateQuality(arrayLabelDetect,arrayLabelTrue,size(arrayLL,1));
 
- 
- 
- index1 = 1;
- index2 = 1;
- count1_1 = 0;
-  count1_2 = 0;
-   count2_1 = 0;
-    count2_2 = 0;
- for i=1:size(rows_1,2)     
-%      if testLabels{1}(1,i) == 0
-%          if rows(1,i) > size(weights_class1,1)
-%             mas0(1,index1) = 2;
-%             count1_2 = count1_2 + 1;
-%            % testSeqs{1}(4,i) = 1;
-%          else
-%             mas0(1,index1) = 1; 
-%             count1_1 = count1_1 + 1;
-%            % testSeqs{1}(4,i) = 0;
-%          end;
-%          
-%          testSeqs{1}(4,i) = 1;
-%          index1 = index1+ 1;
-%      end;
-%       if testLabels{1}(1,i) == 1
-%           if rows(1,i) > size(weights_class1,1)
-%             mas1(1,index2) = 2;
-%             count2_2 = count2_2 + 1;
-%             %testSeqs{1}(4,i) = 1;
-%           else
-%              count2_1 = count2_1 + 1;
-%             mas1(1,index2) = 1; 
-%             %testSeqs{1}(4,i) = 0;
-%          end;
-%          testSeqs{1}(4,i) = 2;
-%          index2 = index2+ 1;
-%      end;
-     masProbab(1,i)= Probab_class1(rows_1(1,i));
-     masProbab(2,i)= Probab_class2(rows_2(1,i));
- end;
- fprintf('Count 1 for 1 class  = %f\n', count1_1/size(mas0,2));
- fprintf('Count 2 for 1 class  = %f\n', count1_2/size(mas0,2));
-  fprintf('Count 1 for 2 class  = %f\n', count2_1/size(mas1,2));
- fprintf('Count 2 for 2 class  = %f\n', count2_2/size(mas1,2));
-%  testSeqs{1,1}(15,:) = [];
-% testSeqs{1,1}(4:14,:) = []; 
-% for i=1:size(d,2)
-%     for k=1:size(w,1)
-%         for l =1:size(w,2)
-%             dist(k,l) = w()
-%         end;
-%     end;    
-%     dist = weights - (cop+);
-% end;
-
-
-
-
-
-
-
-paramsNodHCRF.normalizeWeights = 1;
-R{2}.params = paramsNodHCRF;
-R{2}.params.nbHiddenStates = 3;
-R{2}.params.modelType = 'hcrf';
-R{2}.params.GaussianHCRF = 0;
-%R{2}.params.windowRecSize = 0;
-R{2}.params.windowSize = 0;
-R{2}.params.optimizer = 'bfgs';
-R{2}.params.regFactorL2 = 1;
-R{2}.params.regFactorL1 = 0;
-%R{2}.params.weightsInitType = 'TRANS_HMM';
-%R{2}.params.initWeights = initDataTransHMMtoHCRF;
-for i =1:10
-    i
-[R{2}.model R{2}.stats] = train(trainCompleteSeqs, trainCompleteLabels, R{2}.params);
-[R{2}.ll R{2}.labels] = test(R{2}.model, testSeqs, testLabels);
-
-% paramsNodLDCRF.normalizeWeights = 1;
-% R{3}.params = paramsNodLDCRF;
-% [R{3}.model R{3}.stats] = train(trainSeqs, trainLabels, R{3}.params);
-% [R{3}.ll R{3}.labels] = test(R{3}.model, testSeqs, testLabels);
-
-
-%% оценка результата
-ll = R{2}.ll{1,1};
-label = R{2}.labels{1,1};
-% for i=1:size(label,2)
-%     if label(1,i) == 0
-%         arrayLabel(1,i) = 1;
-%         arrayLabel(2,i) = 0;
-%     else
-%         arrayLabel(1,i) = 0;
-%         arrayLabel(2,i) = 1;
-%     end;   
-% end;
- arrayLL = ll;
-% arrayLL_old = arrayLL';
-% post = exp(normalizeLogspace(arrayLL_old));
-% arrayLL = post';
-
-for i=1:size(arrayLL,2)
-    [c index] = max(arrayLL(:,i));
-     arrayLabelDetect(1,i) = index-1;    
+globDifAllLogLike = 0;
+for seqI=1:size(arrayLL,2)
+    for classI=1:size(arrayLL,1)
+        sumAllLogLike = 0;
+        for i =1:size(arrayLL,1)
+            if i ~= classI
+                sumAllLogLike = sumAllLogLike +  exp(arrayLL(i,seqI));
+            end;
+        end;
+        sumAllLogLike = sumAllLogLike;
+        difAllLogLike = 0;
+    %     for i =1:size(arrayLL,1)
+    %         val = arrayLL(i,j)1
+    %         difAllLogLike = difAllLogLike +  (val - sumAllLogLike);  
+    %     end;
+        val = arrayLL(classI,seqI);
+        difAllLogLike = val - log(sumAllLogLike);
+        %globDifAllLogLike = difAllLogLike;
+        globDifAllLogLike = globDifAllLogLike + difAllLogLike;
+    end;
 end;
-
-D = now();
-strTime = datestr(D,30);
-[AveragePricision, AverageRecall, F_measure] =calculateQuality(arrayLabelDetect,label,2);
+ globDifAllLogLike
+ mmi(mM) = globDifAllLogLike;
 end;
-%plotResults(R);
+ [vaM in] = max(mmi);
+ plot(mmi);
+fprintf('Stop');
+ 

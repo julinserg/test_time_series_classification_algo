@@ -26,7 +26,7 @@ end
 %initial codebook
 randIndeces = randperm(size(D,1));
 M=D(randIndeces(1:INIT_UNITS),:);
-
+M_OLD = M;
 
 %matrices needed for training
 %init linkMatrix: stores link information: links, link ages
@@ -58,8 +58,8 @@ while (epochs<MAX_TRAIN_LEN)
   end
   
   %print info
-  fprintf(1,'Steps: %i/%i\n',epochs,MAX_TRAIN_LEN); 
-  fprintf(1,'Units: %i\n',size(M,1)); 
+  %fprintf(1,'Steps: %i/%i\n',epochs,MAX_TRAIN_LEN); 
+  %fprintf(1,'Units: %i\n',size(M,1)); 
       
   %figure(1)
   %plot_neural_gas(M,D,linkMatrix);
@@ -131,12 +131,12 @@ while (epochs<MAX_TRAIN_LEN)
       
    
       if (size(M,1)<MAX_UNITS && epochIterationCount >= LAMBDA && (lockedUnits(bmu1stError)<=0) && (lastEpoch==0))
-%         traceMap.D = D;
-%         traceMap.M = M;
-%         traceMap.linkMatrix = linkMatrix;
-%         traceMap.COSINE = COSINE;
-%         traceMap.mdl = MDL(traceMap);    
-%         traceData{end+1}=traceMap;
+         %traceMap.D = D;
+         %traceMap.M = M;
+         %traceMap.linkMatrix = linkMatrix;
+         %traceMap.COSINE = COSINE;
+         %traceMap.mdl = MDL(traceMap);    
+        % traceData{end+1}=traceMap;
         logcount=INSERTION_ITERATION_LOG;
         
         epochIterationCount=0;
@@ -160,6 +160,11 @@ while (epochs<MAX_TRAIN_LEN)
         end
         M(bmuNew,:)=newUnit;
         qerrTotalUnits(bmuNew) = 0;
+        if size(M,1) ~= size(M_OLD,1)
+            traceMap.M = M;
+            traceData{end+1}=traceMap; 
+        end;
+        M_OLD = M;
 
         %init link from the new BMU to itself
         linkMatrix(bmuNew,:)=-1;
@@ -189,33 +194,33 @@ while (epochs<MAX_TRAIN_LEN)
         
       end;
      
-%       if (logcount>0)
-%             traceMap.D = D;
-%             traceMap.M = M;
-%             traceMap.linkMatrix = linkMatrix;
-%             traceMap.COSINE = COSINE;
-%             traceMap.mdl = MDL(traceMap);    
-%             traceData{end+1}=traceMap;
-%             logcount=logcount-1;
-%       end
+     % if (logcount>0)
+            %traceMap.D = D;
+            %traceMap.M = M;
+            %traceMap.linkMatrix = linkMatrix;
+            %traceMap.COSINE = COSINE;
+            %traceMap.mdl = MDL(traceMap);    
+            %traceData{end+1}=traceMap;
+            %logcount=logcount-1;
+     % end
       
      
       qerrTotalUnits=qerrTotalUnits*ERROR_ALL_FACTOR;
   end;
-%   if size(traceData,2) > 0      
-%       if size(traceData{end}.linkMatrix,2) < size(linkMatrix,2)
-%           traceMap.D = D;
+%    if size(traceData,2) > 0      
+%      % if size(traceData{end}.linkMatrix,2) < size(linkMatrix,2)
+%          % traceMap.D = D;
 %           traceMap.M = M;
 %           traceMap.linkMatrix = linkMatrix;
-%           traceMap.COSINE = COSINE;
+%          % traceMap.COSINE = COSINE;
 %           traceData{end+1}=traceMap;  
-%       end;
-%   else
-%    traceMap.D = D;
-%    traceMap.M = M;
-%    traceMap.linkMatrix = linkMatrix;
-%    traceMap.COSINE = COSINE;
-%    traceData{end+1}=traceMap;   
+%      % end;
+%    else
+%      % traceMap.D = D;
+%       traceMap.M = M;
+%       traceMap.linkMatrix = linkMatrix;
+%       %traceMap.COSINE = COSINE;
+%       traceData{end+1}=traceMap;   
 %   end;
 
   
