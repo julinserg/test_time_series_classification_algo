@@ -1,16 +1,17 @@
 clc;
 clear all;
+NUMBERPROPUSK = 10;
 isOpen = matlabpool('size') > 0;
 if isOpen
    matlabpool close; 
 end;
 matlabpool open local 12;
 load sampleData;
-if 1 ~= 1
+if 1 == 1
 %load initDataTransHMMtoHCRF
 %paramsData.weightsPerSequence = ones(1,128) ;
 %paramsData.factorSeqWeights = 1;
-USETRAIN = 0
+USETRAIN = 1
 k = 1;
 dataTrainRaw = getTrainData(1);
 for i=1:size(dataTrainRaw,1)
@@ -26,7 +27,7 @@ if USETRAIN == 1
 k_1 = 1;
 k_2 = 1;
 countNeuron = 999999999999;
-epohs = 350;
+epohs = 200;
 dataTrainForClass = cell(size(dataTrainRaw,1),1);
 for i=1:size(dataTrain,1)  
     u = size(dataTrain{i},2);
@@ -52,11 +53,13 @@ end;
 %%
 load modelNeuronGas;
 mM = 0;
+loglistINDEX = 0;
 while mM < size(cellNetGas{1}.traceData,2)
-  mM = mM+10;
+  mM = mM+NUMBERPROPUSK;
   if mM > size(cellNetGas{1}.traceData,2)
      break; 
   end
+  loglistINDEX = loglistINDEX +1;
   clear('Probability','arrayLL','arrayLabelDetect','arrayLabelTrue');
 % %% вычисляем матрицу B (матрицу выходов) для каждого класса
 % outputs = sim(net_class1,dataTrain_class1);
@@ -233,36 +236,39 @@ for i =1:size(labelTest,1)
 end;
 calculateQuality(arrayLabelDetect,arrayLabelTrue,size(arrayLL,1));
 
-loglist(mM) = arrayLL(1,1);
+loglist(loglistINDEX) = {arrayLL};
 
 end;
 save('loglist.mat', 'loglist','-v7.3');
 end;
 load loglist
-loglist(~loglist) = -100;
-sumAllLogLike = 0;
-for i =1:size(loglist,2)            
-    sumAllLogLike = sumAllLogLike +  exp(loglist(i));            
-end;    
-for modelI=1:size(loglist,2)
-%for classI=1:size(arrayLL,1)
-    classDifAllLogLike = 0;
-   % for seqI=1:size(arrayLL,2)       
-                  
-       % val = arrayLL(classI,seqI);
-       val = loglist(modelI);
-       
-        logSum = log(sumAllLogLike);
-        difAllLogLike = val - logSum;        
-       % classDifAllLogLike = classDifAllLogLike + (-1)*difAllLogLike;
-    %end;
-    %globDifAllLogLike(classI) = classDifAllLogLike;
-%end;
-% resMMI = sum(globDifAllLogLike) / length(globDifAllLogLike)
-  resMMI = difAllLogLike;
-  mmi(modelI) = resMMI;
+%loglist(~loglist) = -100;
+
+
+NclassI = 1;%size(loglist{1},1);
+globDifAllSeq = repmat(0,NclassI,length(loglist));
+for classI=1:NclassI
+    NdataSeqI = 20;%size(loglist{1},2);
+    for dataSeqI=1:NdataSeqI        
+        sumAllLogLike = 0;
+        NmodelI = length(loglist);
+        for i =1:NmodelI          
+            sumAllLogLike = sumAllLogLike +  exp(loglist{i}(classI,dataSeqI));            
+        end;
+        
+        for modelI=1:NmodelI   
+           val = loglist{modelI}(classI,dataSeqI);
+           logSum = log(sumAllLogLike);
+           difAllLogLike = val - logSum;      
+           globDifAllSeq(classI,modelI) = globDifAllSeq(classI,modelI) + difAllLogLike;       
+        end; 
+    end;
 end;
- [vaM in] = max(mmi);
- plot(mmi);
+mmi = mean(globDifAllSeq,1);
+for i=1:size(mmi,2)-1
+    dmmi(i) = mmi(i+1)-mmi(i);
+end;
+[vaM in] = max(mmi);
+plot(mmi);
 fprintf('Stop');
  

@@ -10,7 +10,7 @@ if SELECTDATASET == 1
  D = horzcat(D,M); 
  C = D;
 if NUMBER == 1   
-   D = C(1:10,1:88);
+   D = C(1:10,101:400);
    %D = D(1:20,51:100);
 end;
 if NUMBER == 2   
