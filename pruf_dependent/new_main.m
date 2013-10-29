@@ -11,11 +11,21 @@ s2 = rand(1,1);
 s3 = rand(1,1);
 MU = [m1 m2 m3];
 SIGMA = [s1 0 0
-    0 s2 0
-    0 0 s3];
+         0 s2 0
+         0 0 s3];
 
-R = mvnrnd(MU,SIGMA,1000);
-R = [R R];
+%% многомерное распределение гаусса    
+%R = mvnrnd(MU,SIGMA,1000);
+%T = ones(size(R,1),1);
+%% многомерное распределение стьюдента
+df = 5;
+C = [1 0.5;0.5 1];
+cases = 1000;
+R = mvtrnd(C,df, cases)
+%T = R;
+%T(:,3) = [];
+%T(:,2) = [];
+%R = [R T];
 Roystest(R);
 HZmvntest(R);
 %Mskekur(R,1);

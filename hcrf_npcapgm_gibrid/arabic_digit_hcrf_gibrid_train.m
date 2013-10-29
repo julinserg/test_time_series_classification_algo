@@ -16,7 +16,15 @@ for i=1:size(dataTrainArabicDigit,1)
         
         s = size(dataTrainArabicDigit{i,j},1);
         s1 = size(arrayLogLikDataSetTrain{i,j},1);
-        dataTrainArabicDigit{i,j}(s+1:s+s1,:) = arrayLogLikDataSetTrain{i,j}(:,:);
+        d = s+s1+1 - (s+1);
+        d1 = size(arrayLogLikDataSetTrain{i,j},1);
+        dataInsert =  arrayLogLikDataSetTrain{i,j}(:,:);
+        index1 = s+1;
+        index2 = s+s1;
+        dataTrainArabicDigit{i,j}(index1:index2,:) = dataInsert;
+       % inputMas = dataTrainArabicDigit{i,j};
+       % Mas = cat(1, inputMas,dataInsert);
+       % dataTrainArabicDigit{i,j} = Mas;
     end;
 end;
 dataTrainArabicDigitKox = cell(1,1);

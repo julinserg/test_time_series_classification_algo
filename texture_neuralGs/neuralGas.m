@@ -1,7 +1,7 @@
 clc;
 clear all;
-NUMBERPROPUSK =15;
-USETRAIN = 0
+NUMBERPROPUSK =98;
+USETRAIN = 1
 SAVELOGLIKEFORGIBRID = 0
 isOpen = matlabpool('size') > 0;
 if isOpen
@@ -13,9 +13,122 @@ load sampleData;
 %load initDataTransHMMtoHCRF
 %paramsData.weightsPerSequence = ones(1,128) ;
 %paramsData.factorSeqWeights = 1;
+Im = imread('texture/test.jpg');
+window = 10;
+RawTest = cell(1,1);
+
+th = 1;
+i = 1;
+j = 1;
+countX = 0;
+countY = 0;
+while i < size(Im,1)-window
+    bX = i;
+    eX = i+window;
+    
+    while j <size(Im,2)-window 
+        if countX == 0
+            countY = countY + 1;
+        end;
+        bY = j;        
+        eY = j+window;
+        TempTest = Im(bX:eX,bY:eY,:);
+        SP1 = fft2(TempTest(:,:,1)); 
+        SP1a = abs(SP1);
+        SP2 = fft2(TempTest(:,:,2)); 
+        SP2a = abs(SP2);
+        SP3 = fft2(TempTest(:,:,3)); 
+        SP3a = abs(SP3);
+%           SP1a = TempTest(:,:,1);
+%           SP2a = TempTest(:,:,2);
+%           SP3a = TempTest(:,:,3);
+        h = 1;
+        for ii=1:size(SP1a,1)
+            for jj=1:size(SP1a,2)
+                classT(1, h) =  SP1a(ii,jj);
+                classT(2, h) =  SP2a(ii,jj);
+                classT(3, h) =  SP3a(ii,jj);
+                h =  h+1;
+            end;
+        end;
+        RawTest(1,th) = {classT};
+        th = th +1;        
+        j = j+window;    
+    end; 
+    countX = countX + 1;
+    j= 1;
+    i = i+window;    
+end;
+
+Im = imread('texture/road1.jpg');
+Im = Im(1:10,1:10,:);
+SP1 = fft2(Im(:,:,1)); 
+SP1a = abs(SP1);
+SP2 = fft2(Im(:,:,2)); 
+SP2a = abs(SP2);
+SP3 = fft2(Im(:,:,3)); 
+SP3a = abs(SP3);
+% SP1a = Im(:,:,1);
+% SP2a = Im(:,:,2);
+% SP3a = Im(:,:,3);
+th = 1;
+for i=1:size(SP1a,1)
+    for j=1:size(SP1a,2)
+        class1T(1,th) =  SP1a(i,j);
+        class1T(2,th) =  SP2a(i,j);
+        class1T(3,th) =  SP3a(i,j);
+        th = th+1;
+    end;
+end;
+
+Im = imread('texture/les1.jpg');
+Im = Im(1:10,1:10,:);
+SP1 = fft2(Im(:,:,1)); 
+SP1a = abs(SP1);
+SP2 = fft2(Im(:,:,2)); 
+SP2a = abs(SP2);
+SP3 = fft2(Im(:,:,3)); 
+SP3a = abs(SP3);
+% SP1a = Im(:,:,1);
+% SP2a = Im(:,:,2);
+% SP3a = Im(:,:,3);
+th = 1;
+for i=1:size(SP1a,1)
+    for j=1:size(SP1a,2)
+        class2T(1,th) =  SP1a(i,j);
+        class2T(2,th) =  SP2a(i,j);
+        class2T(3,th) =  SP3a(i,j);
+        th = th+1;
+    end;
+end;
+
+Im = imread('texture/ground1.jpg');
+Im = Im(1:10,1:10,:);
+SP1 = fft2(Im(:,:,1)); 
+SP1a = abs(SP1);
+SP2 = fft2(Im(:,:,2)); 
+SP2a = abs(SP2);
+SP3 = fft2(Im(:,:,3)); 
+SP3a = abs(SP3);
+% SP1a = Im(:,:,1);
+% SP2a = Im(:,:,2);
+% SP3a = Im(:,:,3);
+th = 1;
+for i=1:size(SP1a,1)
+    for j=1:size(SP1a,2)
+        class3T(1,th) =  SP1a(i,j);
+        class3T(2,th) =  SP2a(i,j);
+        class3T(3,th) =  SP3a(i,j);
+        th = th+1;
+    end;
+end;
+dataTrainRaw = cell(3,1);
+dataTrainRaw(1,1) = {class1T};
+dataTrainRaw(2,1) = {class2T};
+dataTrainRaw(3,1) = {class3T};
 
 k = 1;
-dataTrainRaw = getTestDataOnTest(2);
+%dataTrainRaw = getTestDataOnTest(2);
 for i=1:size(dataTrainRaw,1)
     for j=1:size(dataTrainRaw,2)
         dataTrain{k,1} = dataTrainRaw{i,j};       
@@ -23,7 +136,8 @@ for i=1:size(dataTrainRaw,1)
         k = k+1;
     end;
 end;
-dataTest =  getTrainData(2);
+%dataTest =  getTrainData(2);
+dataTest = RawTest;
 if 1 == 1
 CountNet = [10 12];
 %% обучаем карты  охонена дл€ каждого класса 
@@ -31,7 +145,7 @@ if USETRAIN == 1
 k_1 = 1;
 k_2 = 1;
 countNeuron = 999999999999;
-epohs = 400;
+epohs = 100;
 dataTrainForClass = cell(size(dataTrainRaw,1),1);
 for i=1:size(dataTrain,1)  
     u = size(dataTrain{i},2);
@@ -335,12 +449,28 @@ for i=1:size(arrayLL,2)
     [c index] = max(arrayLL(:,i));
      arrayLabelDetect(1,i) = index-1;    
 end;
-for i =1:size(labelTest,1)
-    for j=1:size(labelTest,2)
-     arrayLabelTrue(1,(i-1)*size(labelTest,2)+j) = labelTest{i,j}(1,1); 
+i = 1;
+j = 1;
+t = 1;
+while i <= countX*(window)
+    bX = i;
+    eX = i+window;
+    while j <= countY*(window)
+        bY = j;
+        eY = j+window;
+        arrayAnswer(bX:eX,bY:eY) = repmat(arrayLabelDetect(1,t),window+1,window+1);
+        t = t + 1;
+        j = j + window;
     end;
+    j = 1;
+    i = i + window;
 end;
-calculateQuality(arrayLabelDetect,arrayLabelTrue,size(arrayLL,1));
+% for i =1:size(labelTest,1)
+%     for j=1:size(labelTest,2)
+%      arrayLabelTrue(1,(i-1)*size(labelTest,2)+j) = labelTest{i,j}(1,1); 
+%     end;
+% end;
+% calculateQuality(arrayLabelDetect,arrayLabelTrue,size(arrayLL,1));
 
 loglist(loglistINDEX) = {arrayLL};
 

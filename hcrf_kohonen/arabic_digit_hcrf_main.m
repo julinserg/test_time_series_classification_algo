@@ -10,7 +10,7 @@ for NUM=2:10
 %   классификация арабских цифр с помощью HCRF library
 %% init
 load sampleData;
-load initDataTransHMMtoHCRF
+%load initDataTransHMMtoHCRF
 %paramsData.weightsPerSequence = ones(1,512);
 %paramsData.factorSeqWeights = 1;
 R{2}.params = paramsNodHCRF;
@@ -27,7 +27,7 @@ R{2}.params.regFactorL1 = 0;
 %% train
 %net2 = arabic_digit_hcrf_train_koh(R);
 %load dataTrainArabicDigitModul;
-dataTrainArabicDigit = getTrainData(NUM);
+dataTrainArabicDigit = getTestDataOnTest(NUM);
 
 
 %clustering(dataTrainArabicDigit);
@@ -57,7 +57,7 @@ matHCRF('saveModel','fileModel_hcrf','fileFeatureDefinition_hcrf');
 %hF2 = figure;
 %% test on train data
 % %figure(hF1);
- dataTestArabicDigit = getTrainData(NUM);
+ dataTestArabicDigit = getTestDataOnTest(NUM);
 % %load dataTrainArabicDigitModul;
 % %dataTestArabicDigit = dataTrainArabicDigit;
 clear('ll','label','arrayLL','arrayLL_old');
@@ -131,7 +131,7 @@ clear('ll','label','arrayLL','arrayLL_old');
 %          dataTestArabicDigit{i,j} = abs(dataTestArabicDigit{i,j}); 
 %       end;
 %  end;
-dataTestArabicDigit = getTestDataOnTest(NUM);
+dataTestArabicDigit = getTrainData(NUM);
 
 
 [ll label] = arabic_digit_hcrf_test(dataTestArabicDigit,NUM);

@@ -77,7 +77,7 @@ D = mixoutNew(1:20,1:50);
 D(1:20,51:100) = mixoutNew(21:40,1:50);
 C = D;
 if NUMBER == 1   
-   D = C(1:20,1:10);
+   D = C(1:20,1:100);
    %D = D(1:20,51:100);
 end;
 if NUMBER == 2   

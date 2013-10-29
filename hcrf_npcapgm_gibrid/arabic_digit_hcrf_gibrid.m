@@ -1,30 +1,30 @@
 
 clc;
 clear;
-NUM = 1;
+NUM = 2;
 % clear('arrayLabelDetect','arrayLabelTrue','fileLable','R{2}.model', 'R{2}.stats','post','arrayLL','arrayLabel','arrayLL_old','ll', 'label','net','net2','tr','distanseKox','newLableMapKohonen','newLableMapKohonenNormal','distanseKoxNew','lableMinDistanse','res');   
 
 %% about
 %   классификация арабских цифр с помощью HCRF library
 %% init
 load sampleData;
-load initDataTransHMMtoHCRF
+%load initDataTransHMMtoHCRF
 %paramsData.weightsPerSequence = ones(1,512);
 %paramsData.factorSeqWeights = 1;
 R{2}.params = paramsNodHCRF;
-R{2}.params.nbHiddenStates = 7;
+R{2}.params.nbHiddenStates = 5;
 R{2}.params.modelType = 'hcrf';
 R{2}.params.GaussianHCRF = 0;
 R{2}.params.windowRecSize = 0;
 R{2}.params.windowSize = 0;
-R{2}.params.optimizer = 'cg';
+R{2}.params.optimizer = 'bfgs';
 R{2}.params.regFactorL2 = 1;
 R{2}.params.regFactorL1 = 0;
 %R{2}.params.initWeights = initDataTransHMMtoHCRF;
 %% train
 %net2 = arabic_digit_hcrf_train_koh(R);
 %load dataTrainArabicDigitModul;
-dataTrainArabicDigit = getTrainData(NUM);
+dataTrainArabicDigit = getTestDataOnTest(NUM);
 
 
 %clustering(dataTrainArabicDigit);
@@ -128,7 +128,7 @@ clear('ll','label','arrayLL','arrayLL_old');
 %          dataTestArabicDigit{i,j} = abs(dataTestArabicDigit{i,j}); 
 %       end;
 %  end;
-dataTestArabicDigit = getTestDataOnTest(NUM);
+dataTestArabicDigit = getTrainData(NUM);
 
 
 [ll label] = arabic_digit_hcrf_gibrid_test(dataTestArabicDigit,NUM);
