@@ -29,9 +29,9 @@ end;
 if USETRAIN == 1
 k_1 = 1;
 k_2 = 1;
-row = 32;
-col = 32;
-epohs = 200;
+row = 10;
+col = 10;
+epohs = 10;
 dataTrainForClass = cell(size(dataTrainRaw,1),1);
 for i=1:size(dataTrain,1)  
     u = size(dataTrain{i},2);

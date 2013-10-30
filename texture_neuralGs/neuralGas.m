@@ -9,123 +9,81 @@ if isOpen
 end;
 matlabpool open local 12;
 load sampleData;
-
+dataTrainRaw = cell(1,1);
+dataTest = cell(1,1);
 %load initDataTransHMMtoHCRF
 %paramsData.weightsPerSequence = ones(1,128) ;
 %paramsData.factorSeqWeights = 1;
-Im = imread('texture/test.jpg');
-window = 10;
-RawTest = cell(1,1);
+Im = imread('texture/test.png');
+
+window = 20;
+windowLocal = 50;
+NewSizeX = fix(size(Im,1)/window)*window;
+NewSizeY = fix(size(Im,2)/window)*window;
+Im = Im(1:NewSizeX,1:NewSizeY,:);
 
 th = 1;
 i = 1;
 j = 1;
 countX = 0;
 countY = 0;
-while i < size(Im,1)-window
+bX = 0;
+bY = 0;
+while bX <= size(Im,1)-window
     bX = i;
-    eX = i+window;
+    eX = i+window-1;
     
-    while j <size(Im,2)-window 
+    while bY <= size(Im,2)-window
         if countX == 0
             countY = countY + 1;
         end;
         bY = j;        
-        eY = j+window;
-        TempTest = Im(bX:eX,bY:eY,:);
-        SP1 = fft2(TempTest(:,:,1)); 
-        SP1a = abs(SP1);
-        SP2 = fft2(TempTest(:,:,2)); 
-        SP2a = abs(SP2);
-        SP3 = fft2(TempTest(:,:,3)); 
-        SP3a = abs(SP3);
-%           SP1a = TempTest(:,:,1);
-%           SP2a = TempTest(:,:,2);
-%           SP3a = TempTest(:,:,3);
-        h = 1;
-        for ii=1:size(SP1a,1)
-            for jj=1:size(SP1a,2)
-                classT(1, h) =  SP1a(ii,jj);
-                classT(2, h) =  SP2a(ii,jj);
-                classT(3, h) =  SP3a(ii,jj);
-                h =  h+1;
-            end;
-        end;
-        RawTest(1,th) = {classT};
+        eY = j+window-1;
+        TestIm = Im(bX:eX,bY:eY,:);
+        RawTest = razbienie(10,TestIm);    
+        dataTest(1,th) = {RawTest'};
         th = th +1;        
         j = j+window;    
     end; 
     countX = countX + 1;
     j= 1;
+    bY = 0;
     i = i+window;    
 end;
 
-Im = imread('texture/road1.jpg');
-Im = Im(1:10,1:10,:);
-SP1 = fft2(Im(:,:,1)); 
-SP1a = abs(SP1);
-SP2 = fft2(Im(:,:,2)); 
-SP2a = abs(SP2);
-SP3 = fft2(Im(:,:,3)); 
-SP3a = abs(SP3);
-% SP1a = Im(:,:,1);
-% SP2a = Im(:,:,2);
-% SP3a = Im(:,:,3);
-th = 1;
-for i=1:size(SP1a,1)
-    for j=1:size(SP1a,2)
-        class1T(1,th) =  SP1a(i,j);
-        class1T(2,th) =  SP2a(i,j);
-        class1T(3,th) =  SP3a(i,j);
-        th = th+1;
-    end;
+for i =1:5
+filename = sprintf('texture\\road%01d.png', i);
+Im = imread(filename);
+NewSizeX = fix(size(Im,1)/windowLocal)*windowLocal;
+NewSizeY = fix(size(Im,2)/windowLocal)*windowLocal;
+Im = Im(1:NewSizeX,1:NewSizeY,:);
+RawTest = razbienie(windowLocal,Im);
+dataTrainRaw(1,i) = {RawTest'};
 end;
 
-Im = imread('texture/les1.jpg');
-Im = Im(1:10,1:10,:);
-SP1 = fft2(Im(:,:,1)); 
-SP1a = abs(SP1);
-SP2 = fft2(Im(:,:,2)); 
-SP2a = abs(SP2);
-SP3 = fft2(Im(:,:,3)); 
-SP3a = abs(SP3);
-% SP1a = Im(:,:,1);
-% SP2a = Im(:,:,2);
-% SP3a = Im(:,:,3);
-th = 1;
-for i=1:size(SP1a,1)
-    for j=1:size(SP1a,2)
-        class2T(1,th) =  SP1a(i,j);
-        class2T(2,th) =  SP2a(i,j);
-        class2T(3,th) =  SP3a(i,j);
-        th = th+1;
-    end;
+for i =1:5
+filename = sprintf('texture\\ground%01d.png', i);
+Im = imread(filename);
+NewSizeX = fix(size(Im,1)/windowLocal)*windowLocal;
+NewSizeY = fix(size(Im,2)/windowLocal)*windowLocal;
+Im = Im(1:NewSizeX,1:NewSizeY,:);
+RawTest = razbienie(windowLocal,Im);
+dataTrainRaw(2,i) = {RawTest'};
 end;
 
-Im = imread('texture/ground1.jpg');
-Im = Im(1:10,1:10,:);
-SP1 = fft2(Im(:,:,1)); 
-SP1a = abs(SP1);
-SP2 = fft2(Im(:,:,2)); 
-SP2a = abs(SP2);
-SP3 = fft2(Im(:,:,3)); 
-SP3a = abs(SP3);
-% SP1a = Im(:,:,1);
-% SP2a = Im(:,:,2);
-% SP3a = Im(:,:,3);
-th = 1;
-for i=1:size(SP1a,1)
-    for j=1:size(SP1a,2)
-        class3T(1,th) =  SP1a(i,j);
-        class3T(2,th) =  SP2a(i,j);
-        class3T(3,th) =  SP3a(i,j);
-        th = th+1;
-    end;
+
+for i =1:5
+filename = sprintf('texture\\les%01d.png', i);
+Im = imread(filename);
+NewSizeX = fix(size(Im,1)/windowLocal)*windowLocal;
+NewSizeY = fix(size(Im,2)/windowLocal)*windowLocal;
+Im = Im(1:NewSizeX,1:NewSizeY,:);
+RawTest = razbienie(windowLocal,Im);
+dataTrainRaw(3,i) = {RawTest'};
 end;
-dataTrainRaw = cell(3,1);
-dataTrainRaw(1,1) = {class1T};
-dataTrainRaw(2,1) = {class2T};
-dataTrainRaw(3,1) = {class3T};
+
+
+
 
 k = 1;
 %dataTrainRaw = getTestDataOnTest(2);
@@ -137,15 +95,15 @@ for i=1:size(dataTrainRaw,1)
     end;
 end;
 %dataTest =  getTrainData(2);
-dataTest = RawTest;
+
 if 1 == 1
 CountNet = [10 12];
 %% обучаем карты Кохонена для каждого класса 
 if USETRAIN == 1
 k_1 = 1;
 k_2 = 1;
-countNeuron = 999999999999;
-epohs = 100;
+countNeuron = 4;
+epohs = 80;
 dataTrainForClass = cell(size(dataTrainRaw,1),1);
 for i=1:size(dataTrain,1)  
     u = size(dataTrain{i},2);
@@ -170,14 +128,10 @@ save('modelNeuronGas.mat', 'cellNetGas','-v7.3');
 end;
 %%
 load modelNeuronGas;
-mM = 0;
 loglistINDEX = 0;
-while mM < size(cellNetGas{1}.traceData,2)
-  mM = mM+NUMBERPROPUSK;
-  if mM > size(cellNetGas{1}.traceData,2)
-     break; 
-  end
-  loglistINDEX = loglistINDEX +1;
+
+
+
   clear('Probability','arrayLL','arrayLabelDetect','arrayLabelTrue');
 % %% вычисляем матрицу B (матрицу выходов) для каждого класса
 % outputs = sim(net_class1,dataTrain_class1);
@@ -205,9 +159,11 @@ while mM < size(cellNetGas{1}.traceData,2)
 % weights_class1 = net_class1.iw{1,1};
 % weights_class2 = net_class2.iw{1,1};
 Probability = cell(size(cellNetGas,1),1);
-parfor i=1:size(cellNetGas,1);
+
+for i=1:size(cellNetGas,1);
     t = cellNetGas{i};
-    w = t.traceData{1,mM}.M;
+    ry = size(t.traceData,2);
+    w = t.traceData{1,ry}.M;
     sizeW = size(w,1);
     Probability{i}.A = repmat(0,sizeW,sizeW);
     Probability{i}.At = repmat(0,sizeW,1);
@@ -221,7 +177,8 @@ for i=1:size(dataTrainRaw,1)
         %for k=1:size(dataTrainRaw{i,j},2)-1            
             %w= cellNetGas{i}.codeBook;
             t = cellNetGas{i};
-            w = t.traceData{1,mM}.M;
+            ry = size(t.traceData,2);
+            w = t.traceData{1,ry}.M;
             p = dataTrainRaw{i,j};
             [S,R11] = size(w);
             [R2,Q] = size(p);
@@ -229,7 +186,9 @@ for i=1:size(dataTrainRaw,1)
             w = w';
             copies = zeros(1,Q);
             for ii=1:S
-             z(ii,:) = sum((w(:,ii+copies)-p).^2,1);
+            % z(ii,:) = sum((w(:,ii+copies)-p).^2,1);
+                d = w(:,ii+copies)-p;
+                z(ii,:) = sum(d,1)./size(d,1);
             end;
             z = -z.^0.5;
             n= z;
@@ -302,7 +261,6 @@ if SAVELOGLIKEFORGIBRID == 1
     arrayLogLikDataSetTest = cell(1,1);
 end;
 index = 1;
-sizeMap = size(t.traceData{1,mM}.M,1)
 for i = 1:size(dataTest,1)
   for j = 1:size(dataTest,2)
     if SAVELOGLIKEFORGIBRID == 0
@@ -310,7 +268,8 @@ for i = 1:size(dataTest,1)
            %w= cellNetGas{m}.codeBook;
             t = cellNetGas{i};
              p = dataTest{i,j};
-            w = t.traceData{1,mM}.M;
+             ry = size(t.traceData,2);
+            w = t.traceData{1,ry}.M;
             [S,R11] = size(w);
             [R2,Q] = size(p);
             z = zeros(S,Q);
@@ -343,105 +302,12 @@ for i = 1:size(dataTest,1)
            arrayLL(index,m) = logp;       
         end;
         index = index + 1;
-    end;
-    if SAVELOGLIKEFORGIBRID == 1
-        for m = 1:size(cellNetGas,1)
-           %w= cellNetGas{m}.codeBook;
-            t = cellNetGas{i};
-             p = dataTest{i,j};
-            w = t.traceData{1,mM}.M;
-            [S,R11] = size(w);
-            [R2,Q] = size(p);
-            z = zeros(S,Q);
-            w = w';       
-
-           copies = zeros(1,Q);
-           for ii=1:S
-             z(ii,:) = sum((w(:,ii+copies)-p).^2,1);
-           end;
-           z = -z.^0.5;
-           n= z;
-           [maxn,rows] = max(n,[],1);
-           [logB scale] = normalizeLogspace(n');
-           B = exp(logB');
-           pi = repmat(5,1,size(w',1));
-           pi(1,rows(1,1)) = 10;
-           pi = normalizeLogspace(pi);
-           pi = exp(pi);
-           A =  Probability{m}.A;
-           seplogp = 0;
-           [logp alfa seplogp] = sumproduct(pi, A, B);      
-           te = 0;
-           te = seplogp;% + scale;
-           s = sum(te);
-           s1 = sum(seplogp) + sum(scale);
-           feature(m,1:size(te,1)) = te';
-           logp = logp + sum(scale);  
-        end;
-       arrayLogLikDataSetTest{i,j} = feature;
-       feature = 0;
-       index = index + 1;
-    end;
-  end;
-end;
-if SAVELOGLIKEFORGIBRID == 1
-    save('arrayLogLikDataSetTest.mat', 'arrayLogLikDataSetTest','-v7.3');
-    fprintf('Stop');
-end;
-
-if SAVELOGLIKEFORGIBRID == 1
-    arrayLogLikDataSetTrain = cell(1,1);
-end;
-
-index = 1;
-
-if SAVELOGLIKEFORGIBRID == 1
-  for i = 1:size(dataTrainRaw,1)
-    for j = 1:size(dataTrainRaw,2)
-       for m = 1:size(cellNetGas,1)
-           %w= cellNetGas{m}.codeBook;
-            t = cellNetGas{i};
-             p = dataTrainRaw{i,j};
-            w = t.traceData{1,mM}.M;
-            [S,R11] = size(w);
-            [R2,Q] = size(p);
-            z = zeros(S,Q);
-            w = w';       
-
-           copies = zeros(1,Q);
-           for ii=1:S
-             z(ii,:) = sum((w(:,ii+copies)-p).^2,1);
-           end;
-           z = -z.^0.5;
-           n= z;
-           [maxn,rows] = max(n,[],1);
-           [logB scale] = normalizeLogspace(n');
-           B = exp(logB');
-           pi = repmat(5,1,size(w',1));
-           pi(1,rows(1,1)) = 10;
-           pi = normalizeLogspace(pi);
-           pi = exp(pi);
-           A =  Probability{m}.A;
-           seplogp = 0;
-           [logp alfa seplogp] = sumproduct(pi, A, B);      
-           te = 0;
-           te = seplogp;% + scale;
-           s = sum(te);
-           s1 = sum(seplogp) + sum(scale);
-           feature(m,1:size(te,1)) = te';
-           logp = logp + sum(scale);  
-        end;
-       arrayLogLikDataSetTrain{i,j} = feature;
-       feature = 0;
-       index = index + 1; 
-    end;
+    end;  
   end;
 end;
 
-if SAVELOGLIKEFORGIBRID == 1
-    save('arrayLogLikDataSetTrain.mat', 'arrayLogLikDataSetTrain','-v7.3');
-    fprintf('Stop');
-end;
+
+
 
 %arrayLL = exp(normalizeLogspace(arrayLL));
 arrayLL = arrayLL';
@@ -454,17 +320,18 @@ j = 1;
 t = 1;
 while i <= countX*(window)
     bX = i;
-    eX = i+window;
+    eX = i+window-1;
     while j <= countY*(window)
         bY = j;
-        eY = j+window;
-        arrayAnswer(bX:eX,bY:eY) = repmat(arrayLabelDetect(1,t),window+1,window+1);
+        eY = j+window-1;
+        arrayAnswer(bX:eX,bY:eY) = repmat(arrayLabelDetect(1,t),window,window);
         t = t + 1;
         j = j + window;
     end;
     j = 1;
     i = i + window;
 end;
+arrayAnswer  = flipdim(arrayAnswer,1);
 % for i =1:size(labelTest,1)
 %     for j=1:size(labelTest,2)
 %      arrayLabelTrue(1,(i-1)*size(labelTest,2)+j) = labelTest{i,j}(1,1); 
@@ -474,7 +341,7 @@ end;
 
 loglist(loglistINDEX) = {arrayLL};
 
-end;
+
 save('loglist.mat', 'loglist','-v7.3');
 end;
 load loglist

@@ -250,7 +250,8 @@ function [bmu1,bmu2,error_bmu1,error_bmu2] = get_bmus(M,x,COSINE)
           %cosine distance
           if (sum(x)>0)
               onesM = ones(size(M,1),1);
-              xNorm = sqrt(x*x');
+              %xNorm = sqrt(x*x');
+              xNorm = sum(x)/size(x);
               result = mod_distance(acos(sum((M.*x(onesM,:)),2)./(sqrt(sum(M.^2,2)).*xNorm)));
           else
               result = 0;
