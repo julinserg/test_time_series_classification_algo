@@ -1,5 +1,5 @@
 function [D] = getTrainData(NUMBER)
-SELECTDATASET = 3;
+SELECTDATASET = 2;
 if SELECTDATASET == 1
 %% arabic digit
  load dataTrainArabicDigit;

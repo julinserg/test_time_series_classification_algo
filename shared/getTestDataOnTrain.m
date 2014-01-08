@@ -1,5 +1,5 @@
 function [D] = getTestDataOnTrain(NUMBER)
-SELECTDATASET = 3;
+SELECTDATASET = 2;
 if SELECTDATASET == 1
 %% arabic digit
  load dataTrainArabicDigit;
@@ -41,7 +41,7 @@ end;
 D = mixoutNew(1:20,1:50);
 D(1:20,51:100) = mixoutNew(21:40,1:50);
 if NUMBER == 1
-   D = D(1:20,1:20);
+   D = D(1:20,51:55);
 end;
 if NUMBER == 2
    D = D(:,11:20);
