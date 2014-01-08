@@ -1,5 +1,5 @@
 function [D] = getTestDataOnTrain(NUMBER)
-SELECTDATASET = 2;
+SELECTDATASET = 3;
 if SELECTDATASET == 1
 %% arabic digit
  load dataTrainArabicDigit;
@@ -59,3 +59,12 @@ if NUMBER == 6
     D  = D(:,51:60);
 end;
 end;
+
+if SELECTDATASET == 3
+    load dataTrainTexture;
+    D = dataTrainTexture;
+    if NUMBER == 1
+        D = D(1:1,1:1);
+    end;
+end;
+
