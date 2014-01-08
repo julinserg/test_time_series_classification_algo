@@ -4,10 +4,10 @@ NUMBERPROPUSK =98;
 USETRAIN = 1
 SAVELOGLIKEFORGIBRID = 0
 isOpen = matlabpool('size') > 0;
-if isOpen
-   matlabpool close; 
-end;
-matlabpool open local 12;
+% if isOpen
+%    matlabpool close; 
+% end;
+%matlabpool open local 12;
 load sampleData;
 dataTrainRaw = cell(1,1);
 dataTest = cell(1,1);
@@ -16,8 +16,8 @@ dataTest = cell(1,1);
 %paramsData.factorSeqWeights = 1;
 Im = imread('texture/test.png');
 
-window = 20;
-windowLocal = 50;
+window = 10;
+%windowLocal = 50;
 NewSizeX = fix(size(Im,1)/window)*window;
 NewSizeY = fix(size(Im,2)/window)*window;
 Im = Im(1:NewSizeX,1:NewSizeY,:);
@@ -40,8 +40,20 @@ while bX <= size(Im,1)-window
         bY = j;        
         eY = j+window-1;
         TestIm = Im(bX:eX,bY:eY,:);
-        RawTest = razbienie(10,TestIm);    
-        dataTest(1,th) = {RawTest'};
+        
+        angle = 0;
+        index = 1;
+        mapping=getmaplbphf(8);
+        while angle <= 270
+            ImLocal=imrotate(TestIm,angle);
+            h=lbp(ImLocal,1,8,mapping,'h');
+            h=h/sum(h);
+            histograms(index,:)=h;    
+            index = index + 1;
+            angle = angle + 30;
+        end;        
+        lbp_hf_features=constructhf(histograms,mapping);   
+        dataTest(1,th) = {lbp_hf_features'};
         th = th +1;        
         j = j+window;    
     end; 
@@ -51,37 +63,90 @@ while bX <= size(Im,1)-window
     i = i+window;    
 end;
 
+% for i =1:5
+% filename = sprintf('texture\\road%01d.png', i);
+% Im = imread(filename);
+% NewSizeX = fix(size(Im,1)/windowLocal)*windowLocal;
+% NewSizeY = fix(size(Im,2)/windowLocal)*windowLocal;
+% Im = Im(1:NewSizeX,1:NewSizeY,:);
+% RawTest = razbienie(windowLocal,Im);
+% dataTrainRaw(1,i) = {RawTest'};
+% end;
+% 
+% for i =1:5
+% filename = sprintf('texture\\ground%01d.png', i);
+% Im = imread(filename);
+% NewSizeX = fix(size(Im,1)/windowLocal)*windowLocal;
+% NewSizeY = fix(size(Im,2)/windowLocal)*windowLocal;
+% Im = Im(1:NewSizeX,1:NewSizeY,:);
+% RawTest = razbienie(windowLocal,Im);
+% dataTrainRaw(2,i) = {RawTest'};
+% end;
+% 
+% 
+% for i =1:5
+% filename = sprintf('texture\\les%01d.png', i);
+% Im = imread(filename);
+% NewSizeX = fix(size(Im,1)/windowLocal)*windowLocal;
+% NewSizeY = fix(size(Im,2)/windowLocal)*windowLocal;
+% Im = Im(1:NewSizeX,1:NewSizeY,:);
+% RawTest = razbienie(windowLocal,Im);
+% dataTrainRaw(3,i) = {RawTest'};
+% end;
 for i =1:5
 filename = sprintf('texture\\road%01d.png', i);
 Im = imread(filename);
-NewSizeX = fix(size(Im,1)/windowLocal)*windowLocal;
-NewSizeY = fix(size(Im,2)/windowLocal)*windowLocal;
-Im = Im(1:NewSizeX,1:NewSizeY,:);
-RawTest = razbienie(windowLocal,Im);
-dataTrainRaw(1,i) = {RawTest'};
+angle = 0;
+index = 1;
+mapping=getmaplbphf(8);
+while angle <= 270
+    ImLocal=imrotate(Im,angle);
+    h=lbp(ImLocal,1,8,mapping,'h');
+    h=h/sum(h);
+    histograms(index,:)=h;    
+    index = index + 1;
+    angle = angle + 30;
+end;        
+lbp_hf_features=constructhf(histograms,mapping); 
+dataTrainRaw(1,i) = {lbp_hf_features'};
 end;
 
 for i =1:5
 filename = sprintf('texture\\ground%01d.png', i);
 Im = imread(filename);
-NewSizeX = fix(size(Im,1)/windowLocal)*windowLocal;
-NewSizeY = fix(size(Im,2)/windowLocal)*windowLocal;
-Im = Im(1:NewSizeX,1:NewSizeY,:);
-RawTest = razbienie(windowLocal,Im);
-dataTrainRaw(2,i) = {RawTest'};
+angle = 0;
+index = 1;
+mapping=getmaplbphf(8);
+while angle <= 270
+    ImLocal=imrotate(Im,angle);
+    h=lbp(ImLocal,1,8,mapping,'h');
+    h=h/sum(h);
+    histograms(index,:)=h;    
+    index = index + 1;
+    angle = angle + 30;
+end;        
+lbp_hf_features=constructhf(histograms,mapping); 
+dataTrainRaw(2,i) = {lbp_hf_features'};
 end;
 
 
 for i =1:5
 filename = sprintf('texture\\les%01d.png', i);
 Im = imread(filename);
-NewSizeX = fix(size(Im,1)/windowLocal)*windowLocal;
-NewSizeY = fix(size(Im,2)/windowLocal)*windowLocal;
-Im = Im(1:NewSizeX,1:NewSizeY,:);
-RawTest = razbienie(windowLocal,Im);
-dataTrainRaw(3,i) = {RawTest'};
+angle = 0;
+index = 1;
+mapping=getmaplbphf(8);
+while angle <= 270
+    ImLocal=imrotate(Im,angle);
+    h=lbp(ImLocal,1,8,mapping,'h');
+    h=h/sum(h);
+    histograms(index,:)=h;    
+    index = index + 1;
+    angle = angle + 30;
+end;        
+lbp_hf_features=constructhf(histograms,mapping); 
+dataTrainRaw(3,i) = {lbp_hf_features'};
 end;
-
 
 
 
@@ -102,8 +167,8 @@ CountNet = [10 12];
 if USETRAIN == 1
 k_1 = 1;
 k_2 = 1;
-countNeuron = 4;
-epohs = 80;
+countNeuron = 99999;
+epohs = 10;
 dataTrainForClass = cell(size(dataTrainRaw,1),1);
 for i=1:size(dataTrain,1)  
     u = size(dataTrain{i},2);
@@ -115,7 +180,7 @@ end;
 cellNetGas = cell(size(dataTrainRaw,1),1);
 errorNeuralGas = cell(size(dataTrainRaw,1),1);
 
-parfor i=1:size(dataTrainForClass,1)
+for i=1:size(dataTrainForClass,1)
   D = dataTrainForClass{i};
   netGas = gngExt(D',countNeuron,epohs);
 %   for kk=1:size(netGas.traceData)
@@ -186,11 +251,12 @@ for i=1:size(dataTrainRaw,1)
             w = w';
             copies = zeros(1,Q);
             for ii=1:S
-            % z(ii,:) = sum((w(:,ii+copies)-p).^2,1);
-                d = w(:,ii+copies)-p;
-                z(ii,:) = sum(d,1)./size(d,1);
+             z(ii,:) = sum((w(:,ii+copies)-p).^2,1);
+               % d = w(:,ii+copies)-p;
+               % z(ii,:) =  sum(abs(d),1);
             end;
             z = -z.^0.5;
+            %z = -z;
             n= z;
             [maxn,rows] = max(n,[],1);
             array = rows;
@@ -266,7 +332,7 @@ for i = 1:size(dataTest,1)
     if SAVELOGLIKEFORGIBRID == 0
         for m = 1:size(cellNetGas,1)
            %w= cellNetGas{m}.codeBook;
-            t = cellNetGas{i};
+            t = cellNetGas{m};
              p = dataTest{i,j};
              ry = size(t.traceData,2);
             w = t.traceData{1,ry}.M;
@@ -277,13 +343,18 @@ for i = 1:size(dataTest,1)
 
            copies = zeros(1,Q);
            for ii=1:S
-             z(ii,:) = sum((w(:,ii+copies)-p).^2,1);
+             z(ii,:) = sum((w(:,ii+copies)-p).^2,1);              
+            % d = w(:,ii+copies)-p;
+            % z(ii,:) =  sum(abs(d),1);
            end;
            z = -z.^0.5;
+           %z = -z;
            n= z;
            [maxn,rows] = max(n,[],1);
            [logB scale] = normalizeLogspace(n');
            B = exp(logB');
+          %[logB scale] = normalize(n');
+          %B = logB';
            pi = repmat(5,1,size(w',1));
            pi(1,rows(1,1)) = 10;
            pi = normalizeLogspace(pi);

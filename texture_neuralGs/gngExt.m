@@ -122,7 +122,7 @@ while (epochs<MAX_TRAIN_LEN)
       index = h>0;
     
       Dx = M(index,:) - x(ones(sum(index),1),:);                      % each map unit minus the vector
-      M(index,:) = double(M(index,:)) - double(h(index,ones(size(x,2),1))).*double(Dx);
+      M(index,:) = M(index,:) - h(index,ones(size(x,2),1)).*Dx;
       
       [error,bmu1stError] = max(qerrTotalUnits);
       
@@ -243,15 +243,12 @@ function [bmu1,bmu2,error_bmu1,error_bmu2] = get_bmus(M,x,COSINE)
     if COSINE == 0
           %euclidean distance
           Dx = M - x(ones(size(M,1),1),:);     % each map unit minus the vector
-          XX = (Dx.^2);
-          YY = ones(size(M,2),1);
-          result = double(XX)*double(YY);
+          result = (Dx.^2)*ones(size(M,2),1);
     else
           %cosine distance
           if (sum(x)>0)
               onesM = ones(size(M,1),1);
-              %xNorm = sqrt(x*x');
-              xNorm = sum(x)/size(x);
+              xNorm = sqrt(x*x');
               result = mod_distance(acos(sum((M.*x(onesM,:)),2)./(sqrt(sum(M.^2,2)).*xNorm)));
           else
               result = 0;

@@ -1,4 +1,4 @@
-function featurevectors=constructhf(inputvectors, map)
+function [featurevectors, MyFeatureVector]=constructhf(inputvectors, map)
 %construct rotation invariant features from uniform LBP histogram
 %inputvectors: NxD array, N histograms of D bins each
 %map: mapping struct from getmaphf
@@ -19,13 +19,14 @@ function featurevectors=constructhf(inputvectors, map)
 %histogram Fourier feature vectors of rice.png and 
 %its rotated version (with LBP radius 1 and 8 sampling 
 %points)
-
+   
 
     n=map.samples;
     FVLEN=(n-1)*(floor(n/2)+1)+3;
     featurevectors=zeros(size(inputvectors,1),FVLEN);
     
     k=1;
+    t = 1;
     for j=1:length(map.orbits)
         b=inputvectors(:,map.orbits{j}+1);
         if(size(b,2) > 1)
@@ -33,6 +34,11 @@ function featurevectors=constructhf(inputvectors, map)
             b=abs(b);
             b=b(:,1:(floor(size(b,2)/2)+1));
         end
+        if size(b,2) > 1
+            MyFeatureVector(t,:) = b(1,:);
+            t = t + 1;            
+        end;
         featurevectors(:,k:k+size(b,2)-1)=b;
         k=k+size(b,2);
+        
     end

@@ -1,11 +1,14 @@
+clc;
+clear;
 Im = imread('texture/test.png');
 
 window = 15;
 NewSizeX = fix(size(Im,1)/window)*window;
 NewSizeY = fix(size(Im,2)/window)*window;
-Im = imrotate(Im,180);
 Im = Im(1:NewSizeX,1:NewSizeY,:);
-
+testIm = Im;
+radius = 1;
+samples = 8;
 th = 1;
 i = 1;
 j = 1;
@@ -25,11 +28,11 @@ while bX <= size(Im,1)-window
         eY = j+window-1;
         TestIm = Im(bX:eX,bY:eY,:);        
         TestIm2=imrotate(TestIm,90);
-        mapping=getmaplbphf(8);
-        h=lbp(TestIm,1,8,mapping,'h');
+        mapping=getmaplbphf(samples);
+        h=lbp(TestIm,radius,samples,mapping,'h');
         h=h/sum(h);
         histograms(1,:)=h;
-        h=lbp(TestIm2,1,8,mapping,'h');
+        h=lbp(TestIm2,radius,samples,mapping,'h');
         h=h/sum(h);
         histograms(2,:)=h;
         lbp_hf_features=constructhf(histograms,mapping);
@@ -48,11 +51,11 @@ for i =1:5
 filename = sprintf('texture\\sground%01d.png', i);
 Im = imread(filename);
 Im2=imrotate(Im,90);
-mapping=getmaplbphf(8);
-h=lbp(Im,1,8,mapping,'h');
+mapping=getmaplbphf(samples);
+h=lbp(Im,radius,samples,mapping,'h');
 h=h/sum(h);
 histograms(1,:)=h;
-h=lbp(Im2,1,8,mapping,'h');
+h=lbp(Im2,radius,samples,mapping,'h');
 h=h/sum(h);
 histograms(2,:)=h;
 lbp_hf_features=constructhf(histograms,mapping);
@@ -63,11 +66,11 @@ for i =1:5
 filename = sprintf('texture\\ground%01d.png', i);
 Im = imread(filename);
 Im2=imrotate(Im,90);
-mapping=getmaplbphf(8);
-h=lbp(Im,1,8,mapping,'h');
+mapping=getmaplbphf(samples);
+h=lbp(Im,radius,samples,mapping,'h');
 h=h/sum(h);
 histograms(1,:)=h;
-h=lbp(Im2,1,8,mapping,'h');
+h=lbp(Im2,radius,samples,mapping,'h');
 h=h/sum(h);
 histograms(2,:)=h;
 lbp_hf_features=constructhf(histograms,mapping);
@@ -79,11 +82,11 @@ for i =1:5
 filename = sprintf('texture\\les%01d.png', i);
 Im = imread(filename);
 Im2=imrotate(Im,90);
-mapping=getmaplbphf(8);
-h=lbp(Im,1,8,mapping,'h');
+mapping=getmaplbphf(samples);
+h=lbp(Im,radius,samples,mapping,'h');
 h=h/sum(h);
 histograms(1,:)=h;
-h=lbp(Im2,1,8,mapping,'h');
+h=lbp(Im2,radius,samples,mapping,'h');
 h=h/sum(h);
 histograms(2,:)=h;
 lbp_hf_features=constructhf(histograms,mapping);
@@ -111,4 +114,31 @@ while i <= countX*(window)
     j = 1;
     i = i + window;
 end;
-arrayAnswer  = flipdim(arrayAnswer,2);
+arrayAnswer  = flipdim(arrayAnswer,1);
+image(testIm);
+hold on
+for i=1:size(testIm,1)
+    for j=1:size(testIm,2)
+        if arrayAnswer(i,j) == 0
+            testIm(i,j,:) = [0 0 128];
+        end;
+        if arrayAnswer(i,j) == 1
+             testIm(i,j,:) = [0 255 0];
+        end;
+        if arrayAnswer(i,j) == 2
+             testIm(i,j,:) = [255 0 0];
+        end;
+    end;
+end;
+testIm  = flipdim(testIm,1);
+image(testIm);
+
+
+
+
+
+
+
+
+
+
