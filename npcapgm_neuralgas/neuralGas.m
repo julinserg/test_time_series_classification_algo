@@ -1,13 +1,13 @@
 clc;
 clear all;
 NUMBERPROPUSK =15;
-USETRAIN = 0
+USETRAIN = 1
 SAVELOGLIKEFORGIBRID = 0
 isOpen = matlabpool('size') > 0;
 if isOpen
    matlabpool close; 
 end;
-matlabpool open local 12;
+matlabpool open local 4;
 load sampleData;
 
 %load initDataTransHMMtoHCRF
@@ -31,7 +31,7 @@ if USETRAIN == 1
 k_1 = 1;
 k_2 = 1;
 countNeuron = 999999999999;
-epohs = 400;
+epohs = 150;
 dataTrainForClass = cell(size(dataTrainRaw,1),1);
 for i=1:size(dataTrain,1)  
     u = size(dataTrain{i},2);
@@ -194,7 +194,7 @@ for i = 1:size(dataTest,1)
     if SAVELOGLIKEFORGIBRID == 0
         for m = 1:size(cellNetGas,1)
            %w= cellNetGas{m}.codeBook;
-            t = cellNetGas{i};
+            t = cellNetGas{m};
              p = dataTest{i,j};
             w = t.traceData{1,mM}.M;
             [S,R11] = size(w);
@@ -230,44 +230,6 @@ for i = 1:size(dataTest,1)
         end;
         index = index + 1;
     end;
-    if SAVELOGLIKEFORGIBRID == 1
-        for m = 1:size(cellNetGas,1)
-           %w= cellNetGas{m}.codeBook;
-            t = cellNetGas{i};
-             p = dataTest{i,j};
-            w = t.traceData{1,mM}.M;
-            [S,R11] = size(w);
-            [R2,Q] = size(p);
-            z = zeros(S,Q);
-            w = w';       
-
-           copies = zeros(1,Q);
-           for ii=1:S
-             z(ii,:) = sum((w(:,ii+copies)-p).^2,1);
-           end;
-           z = -z.^0.5;
-           n= z;
-           [maxn,rows] = max(n,[],1);
-           [logB scale] = normalizeLogspace(n');
-           B = exp(logB');
-           pi = repmat(5,1,size(w',1));
-           pi(1,rows(1,1)) = 10;
-           pi = normalizeLogspace(pi);
-           pi = exp(pi);
-           A =  Probability{m}.A;
-           seplogp = 0;
-           [logp alfa seplogp] = sumproduct(pi, A, B);      
-           te = 0;
-           te = seplogp;% + scale;
-           s = sum(te);
-           s1 = sum(seplogp) + sum(scale);
-           feature(m,1:size(te,1)) = te';
-           logp = logp + sum(scale);  
-        end;
-       arrayLogLikDataSetTest{i,j} = feature;
-       feature = 0;
-       index = index + 1;
-    end;
   end;
 end;
 if SAVELOGLIKEFORGIBRID == 1
@@ -281,53 +243,8 @@ end;
 
 index = 1;
 
-if SAVELOGLIKEFORGIBRID == 1
-  for i = 1:size(dataTrainRaw,1)
-    for j = 1:size(dataTrainRaw,2)
-       for m = 1:size(cellNetGas,1)
-           %w= cellNetGas{m}.codeBook;
-            t = cellNetGas{i};
-             p = dataTrainRaw{i,j};
-            w = t.traceData{1,mM}.M;
-            [S,R11] = size(w);
-            [R2,Q] = size(p);
-            z = zeros(S,Q);
-            w = w';       
 
-           copies = zeros(1,Q);
-           for ii=1:S
-             z(ii,:) = sum((w(:,ii+copies)-p).^2,1);
-           end;
-           z = -z.^0.5;
-           n= z;
-           [maxn,rows] = max(n,[],1);
-           [logB scale] = normalizeLogspace(n');
-           B = exp(logB');
-           pi = repmat(5,1,size(w',1));
-           pi(1,rows(1,1)) = 10;
-           pi = normalizeLogspace(pi);
-           pi = exp(pi);
-           A =  Probability{m}.A;
-           seplogp = 0;
-           [logp alfa seplogp] = sumproduct(pi, A, B);      
-           te = 0;
-           te = seplogp;% + scale;
-           s = sum(te);
-           s1 = sum(seplogp) + sum(scale);
-           feature(m,1:size(te,1)) = te';
-           logp = logp + sum(scale);  
-        end;
-       arrayLogLikDataSetTrain{i,j} = feature;
-       feature = 0;
-       index = index + 1; 
-    end;
-  end;
-end;
 
-if SAVELOGLIKEFORGIBRID == 1
-    save('arrayLogLikDataSetTrain.mat', 'arrayLogLikDataSetTrain','-v7.3');
-    fprintf('Stop');
-end;
 
 %arrayLL = exp(normalizeLogspace(arrayLL));
 arrayLL = arrayLL';
@@ -340,9 +257,9 @@ for i =1:size(labelTest,1)
      arrayLabelTrue(1,(i-1)*size(labelTest,2)+j) = labelTest{i,j}(1,1); 
     end;
 end;
-calculateQuality(arrayLabelDetect,arrayLabelTrue,size(arrayLL,1));
+[aver prec fmera]= calculateQuality(arrayLabelDetect,arrayLabelTrue,size(arrayLL,1));
 
-loglist(loglistINDEX) = {arrayLL};
+loglist(loglistINDEX) = fmera;
 
 end;
 save('loglist.mat', 'loglist','-v7.3');
@@ -356,10 +273,11 @@ NmodelI = length(loglist);
 globDifAllSeq = repmat(0,NclassI,length(loglist));
 b = 0;
 e = 0;
-for classI =1:NclassI
-    b = e + 1;
-    e = CountSeq*classI;
-    for modelI=1:NmodelI        
+for modelI=1:NmodelI   
+    
+      for classI=1:NclassI  
+          b = e + 1;
+          e = CountSeq*classI;
         for dataSeqI=b:e        
             sumAllLogLike = 0;
 
@@ -370,10 +288,9 @@ for classI =1:NclassI
             val = exp(loglist{modelI}(classI,dataSeqI));
             logSum = log(sumAllLogLike);
             difAllLogLike = log(val/ sumAllLogLike);
-
+         globDifAllSeq(classI,modelI) =difAllLogLike; %globDifAllSeq(classI,modelI) + difAllLogLike; 
         end;
-        globDifAllSeq(classI,modelI) = globDifAllSeq(classI,modelI) + difAllLogLike; 
-    end;
+      end;   
 end;
 mmi = mean(globDifAllSeq,1);
 for i=1:size(mmi,2)-1

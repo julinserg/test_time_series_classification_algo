@@ -4,10 +4,10 @@ NUMBERPROPUSK =98;
 USETRAIN = 1
 SAVELOGLIKEFORGIBRID = 0
 isOpen = matlabpool('size') > 0;
-% if isOpen
-%    matlabpool close; 
-% end;
-%matlabpool open local 12;
+if isOpen
+   matlabpool close; 
+end;
+matlabpool open local 4;
 load sampleData;
 dataTrainRaw = cell(1,1);
 dataTest = cell(1,1);
@@ -16,52 +16,107 @@ dataTest = cell(1,1);
 %paramsData.factorSeqWeights = 1;
 Im = imread('texture/test.png');
 
-window = 10;
-%windowLocal = 50;
-NewSizeX = fix(size(Im,1)/window)*window;
-NewSizeY = fix(size(Im,2)/window)*window;
-Im = Im(1:NewSizeX,1:NewSizeY,:);
+Data_1_1 = importdata('TextureWavelet/train/1_1.txt', ' ', 1);
+Data_1_2 = importdata('TextureWavelet/train/1_2.txt', ' ', 1);
+Data_1_3 = importdata('TextureWavelet/train/1_3.txt', ' ', 1);
+Data_1_4 = importdata('TextureWavelet/train/1_4.txt', ' ', 1);
+Data_1_5 = importdata('TextureWavelet/train/1_5.txt', ' ', 1);
+Data_2_1 = importdata('TextureWavelet/train/2_1.txt', ' ', 1);
+Data_2_2 = importdata('TextureWavelet/train/2_2.txt', ' ', 1);
+Data_2_3 = importdata('TextureWavelet/train/2_3.txt', ' ', 1);
+Data_2_4 = importdata('TextureWavelet/train/2_4.txt', ' ', 1);
+Data_2_5 = importdata('TextureWavelet/train/2_5.txt', ' ', 1);
+Data_3_1 = importdata('TextureWavelet/train/3_1.txt', ' ', 1);
+Data_3_2 = importdata('TextureWavelet/train/3_2.txt', ' ', 1);
+Data_3_3 = importdata('TextureWavelet/train/3_3.txt', ' ', 1);
+Data_3_4 = importdata('TextureWavelet/train/3_4.txt', ' ', 1);
+Data_3_5 = importdata('TextureWavelet/train/3_5.txt', ' ', 1);
 
-th = 1;
-i = 1;
-j = 1;
-countX = 0;
-countY = 0;
-bX = 0;
-bY = 0;
-while bX <= size(Im,1)-window
-    bX = i;
-    eX = i+window-1;
-    
-    while bY <= size(Im,2)-window
-        if countX == 0
-            countY = countY + 1;
-        end;
-        bY = j;        
-        eY = j+window-1;
-        TestIm = Im(bX:eX,bY:eY,:);
-        
-        angle = 0;
-        index = 1;
-        mapping=getmaplbphf(8);
-        while angle <= 270
-            ImLocal=imrotate(TestIm,angle);
-            h=lbp(ImLocal,1,8,mapping,'h');
-            h=h/sum(h);
-            histograms(index,:)=h;    
-            index = index + 1;
-            angle = angle + 30;
-        end;        
-        lbp_hf_features=constructhf(histograms,mapping);   
-        dataTest(1,th) = {lbp_hf_features'};
-        th = th +1;        
-        j = j+window;    
-    end; 
-    countX = countX + 1;
-    j= 1;
-    bY = 0;
-    i = i+window;    
+N_class1 = size(Data_1_1.data,2);
+N_class2 = size(Data_2_1.data,2);
+N_class3 = size(Data_3_1.data,2);
+[Index_cl1] = Generate_Zigzag(N_class1);
+[Index_cl2] = Generate_Zigzag(N_class2);
+[Index_cl3] = Generate_Zigzag(N_class3);
+Index_cl1_1 = Index_cl1(1:100:end,:);
+Index_cl2_1 = Index_cl2(1:100:end,:);
+Index_cl3_1 = Index_cl3(1:100:end,:);
+for i=1:size(Index_cl1_1,1)
+    TrainCl1(1,i) = Data_1_1.data(Index_cl1_1(i,1),Index_cl1_1(i,2));
+    TrainCl1(2,i) = Data_1_2.data(Index_cl1_1(i,1),Index_cl1_1(i,2));
+    TrainCl1(3,i) = Data_1_3.data(Index_cl1_1(i,1),Index_cl1_1(i,2));
+    TrainCl1(4,i) = Data_1_4.data(Index_cl1_1(i,1),Index_cl1_1(i,2));
+    TrainCl1(5,i) = Data_1_5.data(Index_cl1_1(i,1),Index_cl1_1(i,2));
 end;
+for i=1:size(Index_cl2_1,1)
+    TrainCl2(1,i) = Data_2_1.data(Index_cl2_1(i,1),Index_cl2_1(i,2));
+    TrainCl2(2,i) = Data_2_2.data(Index_cl2_1(i,1),Index_cl2_1(i,2));
+    TrainCl2(3,i) = Data_2_3.data(Index_cl2_1(i,1),Index_cl2_1(i,2));
+    TrainCl2(4,i) = Data_2_4.data(Index_cl2_1(i,1),Index_cl2_1(i,2));
+    TrainCl2(5,i) = Data_2_5.data(Index_cl2_1(i,1),Index_cl2_1(i,2));
+end;
+for i=1:size(Index_cl3_1,1)
+    TrainCl3(1,i) = Data_2_1.data(Index_cl3_1(i,1),Index_cl3_1(i,2));
+    TrainCl3(2,i) = Data_2_2.data(Index_cl3_1(i,1),Index_cl3_1(i,2));
+    TrainCl3(3,i) = Data_2_3.data(Index_cl3_1(i,1),Index_cl3_1(i,2));
+    TrainCl3(4,i) = Data_2_4.data(Index_cl3_1(i,1),Index_cl3_1(i,2));
+    TrainCl3(5,i) = Data_2_5.data(Index_cl3_1(i,1),Index_cl3_1(i,2));
+end;
+dataTrainRaw(1,1) = {TrainCl1};
+dataTrainRaw(2,1) = {TrainCl2};
+dataTrainRaw(3,1) = {TrainCl3};
+dataTest(1,1) = {TrainCl1};
+dataTest(1,2) = {TrainCl2};
+dataTest(1,3) = {TrainCl3};
+dataTest(1,4) = {TrainCl1};
+dataTest(1,5) = {TrainCl1};
+dataTest(1,6) = {TrainCl1};
+% window = 15;
+% %windowLocal = 50;
+% NewSizeX = fix(size(Im,1)/window)*window;
+% NewSizeY = fix(size(Im,2)/window)*window;
+% Im = Im(1:NewSizeX,1:NewSizeY,:);
+% 
+% th = 1;
+% i = 1;
+% j = 1;
+% countX = 0;
+% countY = 0;
+% bX = 0;
+% bY = 0;
+% while bX <= size(Im,1)-window
+%     bX = i;
+%     eX = i+window-1;
+%     
+%     while bY <= size(Im,2)-window
+%         if countX == 0
+%             countY = countY + 1;
+%         end;
+%         bY = j;        
+%         eY = j+window-1;
+%         TestIm = Im(bX:eX,bY:eY,:);
+%         
+%         angle = 0;
+%         index = 1;
+%         mapping=getmaplbphf(8);
+%         while angle <= 270
+%             ImLocal=imrotate(TestIm,angle);
+%             h=lbp(ImLocal,1,8,mapping,'h');
+%             h=h/sum(h);
+%             histograms(index,:)=h;    
+%             index = index + 1;
+%             angle = angle + 30;
+%         end;        
+%         lbp_hf_features=constructhf(histograms,mapping);   
+%         dataTest(1,th) = {lbp_hf_features'};
+%         th = th +1;        
+%         j = j+window;    
+%     end; 
+%     countX = countX + 1;
+%     j= 1;
+%     bY = 0;
+%     i = i+window;    
+% end;
 
 % for i =1:5
 % filename = sprintf('texture\\road%01d.png', i);
@@ -93,60 +148,60 @@ end;
 % RawTest = razbienie(windowLocal,Im);
 % dataTrainRaw(3,i) = {RawTest'};
 % end;
-for i =1:5
-filename = sprintf('texture\\road%01d.png', i);
-Im = imread(filename);
-angle = 0;
-index = 1;
-mapping=getmaplbphf(8);
-while angle <= 270
-    ImLocal=imrotate(Im,angle);
-    h=lbp(ImLocal,1,8,mapping,'h');
-    h=h/sum(h);
-    histograms(index,:)=h;    
-    index = index + 1;
-    angle = angle + 30;
-end;        
-lbp_hf_features=constructhf(histograms,mapping); 
-dataTrainRaw(1,i) = {lbp_hf_features'};
-end;
-
-for i =1:5
-filename = sprintf('texture\\ground%01d.png', i);
-Im = imread(filename);
-angle = 0;
-index = 1;
-mapping=getmaplbphf(8);
-while angle <= 270
-    ImLocal=imrotate(Im,angle);
-    h=lbp(ImLocal,1,8,mapping,'h');
-    h=h/sum(h);
-    histograms(index,:)=h;    
-    index = index + 1;
-    angle = angle + 30;
-end;        
-lbp_hf_features=constructhf(histograms,mapping); 
-dataTrainRaw(2,i) = {lbp_hf_features'};
-end;
-
-
-for i =1:5
-filename = sprintf('texture\\les%01d.png', i);
-Im = imread(filename);
-angle = 0;
-index = 1;
-mapping=getmaplbphf(8);
-while angle <= 270
-    ImLocal=imrotate(Im,angle);
-    h=lbp(ImLocal,1,8,mapping,'h');
-    h=h/sum(h);
-    histograms(index,:)=h;    
-    index = index + 1;
-    angle = angle + 30;
-end;        
-lbp_hf_features=constructhf(histograms,mapping); 
-dataTrainRaw(3,i) = {lbp_hf_features'};
-end;
+% for i =1:5
+% filename = sprintf('texture\\road%01d.png', i);
+% Im = imread(filename);
+% angle = 0;
+% index = 1;
+% mapping=getmaplbphf(8);
+% while angle <= 270
+%     ImLocal=imrotate(Im,angle);
+%     h=lbp(ImLocal,1,8,mapping,'h');
+%     h=h/sum(h);
+%     histograms(index,:)=h;    
+%     index = index + 1;
+%     angle = angle + 30;
+% end;        
+% lbp_hf_features=constructhf(histograms,mapping); 
+% dataTrainRaw(1,i) = {lbp_hf_features'};
+% end;
+% 
+% for i =1:5
+% filename = sprintf('texture\\ground%01d.png', i);
+% Im = imread(filename);
+% angle = 0;
+% index = 1;
+% mapping=getmaplbphf(8);
+% while angle <= 270
+%     ImLocal=imrotate(Im,angle);
+%     h=lbp(ImLocal,1,8,mapping,'h');
+%     h=h/sum(h);
+%     histograms(index,:)=h;    
+%     index = index + 1;
+%     angle = angle + 30;
+% end;        
+% lbp_hf_features=constructhf(histograms,mapping); 
+% dataTrainRaw(2,i) = {lbp_hf_features'};
+% end;
+% 
+% 
+% for i =1:5
+% filename = sprintf('texture\\les%01d.png', i);
+% Im = imread(filename);
+% angle = 0;
+% index = 1;
+% mapping=getmaplbphf(8);
+% while angle <= 270
+%     ImLocal=imrotate(Im,angle);
+%     h=lbp(ImLocal,1,8,mapping,'h');
+%     h=h/sum(h);
+%     histograms(index,:)=h;    
+%     index = index + 1;
+%     angle = angle + 30;
+% end;        
+% lbp_hf_features=constructhf(histograms,mapping); 
+% dataTrainRaw(3,i) = {lbp_hf_features'};
+% end;
 
 
 
@@ -167,8 +222,8 @@ CountNet = [10 12];
 if USETRAIN == 1
 k_1 = 1;
 k_2 = 1;
-countNeuron = 99999;
-epohs = 10;
+countNeuron = 9999999;
+epohs = 100;
 dataTrainForClass = cell(size(dataTrainRaw,1),1);
 for i=1:size(dataTrain,1)  
     u = size(dataTrain{i},2);
@@ -180,7 +235,7 @@ end;
 cellNetGas = cell(size(dataTrainRaw,1),1);
 errorNeuralGas = cell(size(dataTrainRaw,1),1);
 
-for i=1:size(dataTrainForClass,1)
+parfor i=1:size(dataTrainForClass,1)
   D = dataTrainForClass{i};
   netGas = gngExt(D',countNeuron,epohs);
 %   for kk=1:size(netGas.traceData)
@@ -332,7 +387,7 @@ for i = 1:size(dataTest,1)
     if SAVELOGLIKEFORGIBRID == 0
         for m = 1:size(cellNetGas,1)
            %w= cellNetGas{m}.codeBook;
-            t = cellNetGas{m};
+            t = cellNetGas{i};
              p = dataTest{i,j};
              ry = size(t.traceData,2);
             w = t.traceData{1,ry}.M;
@@ -353,8 +408,6 @@ for i = 1:size(dataTest,1)
            [maxn,rows] = max(n,[],1);
            [logB scale] = normalizeLogspace(n');
            B = exp(logB');
-          %[logB scale] = normalize(n');
-          %B = logB';
            pi = repmat(5,1,size(w',1));
            pi(1,rows(1,1)) = 10;
            pi = normalizeLogspace(pi);
