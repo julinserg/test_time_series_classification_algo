@@ -1,9 +1,12 @@
-
+%% character traectory
+% ResFmear = 0.7895
+% ResFmearT = 0.9989
+    
 clc;
 clear;
 NUM = 1;
 steps = 0;
-for NUM=2:10
+for NUM12=1:20
  clear('arrayLabelDetect','arrayLabelTrue','fileLable','R{2}.model', 'R{2}.stats','post','arrayLL','arrayLabel','arrayLL_old','ll', 'label','net','net2','tr','distanseKox','newLableMapKohonen','newLableMapKohonenNormal','distanseKoxNew','lableMinDistanse','res');   
 
 %% about
@@ -15,12 +18,12 @@ load sampleData;
 %paramsData.factorSeqWeights = 1;
 R{2}.params = paramsNodHCRF;
 %R{2}.params.rangeWeights = [-1,1];
-R{2}.params.nbHiddenStates = 5;
+R{2}.params.nbHiddenStates = 7;
 R{2}.params.modelType = 'hcrf';
 R{2}.params.GaussianHCRF = 0;
 R{2}.params.windowRecSize = 0;
 R{2}.params.windowSize = 0;
-R{2}.params.optimizer = 'bfgs';
+R{2}.params.optimizer = 'cg';
 R{2}.params.regFactorL2 = 1;
 R{2}.params.regFactorL1 = 0;
 % R{2}.params.initWeights = initDataTransHMMtoHCRF;
