@@ -1,5 +1,5 @@
 function [D] = getTestDataOnTest(NUMBER)
-SELECTDATASET = 2;
+SELECTDATASET = 3;
 %% arabic digit
 if SELECTDATASET == 1
  load dataTrainArabicDigit;
@@ -10,8 +10,8 @@ if SELECTDATASET == 1
  D = horzcat(D,M); 
  C = D;
 if NUMBER == 1   
-   D = C(1:10,101:400);
-   %D = D(1:20,51:100);
+   %D = C(1:10,101:400);
+  % D = D(1:20,56:100);
 end;
 if NUMBER == 2   
    D = C(:,89:176);  
@@ -77,8 +77,8 @@ D = mixoutNew(1:20,1:50);
 D(1:20,51:100) = mixoutNew(21:40,1:50);
 C = D;
 if NUMBER == 1   
-   D = C(1:20,56:100);
-   %D = D(1:20,51:100);
+   %D = C(1:20,1:10);
+   D = D(1:20,56:100);
 end;
 if NUMBER == 2   
    D = C(:,11:20);  
@@ -113,7 +113,7 @@ if SELECTDATASET == 3
     load dataTestTexture;
     D = dataTestTexture;
     if NUMBER == 1
-        D = D(1:3,1:100);
+        D = D(:,:);
     end;
 end;
 
