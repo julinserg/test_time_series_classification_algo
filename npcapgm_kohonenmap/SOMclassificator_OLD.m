@@ -1,11 +1,11 @@
 clc;
 clear;
-load sampleData;
-isOpen = matlabpool('size') > 0;
-if isOpen
-   matlabpool close; 
-end;
-matlabpool open local 12;
+ load sampleData;
+% isOpen = matlabpool('size') > 0;
+% if isOpen
+%    matlabpool close; 
+% end;
+% matlabpool open local 12;
 %load initDataTransHMMtoHCRF
 %paramsData.weightsPerSequence = ones(1,128) ;
 %paramsData.factorSeqWeights = 1;
@@ -22,7 +22,7 @@ matlabpool open local 12;
 %%
 USETRAIN = 0
 k = 1;
-dataTrainRaw = getTrainData(1);
+dataTrainRaw = getTrainData(2);
 for i=1:size(dataTrainRaw,1)
     for j=1:size(dataTrainRaw,2)
         dataTrain{k,1} = dataTrainRaw{i,j};       
