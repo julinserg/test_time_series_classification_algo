@@ -20,7 +20,7 @@ clear;
 % Average Recall  = 0.936364
 % F-measure  = 0.937979
 %%
-USETRAIN = 0
+USETRAIN = 1
 k = 1;
 dataTrainRaw = getTrainData(2);
 for i=1:size(dataTrainRaw,1)
@@ -45,7 +45,7 @@ k_1 = 1;
 k_2 = 1;
 row = 10;
 col = 10;
-epohs = 100;
+epohs = 600;
 dataTrainForClass = cell(size(dataTrainRaw,1),1);
 for i=1:size(dataTrain,1)  
     u = size(dataTrain{i},2);
@@ -178,8 +178,8 @@ end;
 
 %% тест
 arrayLogLikDataSetTest = cell(1,1);
-dataTest =  getTestDataOnTest(1);
-%dataTest = getTrainData(8);
+%dataTest =  getTestDataOnTest(1);
+dataTest = getTestDataOnTrain(1);
 %dataTest = getTestDataOnTest(4);
 for i=1:size(dataTest,1)
     for j=1:size(dataTest,2)       
@@ -242,7 +242,7 @@ for i = 1:size(dataTest,1)
 end;
 save('arrayLogLikDataSetTest.mat', 'arrayLogLikDataSetTest');
 %arrayLL = exp(normalizeLogspace(arrayLL));
-arrayLL = arrayLL';
+arrayLL = arrayLL'
 for i=1:size(arrayLL,2)
     [c index] = max(arrayLL(:,i));
      arrayLabelDetect(1,i) = index-1;    

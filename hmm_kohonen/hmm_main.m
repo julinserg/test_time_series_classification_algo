@@ -56,8 +56,8 @@ calculateQuality(arrayLabelDetect,arrayLabelTrue,size(label,1));
 clear('arrayLabelDetect','arrayLabelTrue','arrayLabel','arrayLL');
 load modelHMM;
 dataTestArabicDigit = getTestDataOnTest(NUM);
-[ll label] = arabic_digit_hmm_test(dataTestArabicDigit,model);
-%[ll label] = arabic_digit_hmm_test_koh(dataTestArabicDigit,model);
+[ll label] = hmm_test(dataTestArabicDigit,model);
+%[ll label] = hmm_test_koh(dataTestArabicDigit,model);
 
 % prepare test result
 k = 0;

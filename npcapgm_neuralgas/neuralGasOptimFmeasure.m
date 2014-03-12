@@ -1,17 +1,17 @@
 clc;
 clear all;
-
+DATASETNUM = 9;
 USETRAIN = 1
 
 isOpen = matlabpool('size') > 0;
 if isOpen
    matlabpool close; 
 end;
-matlabpool open local 4;
+matlabpool open local 12;
 load sampleData;
 
 k = 1;
-dataTrainRaw = getTrainData(1);
+dataTrainRaw = getTrainData(DATASETNUM);
 for i=1:size(dataTrainRaw,1)
     for j=1:size(dataTrainRaw,2)
         dataTrain{k,1} = dataTrainRaw{i,j};       
@@ -19,8 +19,8 @@ for i=1:size(dataTrainRaw,1)
         k = k+1;
     end;
 end;
-dataTest =  getTestDataOnTest(1);
-dataValidate = getTestDataOnTrain(1);
+dataTest =  getTestDataOnTest(DATASETNUM);
+dataValidate = getTestDataOnTest(DATASETNUM);
 CountNet = [10 12];
 
 if USETRAIN == 1
@@ -50,7 +50,8 @@ end;
 cellNetGas = cell(size(dataTrainRaw,1),1);
 varNetGas = cell(size(dataTrainRaw,1),1);
 errorNeuralGas = cell(size(dataTrainRaw,1),1);
-
+masCellNetGas = cell(1,1);
+masProbability = cell(1,1);
 isFirst = ones(size(dataTrainForClass,1),1);
 
 flagStopTrain = 0;
@@ -67,7 +68,9 @@ parfor i=1:size(dataTrainForClass,1)
       varNetGas{i} = map;
   end;  
   isFirst(i) = 0;
-
+  if  size(netGas.codeBook,1) > trainIndex+2
+     netGas.codeBook = netGas.codeBook(1:trainIndex+1,:);
+  end;
   cellNetGas{i} = netGas;
 end;
 
@@ -117,7 +120,7 @@ parfor i=1:size(Probability,1)
          end;
      end;
 
-      Probability{i}.A(~Probability{i}.A) = 0.0000001;     
+      %Probability{i}.A(~Probability{i}.A) = 0.00000001; %0.00000000001;     
 end;
 
 
@@ -162,14 +165,23 @@ end;
 [aver prec fmera]= calculateQuality(arrayLabelDetect,arrayLabelTrueValidate,size(arrayLL,1));
 
 masFmeasure(1,trainIndex) = fmera;
-if size(masFmeasure,2) > 10
-    if masFmeasure(1,trainIndex) == masFmeasure(1,trainIndex-1) && masFmeasure(1,trainIndex-1) == masFmeasure(1,trainIndex-2)
-       flagStopTrain = 1;
-    end;        
+masCellNetGas{1,trainIndex} = cellNetGas;
+masProbability{1,trainIndex} = Probability;
+if trainIndex == 270
+    flagStopTrain = 1;
 end;
+% if size(masFmeasure,2) > 10
+%     if masFmeasure(1,trainIndex) == masFmeasure(1,trainIndex-1) && masFmeasure(1,trainIndex-1) == masFmeasure(1,trainIndex-2)
+%        flagStopTrain = 1;
+%     end;        
+% end;
 trainIndex = trainIndex + 1;
 end;
-
+[Max IndMax] = max(masFmeasure);
+Max
+IndMax
+cellNetGas = masCellNetGas{1,IndMax};
+Probability = masProbability{1,IndMax};
 save('modelNeuronGas.mat', 'cellNetGas','Probability','-v7.3');
 end;
 %% тест
