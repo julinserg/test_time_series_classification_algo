@@ -20,12 +20,21 @@ matlabpool open local 6;
 % Average Recall  = 0.936364
 % F-measure  = 0.937979
 %%
+% 10*10 - 100 texture
+% Average Pricision  = 0.907435
+% Average Recall  = 0.889120
+% F-measure  = 0.898184
+% Average Pricision  = 0.749645
+% Average Recall  = 0.644676
+% F-measure  = 0.693209
 USETRAIN = 1
 k = 1;
 dataTrainRaw = getTrainData(1);
 for i=1:size(dataTrainRaw,1)
     for j=1:size(dataTrainRaw,2)
-        dataTrain{k,1} = dataTrainRaw{i,j};       
+        %DR = featureNormalize(dataTrainRaw{i,j}');
+       % dataTrain{k,1} = DR'; 
+        dataTrain{k,1} = dataTrainRaw{i,j};
         labelTrain(k,1) = i-1; 
         k = k+1;
     end;
@@ -43,9 +52,9 @@ end;
 if USETRAIN == 1
 k_1 = 1;
 k_2 = 1;
-row = 16;
-col = 16;
-epohs = 200;
+row = 10;
+col = 10;
+epohs = 100;
 dataTrainForClass = cell(size(dataTrainRaw,1),1);
 for i=1:size(dataTrain,1)  
     u = size(dataTrain{i},2);
@@ -103,8 +112,10 @@ end;
 %countTrans_2 = 0;
 for i=1:size(dataTrainRaw,1)
     for j=1:size(dataTrainRaw,2)
-        %for k=1:size(dataTrainRaw{i,j},2)-1            
-            array = sim(cellNetKox{i},dataTrainRaw{i,j});
+        %for k=1:size(dataTrainRaw{i,j},2)-1   
+           % DR = featureNormalize(dataTrainRaw{i,j}');
+            %array = sim(cellNetKox{i},DR');
+           array = sim(cellNetKox{i},dataTrainRaw{i,j});
             distArray = calculateDist(cellNetKox{i});
             numNeurons = size(cellNetKox{i}.iw{1,1},1);
             neighbors = sparse(tril(cellNetKox{i}.layers{1}.distances <= 1.001) - eye(numNeurons));
@@ -179,7 +190,7 @@ end;
 %% тест
 arrayLogLikDataSetTest = cell(1,1);
 dataTest =  getTestDataOnTest(1);
-%dataTest = getTrainData(8);
+%dataTest = getTrainData(1);
 %dataTest = getTestDataOnTest(4);
 for i=1:size(dataTest,1)
     for j=1:size(dataTest,2)       
@@ -190,18 +201,22 @@ end;
 index = 1;
 for i = 1:size(dataTest,1)
   for j = 1:size(dataTest,2)
-    for m = 1:size(cellNetKox,1)
-       w= cellNetKox{m}.iw{1,1};
-       p = dataTest{i,j};
+     % DR = featureNormalize(dataTest{i,j}');
+     % p = DR';
+     p = dataTest{i,j};
+    parfor m = 1:size(cellNetKox,1)
+       w= cellNetKox{m}.iw{1,1};       
        [S,R11] = size(w);
        [R2,Q] = size(p);
        z = zeros(S,Q);
        w = w';
        copies = zeros(1,Q);
        for ii=1:S
-         z(ii,:) = sum((w(:,ii+copies)-p).^2,1);
+         z(ii,:) = sum((w(:,ii+copies)-p).^2,1); % l2-norm
+       % z(ii,:) = sum(abs(w(:,ii+copies)-p),1); % l1 -norm
        end;
        z = -z.^0.5;
+      % z = -z;
        n= z;
        [maxn,rows] = max(n,[],1);
 %         for tt =1:size(n,2)
@@ -235,8 +250,7 @@ for i = 1:size(dataTest,1)
        %L = logsumexp(scale', 2);
        logp = logp + sum(scale);     
        arrayLL(index,m) = logp;          
-    end;   
-
+    end;
     index = index + 1;
   end;
 end;
@@ -252,116 +266,7 @@ for i =1:size(labelTest,1)
      arrayLabelTrue(1,(i-1)*size(labelTest,2)+j) = labelTest{i,j}(1,1); 
     end;
 end;
-[ff,gg, fmear] = calculateQuality(arrayLabelDetect,arrayLabelTrue,size(arrayLL,1));
-
-ListFmera(1,countTrainIter) =  fmear;
-
-%end;
- index1 = 1;
- index2 = 1;
- count1_1 = 0;
-  count1_2 = 0;
-   count2_1 = 0;
-    count2_2 = 0;
- for i=1:size(rows_1,2)     
-%      if testLabels{1}(1,i) == 0
-%          if rows(1,i) > size(weights_class1,1)
-%             mas0(1,index1) = 2;
-%             count1_2 = count1_2 + 1;
-%            % testSeqs{1}(4,i) = 1;
-%          else
-%             mas0(1,index1) = 1; 
-%             count1_1 = count1_1 + 1;
-%            % testSeqs{1}(4,i) = 0;
-%          end;
-%          
-%          testSeqs{1}(4,i) = 1;
-%          index1 = index1+ 1;
-%      end;
-%       if testLabels{1}(1,i) == 1
-%           if rows(1,i) > size(weights_class1,1)
-%             mas1(1,index2) = 2;
-%             count2_2 = count2_2 + 1;
-%             %testSeqs{1}(4,i) = 1;
-%           else
-%              count2_1 = count2_1 + 1;
-%             mas1(1,index2) = 1; 
-%             %testSeqs{1}(4,i) = 0;
-%          end;
-%          testSeqs{1}(4,i) = 2;
-%          index2 = index2+ 1;
-%      end;
-     masProbab(1,i)= Probab_class1(rows_1(1,i));
-     masProbab(2,i)= Probab_class2(rows_2(1,i));
- end;
- fprintf('Count 1 for 1 class  = %f\n', count1_1/size(mas0,2));
- fprintf('Count 2 for 1 class  = %f\n', count1_2/size(mas0,2));
-  fprintf('Count 1 for 2 class  = %f\n', count2_1/size(mas1,2));
- fprintf('Count 2 for 2 class  = %f\n', count2_2/size(mas1,2));
-%  testSeqs{1,1}(15,:) = [];
-% testSeqs{1,1}(4:14,:) = []; 
-% for i=1:size(d,2)
-%     for k=1:size(w,1)
-%         for l =1:size(w,2)
-%             dist(k,l) = w()
-%         end;
-%     end;    
-%     dist = weights - (cop+);
-% end;
+[ff,gg, fmear,qual] = calculateQuality(arrayLabelDetect,arrayLabelTrue,size(arrayLL,1));
+save('lastTest.dat','-ascii','qual','-double');
 
 
-
-
-
-
-
-paramsNodHCRF.normalizeWeights = 1;
-R{2}.params = paramsNodHCRF;
-R{2}.params.nbHiddenStates = 3;
-R{2}.params.modelType = 'hcrf';
-R{2}.params.GaussianHCRF = 0;
-%R{2}.params.windowRecSize = 0;
-R{2}.params.windowSize = 0;
-R{2}.params.optimizer = 'bfgs';
-R{2}.params.regFactorL2 = 1;
-R{2}.params.regFactorL1 = 0;
-%R{2}.params.weightsInitType = 'TRANS_HMM';
-%R{2}.params.initWeights = initDataTransHMMtoHCRF;
-for i =1:10
-    i
-[R{2}.model R{2}.stats] = train(trainCompleteSeqs, trainCompleteLabels, R{2}.params);
-[R{2}.ll R{2}.labels] = test(R{2}.model, testSeqs, testLabels);
-
-% paramsNodLDCRF.normalizeWeights = 1;
-% R{3}.params = paramsNodLDCRF;
-% [R{3}.model R{3}.stats] = train(trainSeqs, trainLabels, R{3}.params);
-% [R{3}.ll R{3}.labels] = test(R{3}.model, testSeqs, testLabels);
-
-
-%% оценка результата
-ll = R{2}.ll{1,1};
-label = R{2}.labels{1,1};
-% for i=1:size(label,2)
-%     if label(1,i) == 0
-%         arrayLabel(1,i) = 1;
-%         arrayLabel(2,i) = 0;
-%     else
-%         arrayLabel(1,i) = 0;
-%         arrayLabel(2,i) = 1;
-%     end;   
-% end;
- arrayLL = ll;
-% arrayLL_old = arrayLL';
-% post = exp(normalizeLogspace(arrayLL_old));
-% arrayLL = post';
-
-for i=1:size(arrayLL,2)
-    [c index] = max(arrayLL(:,i));
-     arrayLabelDetect(1,i) = index-1;    
-end;
-
-D = now();
-strTime = datestr(D,30);
-[AveragePricision, AverageRecall, F_measure] =calculateQuality(arrayLabelDetect,label,2);
-end;
-%plotResults(R);
