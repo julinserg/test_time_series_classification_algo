@@ -17,7 +17,7 @@ load sampleData;
 %%
 USETRAIN = 1
 k = 1;
-dataTrainRaw = getTestDataOnTest(5);
+dataTrainRaw = getTestDataOnTest(1);
 for i=1:size(dataTrainRaw,1)
     for j=1:size(dataTrainRaw,2)
         dataTrain{k,1} = dataTrainRaw{i,j};       
@@ -164,7 +164,7 @@ end;
 
 %% тест
 arrayLogLikDataSetTest = cell(1,1);
-dataTest =  getTrainData(5);
+dataTest =  getTrainData(1);
 %dataTest = getTrainData(8);
 %dataTest = getTestDataOnTest(4);
 for i=1:size(dataTest,1)

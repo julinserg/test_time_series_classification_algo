@@ -9,7 +9,7 @@ if SELECTDATASET == 1
  M = dataTestArabicDigit;
  D = horzcat(D,M);
  if NUMBER == 1
-  D = D(1:10,1:100);
+  D = D(1:2,1:4);
   %D = D(1:20,1:50);
 end;
 if NUMBER == 2
