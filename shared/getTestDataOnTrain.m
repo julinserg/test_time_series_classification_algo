@@ -1,5 +1,5 @@
 function [D] = getTestDataOnTrain(NUMBER)
-SELECTDATASET = 2;
+SELECTDATASET = 3;
 if SELECTDATASET == 1
 %% arabic digit
  load dataTrainArabicDigit;
@@ -41,7 +41,7 @@ end;
 D = mixoutNew(1:20,1:50);
 D(1:20,51:100) = mixoutNew(21:40,1:50);
 if NUMBER == 1
-   D = D(1:20,1:20);
+   D = D(1:20,51:55);
 end;
 if NUMBER == 2
    D = D(:,11:20);
@@ -59,3 +59,20 @@ if NUMBER == 6
     D  = D(:,51:60);
 end;
 end;
+
+if SELECTDATASET == 3
+    load dataTrainTexture;
+    D = dataTrainTexture;
+    if NUMBER == 1
+        D = D(1:1,1:1);
+    end;
+end;
+
+if SELECTDATASET == 4
+    load Train_Outex_TC_00014.mat;
+    D = dataTrainTexture;
+    if NUMBER == 1
+        D = D(:,:);
+    end;
+end;
+

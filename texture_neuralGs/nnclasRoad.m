@@ -6,7 +6,7 @@ window = 15;
 NewSizeX = fix(size(Im,1)/window)*window;
 NewSizeY = fix(size(Im,2)/window)*window;
 Im = Im(1:NewSizeX,1:NewSizeY,:);
-
+testIm = Im;
 radius = 1;
 samples = 8;
 th = 1;
@@ -115,3 +115,30 @@ while i <= countX*(window)
     i = i + window;
 end;
 arrayAnswer  = flipdim(arrayAnswer,1);
+image(testIm);
+hold on
+for i=1:size(testIm,1)
+    for j=1:size(testIm,2)
+        if arrayAnswer(i,j) == 0
+            testIm(i,j,:) = [0 0 128];
+        end;
+        if arrayAnswer(i,j) == 1
+             testIm(i,j,:) = [0 255 0];
+        end;
+        if arrayAnswer(i,j) == 2
+             testIm(i,j,:) = [255 0 0];
+        end;
+    end;
+end;
+testIm  = flipdim(testIm,1);
+image(testIm);
+
+
+
+
+
+
+
+
+
+

@@ -12,7 +12,9 @@ levels = zeros(1,ud.numEdges);
 k = 1;
 for i=1:numNeurons
   for j=find(ud.neighbors(i,:))
-    levels(k) = sqrt(sum((weights(i,:)-weights(j,:)).^2));
+    levels(k) = sqrt(sum((weights(i,:)-weights(j,:)).^2)); % -l2 norm
+    %levels(k) =sum((weights(i,:)-weights(j,:)).^2); % squa L2 norm
+   % levels(k) =sum(abs(weights(i,:)-weights(j,:))); % l1 norm
     k = k + 1;
   end
 end

@@ -1,5 +1,5 @@
 function [D] = getTrainData(NUMBER)
-SELECTDATASET = 1;
+SELECTDATASET = 5;
 if SELECTDATASET == 1
 %% arabic digit
  load dataTrainArabicDigit;
@@ -9,12 +9,12 @@ if SELECTDATASET == 1
  M = dataTestArabicDigit;
  D = horzcat(D,M);
  if NUMBER == 1
-  D = D(1:2,1:4);
-  %D = D(1:20,1:50);
+  %D = D(1:10,1:100);
+ % D = D(1:20,1:50);
 end;
 if NUMBER == 2
-  %D = horzcat(D(1:10,1:88),D(1:10,177:880));
-  D = D(:,:);
+  D = horzcat(D(1:10,1:88),D(1:10,177:880));
+  %D = D(:,:);
 end;
 if NUMBER == 3
   D = horzcat(D(1:10,1:176),D(1:10,265:880));
@@ -77,8 +77,8 @@ D = mixoutNew(1:20,1:50);
 D(1:20,51:100) = mixoutNew(21:40,1:50);
 
 if NUMBER == 1
-  %D = D(1:20,1:60);
   D = D(1:20,1:50);
+  %D = D(1:20,11:100);
 end;
 if NUMBER == 2
   D = horzcat(D(1:20,1:10),D(1:20,21:100));
@@ -108,3 +108,48 @@ if NUMBER == 10
   D = D(1:20,1:90);  
 end;
 end;
+
+if SELECTDATASET == 3
+   load Train_Outex_TC_00012.mat;
+   C = dataTrainTexture;
+    if NUMBER == 1
+        D = C(:,:);
+%         for i=1:size(C,1)
+%             for j=1:size(C,2)
+%                Data = C{i,j};
+%                NewData = Data(:,:);
+% %                NewData(6,:) = Data(1,:).*Data(2,:);
+% %                NewData(7,:) = Data(2,:).*Data(3,:);
+% %                NewData(8,:) = Data(3,:).*Data(4,:);
+% %                NewData(9,:) = Data(4,:).*Data(5,:);
+% %                for k =1:size(Data,2)                  
+% %                    NewData(:,k) = Data(:,k)/norm(Data(:,k));
+% %                end;
+%                D(i,j) = {NewData};
+%             end;
+%         end;     
+    end;
+end;
+
+if SELECTDATASET == 4
+    load Train_Outex_TC_00014.mat;
+    D = dataTrainTexture;
+    if NUMBER == 1
+        D = D(:,:);
+    end;
+end;
+
+if SELECTDATASET == 5
+    load Train_Outex_TC_LBP.mat;
+    D = dataTrainTexture;
+    if NUMBER == 1
+        D = D(:,:);
+    end;
+end;
+
+
+
+
+
+
+

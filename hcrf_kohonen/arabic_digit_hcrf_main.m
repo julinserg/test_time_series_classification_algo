@@ -1,9 +1,15 @@
-
+%% character traectory
+% ResFmear = 0.7895
+% ResFmearT = 0.9989
+% F-measure  = 0.821118  
+% F-measureT  = 0.999010
+% F-measure  = 0.891757
+% F-measureT  = 1.000000
 clc;
 clear;
 NUM = 1;
 steps = 0;
-for NUM=2:10
+for NUM12=1:20
  clear('arrayLabelDetect','arrayLabelTrue','fileLable','R{2}.model', 'R{2}.stats','post','arrayLL','arrayLabel','arrayLL_old','ll', 'label','net','net2','tr','distanseKox','newLableMapKohonen','newLableMapKohonenNormal','distanseKoxNew','lableMinDistanse','res');   
 
 %% about
@@ -15,7 +21,7 @@ load sampleData;
 %paramsData.factorSeqWeights = 1;
 R{2}.params = paramsNodHCRF;
 %R{2}.params.rangeWeights = [-1,1];
-R{2}.params.nbHiddenStates = 5;
+R{2}.params.nbHiddenStates = 7;
 R{2}.params.modelType = 'hcrf';
 R{2}.params.GaussianHCRF = 0;
 R{2}.params.windowRecSize = 0;
@@ -27,7 +33,7 @@ R{2}.params.regFactorL1 = 0;
 %% train
 %net2 = arabic_digit_hcrf_train_koh(R);
 %load dataTrainArabicDigitModul;
-dataTrainArabicDigit = getTestDataOnTest(NUM);
+dataTrainArabicDigit = getTrainData(NUM);
 
 
 %clustering(dataTrainArabicDigit);
@@ -57,7 +63,7 @@ matHCRF('saveModel','fileModel_hcrf','fileFeatureDefinition_hcrf');
 %hF2 = figure;
 %% test on train data
 % %figure(hF1);
- dataTestArabicDigit = getTestDataOnTest(NUM);
+ dataTestArabicDigit = getTrainData(NUM);
 % %load dataTrainArabicDigitModul;
 % %dataTestArabicDigit = dataTrainArabicDigit;
 clear('ll','label','arrayLL','arrayLL_old');
@@ -131,7 +137,7 @@ clear('ll','label','arrayLL','arrayLL_old');
 %          dataTestArabicDigit{i,j} = abs(dataTestArabicDigit{i,j}); 
 %       end;
 %  end;
-dataTestArabicDigit = getTrainData(NUM);
+dataTestArabicDigit = getTestDataOnTest(NUM);
 
 
 [ll label] = arabic_digit_hcrf_test(dataTestArabicDigit,NUM);
