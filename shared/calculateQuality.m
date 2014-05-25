@@ -1,4 +1,4 @@
-function [AveragePricision, AverageRecall, F_measure, quality] =  calculateQuality(arrayLabelDetect,arrayLabelTrue,numberClass)
+function [AveragePricision, AverageRecall, F_measure, accuracy] =  calculateQuality(arrayLabelDetect,arrayLabelTrue,numberClass)
     
 % вычисляем количество ошибок первого и второго рода, суммируем их и делим на 
 % общее количесвто тестовых примеров
@@ -8,16 +8,17 @@ for i=1:size(arrayLabelDetect,2)
         error = error+1;
     end;
 end;
-quality = 1 - (error / size(arrayLabelDetect,2));
-fprintf('Quality  = %f\n', quality);
+accuracy = 1 - (error / size(arrayLabelDetect,2));
+fprintf('accuracy  = %f\n', accuracy);
 
-%numberClass = size(arrayLabelDetect,2) / sizeLableForClass;
+%вычисляем матрицу неоднородностей Confusion_Matrix
 Confusion_Matrix = repmat(0, numberClass, numberClass);
 for i=1:size(arrayLabelDetect,2)
     colum = arrayLabelTrue(1,i) + 1;
     row = arrayLabelDetect(1,i) + 1;
     Confusion_Matrix(row,colum) = Confusion_Matrix(row,colum) + 1; 
 end;
+% на основе матрицы неоднородностей высисляем точность и полноту
 Pricision = repmat(0, 1, numberClass);
 Recall = repmat(0, 1, numberClass);
 for i=1:numberClass
@@ -32,7 +33,9 @@ for i=1:numberClass
       Recall(1,i) = Confusion_Matrix(i,i) / sum(Confusion_Matrix(:,i));  
     end;   
 end;
+% выводим матрицу неоднородностей 
 Confusion_Matrix
+% вычисляем среднюю F-меру по всем классам
 AveragePricision = sum(Pricision) / numberClass;
 AverageRecall = sum(Recall) / numberClass;
 F_measure = 2*AveragePricision*AverageRecall / (AveragePricision + AverageRecall);

@@ -22,6 +22,7 @@ function [Probability, cellNetKox] = trainModel(dataTrainRaw,dataTrainForClass, 
 %%
 cellNetKox = cell(size(dataTrainRaw,1),1);
 % обучение карт Кохонена
+% !!!! обучение карты внутри parfor возможно только наиная с версии R2013a 
 parfor i=1:size(dataTrainForClass,1)
   i % вывод текущего номера класса в консоль
   net = newsom(dataTrainForClass{i},[row_map col_map],'hextop','dist');

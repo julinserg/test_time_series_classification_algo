@@ -1,6 +1,7 @@
 clc;
 clear;
 %% Инициализация пула потоков (задание количества потоков)
+% обычно количества потоков = количеству ядер процессора
 isOpen = matlabpool('size') > 0;
 if isOpen
    matlabpool close; 
@@ -22,8 +23,8 @@ val_dirichlet = 0; % параметр распределения Дирихле
 %       примеров для каждого класса; каждая ячейка содержит массив -
 %       временную последовательность DxT - D - размерность ветора признаков
 %       , T - длина последовательности
-%load dataTrainRaw;
-dataTrainRaw = getTrainData(1);
+load dataTrainRaw;
+%dataTrainRaw = getTrainData(1);
 k = 1;
 for i=1:size(dataTrainRaw,1)
     for j=1:size(dataTrainRaw,2)
@@ -62,8 +63,8 @@ load ProbabilityTransaction;
 %       примеров для каждого класса; каждая ячейка содержит массив -
 %       временную последовательность DxT - D - размерность ветора признаков
 %       , T - длина последовательности
-%load dataTest; 
-dataTest = getTestDataOnTest(1);
+load dataTest; 
+%dataTest = getTestDataOnTest(1);
 for i=1:size(dataTest,1)
     for j=1:size(dataTest,2)       
         labelTest{i,j}(1,1) = i-1; 
@@ -82,7 +83,7 @@ arrayLabelTrue = cell2mat(labelTest(:));
 arrayLabelTrue = arrayLabelTrue';
 
 %% Оценка качества классификации
-[ff,gg, fmear,qual] = calculateQuality(arrayLabelDetect,arrayLabelTrue,size(arrayLL,1));
-save('lastTest.dat','-ascii','qual','-double');
+[ff,gg, fmear,accuracy] = calculateQuality(arrayLabelDetect,arrayLabelTrue,size(arrayLL,1));
+save('lastTest.dat','-ascii','fmear','-double');
 
 
