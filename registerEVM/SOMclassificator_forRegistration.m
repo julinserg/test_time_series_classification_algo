@@ -5,16 +5,24 @@ isOpen = matlabpool('size') > 0;
 if isOpen
    matlabpool close; 
 end;
-matlabpool open local 1;
+matlabpool open local 4;
 %% »нициализаци€ параметров классификатора
 USETRAIN = 1 % 1-обучать модель заново 0-использовать сохраненную модель 
-row_map = 10; % колличество строк карты  охонена
-col_map = 10; % колличество столбцов карты  охонена
-epohs_map = 100; % колличество эпох обучени€ карты  охонена
+row_map = 5; % колличество строк карты  охонена
+col_map = 5; % колличество столбцов карты  охонена
+epohs_map = 10; % колличество эпох обучени€ карты  охонена
 val_dirichlet = 0; % параметр распределени€ ƒирихле
 % чтение обучающих данных
 % подготовка обучающих данных дл€ карты  охонена
 k = 1;
+% загрузить обучающие данные 
+%       dataTrainRaw - массив €чеек (cell) содежащий обучающие данные,
+%       номер строки соответсвует классу, к котормоу принадлежат оубчающие
+%       данные: (NxM) - N - количество классов, M - количесвто обучающих
+%       примеров дл€ каждого класса; кажда€ €чейка содержит массив -
+%       временную последовательность DxT - D - размерность ветора признаков
+%       , T - длина последовательности
+%load dataTrainRaw;
 dataTrainRaw = getTrainData(1);
 for i=1:size(dataTrainRaw,1)
     for j=1:size(dataTrainRaw,2)
@@ -46,26 +54,31 @@ end;
 % «агрузка ранее сохраненной модели
 load modelKohonen;
 load ProbabilityTransaction;
-% чтение тестовых данных
-dataTest =  getTestDataOnTest(1);
+% загрузить тестовые данные
+%       dataTest - массив €чеек (cell) содежащий тестовые размечанные данные,
+%       номер строки соответсвует классу, к котормоу принадлежат тестовые
+%       размечанны  данные: (NxM) - N - количество классов, M - количесвто обучающих
+%       примеров дл€ каждого класса; кажда€ €чейка содержит массив -
+%       временную последовательность DxT - D - размерность ветора признаков
+%       , T - длина последовательности
+load dataTest; 
 for i=1:size(dataTest,1)
     for j=1:size(dataTest,2)       
         labelTest{i,j}(1,1) = i-1; 
         k = k+1;
     end;
 end;
-
+dataTest = dataTest(:);
 [arrayLL] = testModel(Probability,cellNetKox,dataTest);
-
+% arrayLabelDetect - массив меток классов выданных классификатором  
 for i=1:size(arrayLL,2)
     [c index] = max(arrayLL(:,i));
-     arrayLabelDetect(1,i) = index-1;    
+     arrayLabelDetect(1,i) = index-1;  
 end;
-for i =1:size(labelTest,1)
-    for j=1:size(labelTest,2)
-     arrayLabelTrue(1,(i-1)*size(labelTest,2)+j) = labelTest{i,j}(1,1); 
-    end;
-end;
+% arrayLabelTrue - массив меток классов выданных экспертом
+arrayLabelTrue = cell2mat(labelTest(:));
+arrayLabelTrue = arrayLabelTrue';
+
 %% ќценка качества классификации
 [ff,gg, fmear,qual] = calculateQuality(arrayLabelDetect,arrayLabelTrue,size(arrayLL,1));
 save('lastTest.dat','-ascii','qual','-double');

@@ -1,8 +1,20 @@
 function [arrayLL] = testModel(Probability,cellNetKox,dataTest)
-index = 1;
+%% ‘ункци€ классификации
+% ¬ходные данные:
+%       Probability - массив €чеек((Nx1)- N - количество классов), кажда€ €чейка это матрица условных распределений вер€отностей перехода
+%       между узлами карты  охонена: LxL - где L =row_map*col_map
+%       cellNetKox - массив структур соержаща€ веса узлов карты  охонена дл€
+%       каждого класса: (Nx1)- N - количество классов
+%       dataTest -массив €чеек (cell) содежащий данные дл€ классифкации, - 1xM,
+%       где M - количесвто тестовых примеров,кажда€ €чейка содержит 
+%       временную последовательностей DxT - D - размерность ветора признаков
+%       , T - длина последовательности
+% ¬ыходные данные:
+%       arrayLL - массив значений правдоподобий (NxM) - N - количество
+%       классов, M - количесвто тестовых примеров
+%%
 for i = 1:size(dataTest,1)
-  for j = 1:size(dataTest,2)
-     p = dataTest{i,j};
+    p = dataTest{i};
     parfor m = 1:size(cellNetKox,1)
        w= cellNetKox{m}.iw{1,1};       
        [S,R11] = size(w);
@@ -11,13 +23,13 @@ for i = 1:size(dataTest,1)
        w = w';
        copies = zeros(1,Q);
        for ii=1:S
-         z(ii,:) = sum((w(:,ii+copies)-p).^2,1); % l2-norm
-       % z(ii,:) = sum(abs(w(:,ii+copies)-p),1); % l1 -norm
+         z(ii,:) = sum((w(:,ii+copies)-p).^2,1);
        end;
        z = -z.^0.5;
-      % z = -z;
        n= z;
        [maxn,rows] = max(n,[],1);
+       % normalizeLogspace - функци€ из matlab-пакета Probabilistic Modeling Toolkit for
+       % Matlab/Octave https://github.com/probml/pmtk3
        [logB scale] = normalizeLogspace(n');
        B = exp(logB');
        pi = repmat(5,1,size(w',1));
@@ -25,11 +37,11 @@ for i = 1:size(dataTest,1)
        pi = normalizeLogspace(pi);
        pi = exp(pi);
        A =  Probability{m}.A;
+       % hmmFilter - функци€ из matlab-пакета Probabilistic Modeling Toolkit for
+       % Matlab/Octave https://github.com/probml/pmtk3
        logp = hmmFilter(pi, A, B);
        logp = logp + sum(scale);     
-       arrayLL(index,m) = logp;          
+       arrayLL(i,m) = logp;          
     end;
-    index = index + 1;
-  end;
 end;
 arrayLL = arrayLL';

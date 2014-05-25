@@ -5,7 +5,7 @@ isOpen = matlabpool('size') > 0;
 if isOpen
    matlabpool close; 
 end;
-matlabpool open local 6;
+matlabpool open local 4;
 %load initDataTransHMMtoHCRF
 %paramsData.weightsPerSequence = ones(1,128) ;
 %paramsData.factorSeqWeights = 1;
@@ -52,8 +52,8 @@ end;
 if USETRAIN == 1
 k_1 = 1;
 k_2 = 1;
-row = 10;
-col = 10;
+row = 5;
+col = 5;
 epohs = 100;
 dataTrainForClass = cell(size(dataTrainRaw,1),1);
 for i=1:size(dataTrain,1)  

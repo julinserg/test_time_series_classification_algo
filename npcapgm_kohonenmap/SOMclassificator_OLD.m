@@ -43,9 +43,9 @@ end;
 if USETRAIN == 1
 k_1 = 1;
 k_2 = 1;
-row = 10;
-col = 10;
-epohs = 600;
+row = 5;
+col = 5;
+epohs = 10;
 dataTrainForClass = cell(size(dataTrainRaw,1),1);
 for i=1:size(dataTrain,1)  
     u = size(dataTrain{i},2);
@@ -55,7 +55,7 @@ for i=1:size(dataTrain,1)
     k_1 = k_1+size(a,2);  
 end; 
 cellNetKox = cell(size(dataTrainRaw,1),1);
-parfor i=1:size(dataTrainForClass,1)
+for i=1:size(dataTrainForClass,1)
   i
   net = newsom(dataTrainForClass{i},[row col],'hextop','dist');
   net.trainParam.epochs = epohs;
