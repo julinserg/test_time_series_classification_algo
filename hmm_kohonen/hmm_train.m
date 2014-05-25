@@ -17,14 +17,14 @@ for i=1:size(dataTrainArabicDigit,1)
 end;
 
 %% train
-pi0 = [1, 0, 0, 0, 0, 0, 0];
+pi0 = [1, 0, 0, 0, 0, 0 ,0];
 transmat0 = normalize(diag(ones(nstates, 1)) + ...
             diag(ones(nstates-1, 1), 1), 2);
 %fitArgs = {'pi0', pi0, 'trans0', transmat0, 'maxIter', 1000, 'verbose', true};
-%nmix    = 2; 
+%nmix    = 16; 
 %fitArgs = [fitArgs, {'nmix', nmix}];
 %fitFn   = @(X)hmmFit(X, nstates, 'mixGaussTied', fitArgs{:});
- fitArgs = {'pi0', pi0, 'trans0', transmat0, 'maxIter', 500, 'verbose', true};
- fitFn   = @(X)hmmFit(X, nstates, 'gauss', fitArgs{:}); 
+fitArgs = {'pi0', pi0, 'trans0', transmat0, 'maxIter', 500, 'verbose', true};
+fitFn   = @(X)hmmFit(X, nstates, 'gauss', fitArgs{:}); 
 model = generativeClassifierFit(fitFn, dataTrain, labelTrain);
 fprintf('..........Stop train\n');

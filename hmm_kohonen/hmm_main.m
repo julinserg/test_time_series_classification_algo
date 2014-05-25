@@ -9,9 +9,10 @@ clc;
 nstates = 7;
 setSeed(0); 
 
-NUM = 1;
+NUM = 2
 %% train
 dataTrainArabicDigit = getTrainData(NUM);
+%dataTrainArabicDigit = getTestDataOnTest(NUM);
 model = hmm_train(nstates,dataTrainArabicDigit);
 %calcDataForInitHCRF(model);
 %[model] = hmm_train_koh(nstates,dataTrainArabicDigit);
@@ -21,7 +22,8 @@ save('modelHMM', 'model');
 %% test on train data
 
 load modelHMM;
-dataTestArabicDigit = getTestDataOnTrain(NUM);
+dataTestArabicDigit = getTrainData(NUM);
+%dataTestArabicDigit = getTestDataOnTest(NUM);
 [ll label] = hmm_test(dataTestArabicDigit,model);
 %[ll label] = hmm_test_koh(dataTestArabicDigit,model);
 
@@ -56,6 +58,7 @@ calculateQuality(arrayLabelDetect,arrayLabelTrue,size(label,1));
 clear('arrayLabelDetect','arrayLabelTrue','arrayLabel','arrayLL');
 load modelHMM;
 dataTestArabicDigit = getTestDataOnTest(NUM);
+%dataTestArabicDigit = getTrainData(NUM);
 [ll label] = hmm_test(dataTestArabicDigit,model);
 %[ll label] = hmm_test_koh(dataTestArabicDigit,model);
 
