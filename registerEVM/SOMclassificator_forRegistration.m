@@ -5,16 +5,16 @@ isOpen = matlabpool('size') > 0;
 if isOpen
    matlabpool close; 
 end;
-matlabpool open local 4;
+matlabpool open local 2;
 %% Инициализация параметров классификатора
 USETRAIN = 1 % 1-обучать модель заново 0-использовать сохраненную модель 
-row_map = 5; % колличество строк карты Кохонена
-col_map = 5; % колличество столбцов карты Кохонена
-epohs_map = 10; % колличество эпох обучения карты Кохонена
+row_map = 10; % колличество строк карты Кохонена
+col_map = 10; % колличество столбцов карты Кохонена
+epohs_map = 100; % колличество эпох обучения карты Кохонена
 val_dirichlet = 0; % параметр распределения Дирихле
 % чтение обучающих данных
 % подготовка обучающих данных для карты Кохонена
-k = 1;
+
 % загрузить обучающие данные 
 %       dataTrainRaw - массив ячеек (cell) содежащий обучающие данные,
 %       номер строки соответсвует классу, к котормоу принадлежат оубчающие
@@ -24,6 +24,7 @@ k = 1;
 %       , T - длина последовательности
 %load dataTrainRaw;
 dataTrainRaw = getTrainData(1);
+k = 1;
 for i=1:size(dataTrainRaw,1)
     for j=1:size(dataTrainRaw,2)
         dataTrain{k,1} = dataTrainRaw{i,j};
@@ -61,7 +62,8 @@ load ProbabilityTransaction;
 %       примеров для каждого класса; каждая ячейка содержит массив -
 %       временную последовательность DxT - D - размерность ветора признаков
 %       , T - длина последовательности
-load dataTest; 
+%load dataTest; 
+dataTest = getTestDataOnTest(1);
 for i=1:size(dataTest,1)
     for j=1:size(dataTest,2)       
         labelTest{i,j}(1,1) = i-1; 

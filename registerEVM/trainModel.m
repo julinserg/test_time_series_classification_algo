@@ -26,8 +26,8 @@ parfor i=1:size(dataTrainForClass,1)
   i % вывод текущего номера класса в консоль
   net = newsom(dataTrainForClass{i},[row_map col_map],'hextop','dist');
   net.trainParam.epochs = epohs_map;
-  [net1] = train(net,dataTrainForClass{i}); 
- % cellNetKox{i} = net;
+  [net] = train(net,dataTrainForClass{i}); 
+  cellNetKox{i} = net;
 end;
 % вычисляем распределение вероятностей переходов между узлами карты для каждого класса
 Probability = cell(size(cellNetKox,1),1);
