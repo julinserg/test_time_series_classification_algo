@@ -1,5 +1,5 @@
 function [D] = getTrainData(NUMBER)
-SELECTDATASET = 3;
+SELECTDATASET = 1;
 if SELECTDATASET == 1
 %% arabic digit
  load dataTrainArabicDigit;
@@ -110,13 +110,42 @@ end;
 end;
 
 if SELECTDATASET == 3
-    load dataTrainTexture;
+   load Train_Outex_TC_00012.mat;
+   C = dataTrainTexture;
+    if NUMBER == 1
+        D = C(:,:);
+%         for i=1:size(C,1)
+%             for j=1:size(C,2)
+%                Data = C{i,j};
+%                NewData = Data(:,:);
+% %                NewData(6,:) = Data(1,:).*Data(2,:);
+% %                NewData(7,:) = Data(2,:).*Data(3,:);
+% %                NewData(8,:) = Data(3,:).*Data(4,:);
+% %                NewData(9,:) = Data(4,:).*Data(5,:);
+% %                for k =1:size(Data,2)                  
+% %                    NewData(:,k) = Data(:,k)/norm(Data(:,k));
+% %                end;
+%                D(i,j) = {NewData};
+%             end;
+%         end;     
+    end;
+end;
+
+if SELECTDATASET == 4
+    load Train_Outex_TC_00014.mat;
     D = dataTrainTexture;
     if NUMBER == 1
         D = D(:,:);
     end;
 end;
 
+if SELECTDATASET == 5
+    load Train_Outex_TC_LBP.mat;
+    D = dataTrainTexture;
+    if NUMBER == 1
+        D = D(:,:);
+    end;
+end;
 
 
 

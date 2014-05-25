@@ -6,7 +6,7 @@ clear;
 % end;
 % matlabpool open local 12;
 fprintf('Start form data');
-WAVELETLEVEL = 5;
+WAVELETLEVEL = 7;
 SIZE_N = 128;
 rootdir = 'd:\Outex_TC_00012\';
 Problem_STR = '001';
@@ -45,7 +45,8 @@ end
 
 imgpath = strcat(rootdir,'images');
 
-[IndexZigzag] =  Generate_Zigzag(SIZE_N);
+%[IndexZigzag] =  Generate_Zigzag(SIZE_N);
+[IndexZigzag] = Generate_Spiral(SIZE_N);
 %IndexZigzag = IndexZigzag(1:100:end,:);
 fprintf('....form tarin  data');
 progress = size(SampleList,1);
@@ -121,8 +122,8 @@ for index2 = 1:size(SampleList,1)
     
 end; 
 
-save('dataTrainTexture.mat', 'dataTrainTexture','-v7.3');
-save('dataTestTexture.mat', 'dataTestTexture','-v7.3');
+save('Train_Outex_TC_00012.mat', 'dataTrainTexture','-v7.3');
+save('Test_Outex_TC_00012.mat', 'dataTestTexture','-v7.3');
 fprintf('Stop form data');
 
     

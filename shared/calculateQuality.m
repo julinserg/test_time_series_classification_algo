@@ -1,4 +1,4 @@
-function [AveragePricision, AverageRecall, F_measure] =  calculateQuality(arrayLabelDetect,arrayLabelTrue,numberClass)
+function [AveragePricision, AverageRecall, F_measure, quality] =  calculateQuality(arrayLabelDetect,arrayLabelTrue,numberClass)
     
 % вычисляем количество ошибок первого и второго рода, суммируем их и делим на 
 % общее количесвто тестовых примеров
@@ -9,7 +9,7 @@ for i=1:size(arrayLabelDetect,2)
     end;
 end;
 quality = 1 - (error / size(arrayLabelDetect,2));
-fprintf('quality  = %f\n', quality);
+fprintf('Quality  = %f\n', quality);
 
 %numberClass = size(arrayLabelDetect,2) / sizeLableForClass;
 Confusion_Matrix = repmat(0, numberClass, numberClass);
