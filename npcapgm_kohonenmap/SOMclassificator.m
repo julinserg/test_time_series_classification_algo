@@ -5,7 +5,7 @@ isOpen = matlabpool('size') > 0;
 if isOpen
    matlabpool close; 
 end;
-matlabpool open local 6;
+matlabpool open local 4;
 %load initDataTransHMMtoHCRF
 %paramsData.weightsPerSequence = ones(1,128) ;
 %paramsData.factorSeqWeights = 1;
@@ -43,9 +43,9 @@ end;
 if USETRAIN == 1
 k_1 = 1;
 k_2 = 1;
-row = 16;
-col = 16;
-epohs = 200;
+row = 25;
+col = 25;
+epohs = 50;
 dataTrainForClass = cell(size(dataTrainRaw,1),1);
 for i=1:size(dataTrain,1)  
     u = size(dataTrain{i},2);
@@ -55,7 +55,8 @@ for i=1:size(dataTrain,1)
     k_1 = k_1+size(a,2);  
 end; 
 cellNetKox = cell(size(dataTrainRaw,1),1);
-parfor i=1:size(dataTrainForClass,1)
+t = 0;
+for i=1:size(dataTrainForClass,1)
   i
   net = newsom(dataTrainForClass{i},[row col],'hextop','dist');
   net.trainParam.epochs = epohs;
@@ -164,7 +165,7 @@ for i=1:size(Probability,1)
 %             end;
 %         end;
 %     end;
-   % Probability{i}.A(~Probability{i}.A) = 0.0000001;
+    Probability{i}.A(~Probability{i}.A) = 0.0000001;
      %Probability{i}.A = ones(size(Probability{i}.A,2),size(Probability{i}.A,2));
     %logA = normalizeLogspace(Probability{i}.A);
     %Probability{i}.A = exp(logA);
@@ -188,6 +189,7 @@ for i=1:size(dataTest,1)
     end;
 end;
 index = 1;
+
 for i = 1:size(dataTest,1)
   for j = 1:size(dataTest,2)
     for m = 1:size(cellNetKox,1)
@@ -197,10 +199,10 @@ for i = 1:size(dataTest,1)
        [R2,Q] = size(p);
        z = zeros(S,Q);
        w = w';
-       copies = zeros(1,Q);
+       copies = zeros(1,Q);      
        for ii=1:S
          z(ii,:) = sum((w(:,ii+copies)-p).^2,1);
-       end;
+       end;    
        z = -z.^0.5;
        n= z;
        [maxn,rows] = max(n,[],1);
@@ -230,7 +232,9 @@ for i = 1:size(dataTest,1)
 %          resP = resP + log(A(t_prev,t_cur)) + log(B(t_cur,li));
 %        end;
 %        logp =resP;
+    
        logp = hmmFilter(pi, A, B);
+  
        %logp = 0;
        %L = logsumexp(scale', 2);
        logp = logp + sum(scale);     
@@ -240,6 +244,7 @@ for i = 1:size(dataTest,1)
     index = index + 1;
   end;
 end;
+
 save('arrayLogLikDataSetTest.mat', 'arrayLogLikDataSetTest');
 %arrayLL = exp(normalizeLogspace(arrayLL));
 arrayLL = arrayLL';

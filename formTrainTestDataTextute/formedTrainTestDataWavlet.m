@@ -8,7 +8,7 @@ clear;
 fprintf('Start form data');
 WAVELETLEVEL = 5;
 SIZE_N = 128;
-rootdir = 'd:\scienceProject\TextureClassifData\Outex_TC_00012\';
+rootdir = 'd:\Outex_TC_00012\';
 Problem_STR = '001';
 trainfile = strcat(rootdir,Problem_STR,'\','train.txt');
 
@@ -68,6 +68,7 @@ for index2 = 1:size(SampleList,1)
         indexM = 1;
         curLableTrain = Labels_Train(index2);          
     end;
+    DataZigzag = DataZigzag(:,1:81:end);
     dataTrainTexture{Labels_Train(index2)+1,indexM} = DataZigzag;
     indexM = indexM + 1;
     
@@ -112,6 +113,7 @@ for index2 = 1:size(SampleList,1)
         indexM = 1;
         curLableTest = Labels_Test(index2);          
     end;
+    DataZigzag = DataZigzag(:,1:81:end);
     dataTestTexture{Labels_Test(index2)+1,indexM} = DataZigzag;  
     indexM = indexM + 1;
     

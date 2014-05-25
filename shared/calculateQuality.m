@@ -9,7 +9,7 @@ for i=1:size(arrayLabelDetect,2)
     end;
 end;
 quality = 1 - (error / size(arrayLabelDetect,2));
-%fprintf('Error  = %f\n', 1-quality);
+fprintf('quality  = %f\n', quality);
 
 %numberClass = size(arrayLabelDetect,2) / sizeLableForClass;
 Confusion_Matrix = repmat(0, numberClass, numberClass);
