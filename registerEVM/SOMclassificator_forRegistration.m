@@ -23,8 +23,8 @@ val_dirichlet = 0; % параметр распределения Дирихле
 %       примеров для каждого класса; каждая ячейка содержит массив -
 %       временную последовательность DxT - D - размерность ветора признаков
 %       , T - длина последовательности
-load dataTrainRaw;
-%dataTrainRaw = getTrainData(1);
+%load dataTrainRaw;
+dataTrainRaw = getTrainData(1);
 k = 1;
 for i=1:size(dataTrainRaw,1)
     for j=1:size(dataTrainRaw,2)
@@ -63,8 +63,8 @@ load ProbabilityTransaction;
 %       примеров для каждого класса; каждая ячейка содержит массив -
 %       временную последовательность DxT - D - размерность ветора признаков
 %       , T - длина последовательности
-load dataTest; 
-%dataTest = getTestDataOnTest(1);
+%load dataTest; 
+dataTest = getTestDataOnTest(1);
 for i=1:size(dataTest,1)
     for j=1:size(dataTest,2)       
         labelTest{i,j}(1,1) = i-1; 

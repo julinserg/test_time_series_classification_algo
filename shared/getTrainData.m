@@ -1,5 +1,5 @@
 function [D] = getTrainData(NUMBER)
-SELECTDATASET = 2;
+SELECTDATASET = 6;
 if SELECTDATASET == 1
 %% arabic digit
  load dataTrainArabicDigit;
@@ -142,6 +142,14 @@ end;
 if SELECTDATASET == 5
     load Train_Outex_TC_LBP.mat;
     D = dataTrainTexture;
+    if NUMBER == 1
+        D = D(:,:);
+    end;
+end;
+
+if SELECTDATASET == 6
+    load higgsTrain.mat;
+    D = dataTrainArabicDigit;
     if NUMBER == 1
         D = D(:,:);
     end;

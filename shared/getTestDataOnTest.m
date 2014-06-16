@@ -1,5 +1,5 @@
 function [D] = getTestDataOnTest(NUMBER)
-SELECTDATASET = 2;
+SELECTDATASET = 6;
 %% arabic digit
 if SELECTDATASET == 1
  load dataTrainArabicDigit;
@@ -147,3 +147,10 @@ if SELECTDATASET == 5
     end;
 end;
 
+if SELECTDATASET == 6
+    load higgsTest.mat;
+    D = dataTestArabicDigit;
+    if NUMBER == 1
+        D = D(:,:);
+    end;
+end;
