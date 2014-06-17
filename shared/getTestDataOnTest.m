@@ -151,6 +151,6 @@ if SELECTDATASET == 6
     load higgsTest.mat;
     D = dataTestArabicDigit;
     if NUMBER == 1
-        D = D(:,:);
+        D = D(1:100,:);
     end;
 end;
