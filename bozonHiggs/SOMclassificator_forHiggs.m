@@ -84,7 +84,7 @@ for i=1:8
     indexBE(i,1) = b;
     indexBE(i,2) = e;
 end;
-parfor i=1:8   
+for i=1:8   
     arrayBE = testModel(0,cellNetKox,dataTest(indexBE(i,1):indexBE(i,2),:));
     arrayLLcell{i} = arrayBE;
 end;
