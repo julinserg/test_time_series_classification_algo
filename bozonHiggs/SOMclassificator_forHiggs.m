@@ -6,18 +6,17 @@ isOpen = matlabpool('size') > 0;
 if isOpen
    matlabpool close; 
 end;
-matlabpool open local 4;
+matlabpool open local 8;
 %% Инициализация параметров классификатора
-USETRAIN = 1 % 1-обучать модель заново 0-использовать сохраненную модель 
-row_map = 10; % колличество строк карты Кохонена
-col_map = 10; % колличество столбцов карты Кохонена
-epohs_map = 100; % колличество эпох обучения карты Кохонена
+USETRAIN = 0 % 1-обучать модель заново 0-использовать сохраненную модель 
+row_map = 15; % колличество строк карты Кохонена
+col_map = 15; % колличество столбцов карты Кохонена
+epohs_map = 500; % колличество эпох обучения карты Кохонена
 val_dirichlet = 0; % параметр распределения Дирихле
 % чтение обучающих данных
 % подготовка обучающих данных для карты Кохонена
-
 %% Обучение модели
-if USETRAIN == 1    
+if USETRAIN == 1   
 % загрузить обучающие данные 
 %       dataTrainRaw - массив ячеек (cell) содежащий обучающие данные,
 %       номер строки соответсвует классу, к котормоу принадлежат оубчающие
@@ -47,7 +46,7 @@ for i=1:size(dataTrain,1)
     k_1 = k_1+size(a,2);  
 end; 
 
-
+ 
    [Probability, cellNetKox] = trainModel(dataTrainRaw,dataTrainForClass, ...
    row_map,col_map,epohs_map,val_dirichlet);
    % Сохранение матриц условных вероятностей в файл
@@ -59,6 +58,7 @@ display('Stop Train');
 %% Классификация
 % Загрузка ранее сохраненной модели
 load modelKohonen;
+load ProbabilityTransaction;
 % загрузить тестовые данные
 %       dataTest - массив ячеек (cell) содежащий тестовые размечанные данные,
 %       номер строки соответсвует классу, к котормоу принадлежат тестовые
@@ -78,12 +78,17 @@ end;
 dataTest = dataTest(:);
 b = 0;
 e = 0;
-for i=1:4  
+for i=1:8
     b = e + 1;
-    e = b + 25*i - 1;
-    
-    [arrayLL{i}] = testModel(0,cellNetKox,dataTest(b:e,:));
+    e = b + 68750 - 1; %
+    indexBE(i,1) = b;
+    indexBE(i,2) = e;
 end;
+parfor i=1:8   
+    arrayBE = testModel(0,cellNetKox,dataTest(indexBE(i,1):indexBE(i,2),:));
+    arrayLLcell{i} = arrayBE;
+end;
+arrayLL = cell2mat(arrayLLcell);
 % arrayLabelDetect - массив меток классов выданных классификатором  
 for i=1:size(arrayLL,2)
     [c index] = max(arrayLL(:,i));
