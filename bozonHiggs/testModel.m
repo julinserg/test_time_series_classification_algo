@@ -15,7 +15,7 @@ function [arrayLL] = testModel(Probability,cellNetKox,dataTest)
 %%
 for i = 1:size(dataTest,1)
     p = dataTest{i};
-    for m = 1:size(cellNetKox,1)
+    parfor m = 1:size(cellNetKox,1)
        w= cellNetKox{m}.iw{1,1};       
        [S,R11] = size(w);
        [R2,Q] = size(p);

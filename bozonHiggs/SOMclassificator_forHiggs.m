@@ -84,7 +84,7 @@ for i=1:8
     indexBE(i,1) = b;
     indexBE(i,2) = e;
 end;
-for i=1:8   
+parfor i=1:8   
     arrayBE = testModel(0,cellNetKox,dataTest(indexBE(i,1):indexBE(i,2),:));
     arrayLLcell{i} = arrayBE;
 end;
@@ -124,7 +124,7 @@ T = [EventId,point,RankOrder,point,Class];
 C = cat(2, num2str(testID),pointVector', num2str(nuulVector),pointVector',GroupDetect);
 %RES = cat(1,T,C);
 
-eutid = fopen('result.csv', 'w+'); 
+eutid = fopen('result.csv', 'w'); 
 fprintf(eutid, '%s\n', T); 
 for i=1:size(C,1)
 fprintf(eutid, '%s\n', C(i,:)); 
