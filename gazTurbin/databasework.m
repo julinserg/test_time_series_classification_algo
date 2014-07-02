@@ -1,11 +1,25 @@
 clc;
 clear;
-conn = database('','','','com.microsoft.sqlserver.jdbc.SQLServerDriver','jdbc:sqlserver://192.168.1.34:1433;database=GazTurbin;integratedSecurity=true;');
+conn = database('','','','com.microsoft.sqlserver.jdbc.SQLServerDriver','jdbc:sqlserver://192.168.1.33:1433;database=GazTurbin;integratedSecurity=true;');
 ping(conn);
-gg = 'select top 10 [Naryan_mar_GTS_Naryan_mar_GTS.A1_alarm_a].value  from [Naryan_mar_GTS_Naryan_mar_GTS.A1_alarm_a] where [Naryan_mar_GTS_Naryan_mar_GTS.A1_alarm_a].param = ''BL0100'''
-curs = exec(conn, 'select top 10 [Naryan_mar_GTS_Naryan_mar_GTS.A1_alarm_a].value  from [Naryan_mar_GTS_Naryan_mar_GTS.A1_alarm_a] where [Naryan_mar_GTS_Naryan_mar_GTS.A1_alarm_a].param = ''BL0100''');
-setdbprefs('DataReturnFormat','cellarray');
-curs = fetch(curs, 10);
-AA = curs.Data;
+dataBegin = datenum(2010, 11, 13, 17, 9, 0);
+dataEnd = datenum(2010, 11, 15, 17, 10, 0);
+DataStrBegin = datestr(dataBegin, 'yyyymmdd HH:MM:SS');
+DataStrEnd = datestr(dataEnd, 'yyyymmdd HH:MM:SS');
+strQueryAnalogData = 'select [Naryan_mar_GTS_Naryan_mar_GTS.A1_a].value from [Naryan_mar_GTS_Naryan_mar_GTS.A1_a] where [Naryan_mar_GTS_Naryan_mar_GTS.A1_a].date between ''%s'' and ''%s''';
+strQueryAnalogDataF = sprintf(strQueryAnalogData, DataStrBegin, DataStrEnd);
+curs = exec(conn,strQueryAnalogDataF);
+setdbprefs('DataReturnFormat','numeric');
+curs = fetch(curs);
+ResultSelectAnalogData = curs.Data;
+SizeResultSelectAnalogData = size(ResultSelectAnalogData,1);
+numColumnAnalogData  = SizeResultSelectAnalogData/156;
+b = 1;
+e = 1;
+for i=1:numColumnAnalogData
+    e = i*156;
+    AnalogData(1:156,i) = ResultSelectAnalogData(b:e);
+    b = e+1;
+end;
 close(curs);
 close(conn);
