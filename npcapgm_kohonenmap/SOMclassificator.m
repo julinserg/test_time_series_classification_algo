@@ -1,11 +1,11 @@
 clc;
 clear;
-load sampleData;
-isOpen = matlabpool('size') > 0;
-if isOpen
-   matlabpool close; 
-end;
-matlabpool open local 6;
+% load sampleData;
+% isOpen = matlabpool('size') > 0;
+% if isOpen
+%    matlabpool close; 
+% end;
+% matlabpool open local 6;
 %load initDataTransHMMtoHCRF
 %paramsData.weightsPerSequence = ones(1,128) ;
 %paramsData.factorSeqWeights = 1;
@@ -49,7 +49,7 @@ end;
 %     sizeTrain = sizeTrain + 10;
 %     clear('Probability','arrayLL','arrayLabelDetect','arrayLabelTrue');
 %% обучаем карты  охонена дл€ каждого класса 
-if USETRAIN == 1
+if USETRAIN == 0
 k_1 = 1;
 k_2 = 1;
 row = 5;
@@ -64,7 +64,7 @@ for i=1:size(dataTrain,1)
     k_1 = k_1+size(a,2);  
 end; 
 cellNetKox = cell(size(dataTrainRaw,1),1);
-parfor i=1:size(dataTrainForClass,1)
+for i=1:size(dataTrainForClass,1)
   i
   net = newsom(dataTrainForClass{i},[row col],'hextop','dist');
   net.trainParam.epochs = epohs;
@@ -101,6 +101,7 @@ save('modelKohonen.mat', 'cellNetKox');
 % weights_class1 = net_class1.iw{1,1};
 % weights_class2 = net_class2.iw{1,1};
 Probability = cell(size(cellNetKox,1),1);
+DistKohonen = cell(size(cellNetKox,1),1);
 for i=1:size(cellNetKox,1);
     sizeW = size(cellNetKox{i}.iw{1,1},1);
     Probability{i}.A = repmat(0,sizeW,sizeW);
@@ -204,7 +205,7 @@ for i = 1:size(dataTest,1)
      % DR = featureNormalize(dataTest{i,j}');
      % p = DR';
      p = dataTest{i,j};
-    parfor m = 1:size(cellNetKox,1)
+    for m = 1:size(cellNetKox,1)
        w= cellNetKox{m}.iw{1,1};       
        [S,R11] = size(w);
        [R2,Q] = size(p);
@@ -245,11 +246,24 @@ for i = 1:size(dataTest,1)
 %          resP = resP + log(A(t_prev,t_cur)) + log(B(t_cur,li));
 %        end;
 %        logp =resP;
-       logp = hmmFilter(pi, A, B);
+       %logp = hmmFilter(pi, A, B);
+       lik  = 1;
+       sumLik = 0;
+       for step=1:100
+           SEED = randomseed();
+           randomseed( SEED+1 );
+           z = SampleHMMStateSeqC( A, B, pi, SEED(1) );           
+           lik = pi(z(1))*B(z(1),1);
+           for t=2:size(B,2)            
+             lik =lik*A(z(t-1),z(t))*B(z(t),t);
+           end;
+           sumLik = sumLik + lik;
+       end;
        %logp = 0;
        %L = logsumexp(scale', 2);
-       logp = logp + sum(scale);     
-       arrayLL(index,m) = logp;          
+       %logp = logp + sum(scale);     
+       %arrayLL(index,m) = logp;
+       arrayLL(index,m) = log(sumLik) + sum(scale);
     end;
     index = index + 1;
   end;
