@@ -1,11 +1,11 @@
 clc;
 clear;
-load sampleData;
-%isOpen = matlabpool('size') > 0;
-%if isOpen
-%   matlabpool close; 
-%end;
-%matlabpool open local 4;
+% load sampleData;
+% isOpen = matlabpool('size') > 0;
+% if isOpen
+%    matlabpool close; 
+% end;
+% matlabpool open local 6;
 %load initDataTransHMMtoHCRF
 %paramsData.weightsPerSequence = ones(1,128) ;
 %paramsData.factorSeqWeights = 1;
@@ -27,7 +27,7 @@ load sampleData;
 % Average Pricision  = 0.749645
 % Average Recall  = 0.644676
 % F-measure  = 0.693209
-USETRAIN = 0
+USETRAIN = 1
 k = 1;
 dataTrainRaw = getTrainData(1);
 for i=1:size(dataTrainRaw,1)
@@ -49,11 +49,11 @@ end;
 %     sizeTrain = sizeTrain + 10;
 %     clear('Probability','arrayLL','arrayLabelDetect','arrayLabelTrue');
 %% обучаем карты  охонена дл€ каждого класса 
-if USETRAIN == 1
+if USETRAIN == 0
 k_1 = 1;
 k_2 = 1;
-row = 10;
-col = 10;
+row = 5;
+col = 5;
 epohs = 100;
 dataTrainForClass = cell(size(dataTrainRaw,1),1);
 for i=1:size(dataTrain,1)  
@@ -101,6 +101,7 @@ save('modelKohonen.mat', 'cellNetKox');
 % weights_class1 = net_class1.iw{1,1};
 % weights_class2 = net_class2.iw{1,1};
 Probability = cell(size(cellNetKox,1),1);
+DistKohonen = cell(size(cellNetKox,1),1);
 for i=1:size(cellNetKox,1);
     sizeW = size(cellNetKox{i}.iw{1,1},1);
     Probability{i}.A = repmat(0,sizeW,sizeW);
@@ -230,9 +231,8 @@ for i = 1:size(dataTest,1)
 %         B = n;
        [logB scale] = normalizeLogspace(n');
        %Index = find(n(:,1));
-      % [logB scale] = normalizeTraps(n',Index');
+       %[logB scale] = normalizeTraps(n',Index');
        B = exp(logB');
-      %  B = exp(n);
        %B = logB';
        pi = repmat(5,1,size(w',1));
        pi(1,rows(1,1)) = 10;
@@ -246,11 +246,24 @@ for i = 1:size(dataTest,1)
 %          resP = resP + log(A(t_prev,t_cur)) + log(B(t_cur,li));
 %        end;
 %        logp =resP;
-       logp = hmmFilter(pi, A, B);
+       %logp = hmmFilter(pi, A, B);
+       lik  = 1;
+       sumLik = 0;
+       for step=1:100
+           SEED = randomseed();
+           randomseed( SEED+1 );
+           z = SampleHMMStateSeqC( A, B, pi, SEED(1) );           
+           lik = pi(z(1))*B(z(1),1);
+           for t=2:size(B,2)            
+             lik =lik*A(z(t-1),z(t))*B(z(t),t);
+           end;
+           sumLik = sumLik + lik;
+       end;
        %logp = 0;
        %L = logsumexp(scale', 2);
-       logp = logp + sum(scale);     
-       arrayLL(index,m) = logp;          
+       %logp = logp + sum(scale);     
+       %arrayLL(index,m) = logp;
+       arrayLL(index,m) = log(sumLik) + sum(scale);
     end;
     index = index + 1;
   end;
