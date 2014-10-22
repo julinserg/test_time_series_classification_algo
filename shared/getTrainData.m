@@ -1,5 +1,5 @@
 function [D] = getTrainData(NUMBER)
-SELECTDATASET = 6;
+SELECTDATASET = 2;
 if SELECTDATASET == 1
 %% arabic digit
  load dataTrainArabicDigit;
@@ -78,7 +78,7 @@ D(1:20,51:100) = mixoutNew(21:40,1:50);
 
 if NUMBER == 1
  % D = D(1:20,1:50);
-  D = D(1:20,1:50);
+  D = D(1:10,1:50);
 end;
 if NUMBER == 2
   D = horzcat(D(1:20,1:10),D(1:20,21:100));

@@ -1,11 +1,11 @@
 clc;
 clear;
 load sampleData;
-isOpen = matlabpool('size') > 0;
-if isOpen
-   matlabpool close; 
-end;
-matlabpool open local 6;
+%isOpen = matlabpool('size') > 0;
+%if isOpen
+%   matlabpool close; 
+%end;
+%matlabpool open local 4;
 %load initDataTransHMMtoHCRF
 %paramsData.weightsPerSequence = ones(1,128) ;
 %paramsData.factorSeqWeights = 1;
@@ -27,7 +27,7 @@ matlabpool open local 6;
 % Average Pricision  = 0.749645
 % Average Recall  = 0.644676
 % F-measure  = 0.693209
-USETRAIN = 1
+USETRAIN = 0
 k = 1;
 dataTrainRaw = getTrainData(1);
 for i=1:size(dataTrainRaw,1)
@@ -52,8 +52,8 @@ end;
 if USETRAIN == 1
 k_1 = 1;
 k_2 = 1;
-row = 5;
-col = 5;
+row = 10;
+col = 10;
 epohs = 100;
 dataTrainForClass = cell(size(dataTrainRaw,1),1);
 for i=1:size(dataTrain,1)  
@@ -64,7 +64,7 @@ for i=1:size(dataTrain,1)
     k_1 = k_1+size(a,2);  
 end; 
 cellNetKox = cell(size(dataTrainRaw,1),1);
-parfor i=1:size(dataTrainForClass,1)
+for i=1:size(dataTrainForClass,1)
   i
   net = newsom(dataTrainForClass{i},[row col],'hextop','dist');
   net.trainParam.epochs = epohs;
@@ -204,7 +204,7 @@ for i = 1:size(dataTest,1)
      % DR = featureNormalize(dataTest{i,j}');
      % p = DR';
      p = dataTest{i,j};
-    parfor m = 1:size(cellNetKox,1)
+    for m = 1:size(cellNetKox,1)
        w= cellNetKox{m}.iw{1,1};       
        [S,R11] = size(w);
        [R2,Q] = size(p);
@@ -230,8 +230,9 @@ for i = 1:size(dataTest,1)
 %         B = n;
        [logB scale] = normalizeLogspace(n');
        %Index = find(n(:,1));
-       %[logB scale] = normalizeTraps(n',Index');
+      % [logB scale] = normalizeTraps(n',Index');
        B = exp(logB');
+      %  B = exp(n);
        %B = logB';
        pi = repmat(5,1,size(w',1));
        pi(1,rows(1,1)) = 10;
