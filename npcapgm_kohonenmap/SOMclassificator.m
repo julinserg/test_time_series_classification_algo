@@ -1,6 +1,6 @@
 clc;
 clear;
-% load sampleData;
+load sampleData;
 % isOpen = matlabpool('size') > 0;
 % if isOpen
 %    matlabpool close; 
@@ -49,11 +49,11 @@ end;
 %     sizeTrain = sizeTrain + 10;
 %     clear('Probability','arrayLL','arrayLabelDetect','arrayLabelTrue');
 %% обучаем карты  охонена дл€ каждого класса 
-if USETRAIN == 0
+if USETRAIN == 1
 k_1 = 1;
 k_2 = 1;
-row = 5;
-col = 5;
+row = 10;
+col = 10;
 epohs = 100;
 dataTrainForClass = cell(size(dataTrainRaw,1),1);
 for i=1:size(dataTrain,1)  
@@ -64,7 +64,7 @@ for i=1:size(dataTrain,1)
     k_1 = k_1+size(a,2);  
 end; 
 cellNetKox = cell(size(dataTrainRaw,1),1);
-for i=1:size(dataTrainForClass,1)
+parfor i=1:size(dataTrainForClass,1)
   i
   net = newsom(dataTrainForClass{i},[row col],'hextop','dist');
   net.trainParam.epochs = epohs;
@@ -190,8 +190,8 @@ end;
 
 %% тест
 arrayLogLikDataSetTest = cell(1,1);
-dataTest =  getTestDataOnTest(1);
-%dataTest = getTrainData(1);
+%dataTest =  getTestDataOnTest(2);
+dataTest = getTrainData(1);
 %dataTest = getTestDataOnTest(4);
 for i=1:size(dataTest,1)
     for j=1:size(dataTest,2)       
@@ -219,7 +219,14 @@ for i = 1:size(dataTest,1)
        z = -z.^0.5;
       % z = -z;
        n= z;
-       [maxn,rows] = max(n,[],1);
+        [maxn,rows] = max(z,[],1);
+%        zH = zeros(S,Q);
+%        for ii=1:S
+%          zH(ii,:) = sum((w(:,ii+copies)-w(:,rows)).^2,1); % l2-norm
+%        % z(ii,:) = sum(abs(w(:,ii+copies)-p),1); % l1 -norm
+%        end;
+%         zH = zH.^0.5;
+%         n = z.*zH;
 %         for tt =1:size(n,2)
 %             summaRow = sum(n(tt,:));
 %             if summaRow ~= 0
@@ -246,24 +253,26 @@ for i = 1:size(dataTest,1)
 %          resP = resP + log(A(t_prev,t_cur)) + log(B(t_cur,li));
 %        end;
 %        logp =resP;
-       %logp = hmmFilter(pi, A, B);
-       lik  = 1;
-       sumLik = 0;
-       for step=1:100
-           SEED = randomseed();
-           randomseed( SEED+1 );
-           z = SampleHMMStateSeqC( A, B, pi, SEED(1) );           
-           lik = pi(z(1))*B(z(1),1);
-           for t=2:size(B,2)            
-             lik =lik*A(z(t-1),z(t))*B(z(t),t);
-           end;
-           sumLik = sumLik + lik;
-       end;
+       logp = hmmFilter(pi, A, B);     
+%        sumLik = 0;
+%        COUNTITER = 1000;
+%        clear('Ll');
+%        for step=1:COUNTITER
+%            SEED = randomseed();
+%            randomseed( SEED+1 );
+%            z = SampleHMMStateSeqC( A, B, pi, SEED(1) );   
+%            loglik = log(pi(z(1))) + log(B(z(1),1));           
+%            for t=2:size(B,2)
+%               loglik = loglik +  log(A(z(t-1),z(t))) + log(B(z(t),t));
+%            end;
+%            Ll(step) = loglik;
+%        end;
+%        sumLik = logsumexp(Ll');
        %logp = 0;
        %L = logsumexp(scale', 2);
-       %logp = logp + sum(scale);     
-       %arrayLL(index,m) = logp;
-       arrayLL(index,m) = log(sumLik) + sum(scale);
+       logp = logp + sum(scale);     
+       arrayLL(index,m) = logp;
+      % arrayLL(index,m) = sumLik + sum(scale);
     end;
     index = index + 1;
   end;
