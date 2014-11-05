@@ -27,9 +27,9 @@ load sampleData;
 % Average Pricision  = 0.749645
 % Average Recall  = 0.644676
 % F-measure  = 0.693209
-USETRAIN = 1
+USETRAIN = 0
 k = 1;
-dataTrainRaw = getTrainData(1);
+dataTrainRaw = getTrainData(2);
 for i=1:size(dataTrainRaw,1)
     for j=1:size(dataTrainRaw,2)
         %DR = featureNormalize(dataTrainRaw{i,j}');
@@ -52,8 +52,8 @@ end;
 if USETRAIN == 1
 k_1 = 1;
 k_2 = 1;
-row = 10;
-col = 10;
+row = 16;
+col = 16;
 epohs = 100;
 dataTrainForClass = cell(size(dataTrainRaw,1),1);
 for i=1:size(dataTrain,1)  
@@ -191,7 +191,7 @@ end;
 %% тест
 arrayLogLikDataSetTest = cell(1,1);
 %dataTest =  getTestDataOnTest(2);
-dataTest = getTrainData(1);
+dataTest = getTestDataOnTest(2);
 %dataTest = getTestDataOnTest(4);
 for i=1:size(dataTest,1)
     for j=1:size(dataTest,2)       
