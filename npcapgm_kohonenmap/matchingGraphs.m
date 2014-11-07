@@ -3,7 +3,7 @@ n1 = size(G1,2);
 n2 = size(G2,2);
 nMax=max(n1,n2);
 [target,G2,W2]=permuteIndexes(G2,W2,nMax,nMax);
-density_matches=0.01;
+density_matches=0.000000001;
 target=target(1:n1,1:n2);
 G1=G1(1:n1,1:n1,:);
 G2=G2(1:n2,1:n2,:);
@@ -22,12 +22,12 @@ W = compute_matchingW(G1,W1,G2,W2,F12,E12,f,options);
 
 
 options.constraintMode='both'; %'both' for 1-1 graph matching
-options.isAffine=1;% affine constraint
-options.isOrth=1;%orthonormalization before discretization
-options.normalization='iterative';%bistochastic kronecker normalization
-% options.normalization='none'; %we can also see results without normalization
-options.discretisation=@discretisationGradAssignment; %function for discretization
-options.is_discretisation_on_original_W=0;
+%options.isAffine=0;% affine constraint
+%options.isOrth=0;%orthonormalization before discretization
+%options.normalization='iterative';%bistochastic kronecker normalization
+ options.normalization='none'; %we can also see results without normalization
+%options.discretisation=@discretisationGradAssignment; %function for discretization
+%options.is_discretisation_on_original_W=0;
 
 %put options.is_discretisation_on_original_W=1 if you want to discretize on original W 
 %1: might be better for raw objective (based orig W), but should be worse for accuracy

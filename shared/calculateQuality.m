@@ -9,7 +9,7 @@ for i=1:size(arrayLabelDetect,2)
     end;
 end;
 accuracy = 1 - (error / size(arrayLabelDetect,2));
-fprintf('accuracy  = %f\n', accuracy);
+%fprintf('accuracy  = %f\n', accuracy);
 
 %вычисляем матрицу неоднородностей Confusion_Matrix
 Confusion_Matrix = repmat(0, numberClass, numberClass);
