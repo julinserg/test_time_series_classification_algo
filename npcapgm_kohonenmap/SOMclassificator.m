@@ -49,12 +49,12 @@ end;
 %     sizeTrain = sizeTrain + 10;
 %     clear('Probability','arrayLL','arrayLabelDetect','arrayLabelTrue');
 %% обучаем карты  охонена дл€ каждого класса 
-if USETRAIN == 0
+if USETRAIN == 1
 k_1 = 1;
 k_2 = 1;
 row = 5;
 col = 5;
-epohs = 100;
+epohs = 10;
 dataTrainForClass = cell(size(dataTrainRaw,1),1);
 for i=1:size(dataTrain,1)  
     u = size(dataTrain{i},2);
@@ -119,7 +119,24 @@ for i=1:size(dataTrainRaw,1)
            array = sim(cellNetKox{i},dataTrainRaw{i,j});
             distArray = calculateDist(cellNetKox{i});
             numNeurons = size(cellNetKox{i}.iw{1,1},1);
+          
             neighbors = sparse(tril(cellNetKox{i}.layers{1}.distances <= 1.001) - eye(numNeurons));
+            g = graph;
+            resize(g,size(neighbors,1));
+            clear_edges(g);       
+
+            for ii=1:size(neighbors,1)
+                for jj=1:size(neighbors,1)
+                    if (neighbors(ii,jj) == 1)
+                       add(g,ii,jj); 
+                    end;
+                end;
+            end;
+            p = randperm(size(neighbors,1));
+            renumber(g,p);
+            L = laplacian(g);
+            [V,d] = eig(L);
+            v2 = V(:,2);
             array = vec2ind(array);
             for k=1:size(array,2)-1
                 pp = array(1,k);
@@ -187,10 +204,68 @@ end;
 % A_2 = exp(logA2);
 %A_1(~A_1) = 0.000001;
 %A_2(~A_2) = 0.000001;
-
+for m = 1:size(cellNetKox,1)
+    ZZmodel = repmat(0,1,size(cellNetKox{m}.iw{1,1},1));
+    for j = 1:size(dataTrainRaw,2)
+      p = dataTrainRaw{m,j};
+      w= cellNetKox{m}.iw{1,1};       
+      [S,R11] = size(w);
+      [R2,Q] = size(p);
+      z = zeros(S,Q);
+      w = w';
+      copies = zeros(1,Q);
+      for ii=1:S
+        z(ii,:) = sum((w(:,ii+copies)-p).^2,1); % l2-norm       
+      end;
+      z = -z.^0.5;         
+      n= z;
+      [maxn,rows] = max(n,[],1);
+      [logB scale] = normalizeLogspace(n');      
+      B = exp(logB');      
+      pi = repmat(5,1,size(w',1));
+      pi(1,rows(1,1)) = 10;
+      pi = normalizeLogspace(pi);
+      pi = exp(pi);
+      A =  Probability{m}.A; 
+      
+      SEMPLCOUNT = 1;        
+      for step=1:SEMPLCOUNT
+        lik = 0;
+        SEED = randomseed();
+        randomseed( SEED+1 );
+        z = SampleHMMStateSeqC( A, B, pi, SEED(1) );
+        for i=1:size(z,2)
+            ZZmodel(1,z(1,i)) =  ZZmodel(1,z(1,i)) + 1;
+        end;
+      end;
+    end;
+    ZZmodel = ZZmodel ./ sum(ZZmodel);
+    me = mean(ZZmodel); 
+    ZZmodelNew = find(ZZmodel > me);
+    AllZZmodel{m} = ZZmodel;
+    SizeArray(m) = size(ZZmodelNew,2);
+    
+end;
+clear('pi','A','B','n');
+maxSZ = 80;%max(SizeArray);
+for i=1:size(AllZZmodel,2)  
+    [SortAr,IndX] = sort(AllZZmodel{i},2,'descend');
+    AllZZmodelNew{i} = IndX(1:maxSZ);
+    AllZZmodelNew{i} = sort(AllZZmodelNew{i});
+    w = cellNetKox{i}.iw{1,1}(AllZZmodelNew{i},:);    
+    cellNetKoxNEW{i} = w;
+    A =  Probability{i}.A(AllZZmodelNew{i},AllZZmodelNew{i});
+    sumA = sum(A,2);
+    for j=1:size(A,1)
+        if sumA(j) ~= 0
+            A(j,:) = A(j,:)./sumA(j);
+        end;
+    end;
+    %Probability{i}.A = A;
+end;
 %% тест
 arrayLogLikDataSetTest = cell(1,1);
-dataTest =  getTestDataOnTest(1);
+dataTest =  getTestDataOnTest(2);
 %dataTest = getTrainData(1);
 %dataTest = getTestDataOnTest(4);
 for i=1:size(dataTest,1)
@@ -206,7 +281,8 @@ for i = 1:size(dataTest,1)
      % p = DR';
      p = dataTest{i,j};
     for m = 1:size(cellNetKox,1)
-       w= cellNetKox{m}.iw{1,1};       
+       w= cellNetKox{m}.iw{1,1}; 
+     % w = cellNetKoxNEW{m};
        [S,R11] = size(w);
        [R2,Q] = size(p);
        z = zeros(S,Q);
@@ -214,12 +290,22 @@ for i = 1:size(dataTest,1)
        copies = zeros(1,Q);
        for ii=1:S
          z(ii,:) = sum((w(:,ii+copies)-p).^2,1); % l2-norm
-       % z(ii,:) = sum(abs(w(:,ii+copies)-p),1); % l1 -norm
+       % z(ii,:) = sum(abs(w(:,ii+copies)-p),1); % l1-norm
        end;
        z = -z.^0.5;
-      % z = -z;
+     %  z = -z;       
        n= z;
        [maxn,rows] = max(n,[],1);
+%        zH = zeros(S,Q);
+%        for ii=1:S
+%          zH(ii,:) = sum((w(:,ii+copies)-w(:,rows)).^2,1); % l2-norm
+%        % zH(ii,:) = sum(abs(w(:,ii+copies)-p),1); % l1-norm
+%        end;
+%        zH = zH.^0.5;
+      
+       %n = z.*zH;
+     %  distArray = calculateDist(cellNetKox{m});
+       
 %         for tt =1:size(n,2)
 %             summaRow = sum(n(tt,:));
 %             if summaRow ~= 0
@@ -246,24 +332,32 @@ for i = 1:size(dataTest,1)
 %          resP = resP + log(A(t_prev,t_cur)) + log(B(t_cur,li));
 %        end;
 %        logp =resP;
-       %logp = hmmFilter(pi, A, B);
-       lik  = 1;
-       sumLik = 0;
-       for step=1:100
-           SEED = randomseed();
-           randomseed( SEED+1 );
-           z = SampleHMMStateSeqC( A, B, pi, SEED(1) );           
-           lik = pi(z(1))*B(z(1),1);
-           for t=2:size(B,2)            
-             lik =lik*A(z(t-1),z(t))*B(z(t),t);
-           end;
-           sumLik = sumLik + lik;
-       end;
+      % tic; 
+      % logp = hmmFilter(pi, A, B); 
+      % toc;
+      % tic;
+       [ggg logp] = FilterFwdC(A, B, pi);
+      % toc;
+%        sumLik = 0;    
+%        clear('L');     
+%        for step=1:10
+%            lik = 0;
+%            SEED = randomseed();
+%            randomseed( SEED+1 );
+%            z = SampleHMMStateSeqC( A, B, pi, SEED(1) );           
+%            lik = log(pi(z(1)))+log(B(z(1),1));
+%            for t=2:size(B,2)            
+%              lik = lik + log(A(z(t-1),z(t)))+log(B(z(t),t));
+%            end;
+%            L(step) = lik;
+%         end;       
+%         sumLik = logsumexp(L');
+      % sumLik = log(sum(L'));
        %logp = 0;
        %L = logsumexp(scale', 2);
-       %logp = logp + sum(scale);     
-       %arrayLL(index,m) = logp;
-       arrayLL(index,m) = log(sumLik) + sum(scale);
+       logp = logp + sum(scale);     
+       arrayLL(index,m) = logp;
+      % arrayLL(index,m) = sumLik + sum(scale);
     end;
     index = index + 1;
   end;
