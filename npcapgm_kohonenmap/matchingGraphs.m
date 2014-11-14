@@ -1,4 +1,4 @@
-function [score] = matchingGraphs(G1,W1,G2,W2)
+function [score] = matchingGraphs(neighbors,G1,W1,G2,W2)
 n1 = size(G1,2);
 n2 = size(G2,2);
 nMax=max(n1,n2);
@@ -13,6 +13,7 @@ W2=W2(1:n2,1:n2);
 na=size(G1,3);
 F12=ones(n1,n2);
 E12=rand(n1,n2)<=density_matches;
+%E12= neighbors;
 E12(target==1)=1;
 f.fG=ones(na,1);
 

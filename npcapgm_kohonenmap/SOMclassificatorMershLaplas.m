@@ -29,7 +29,7 @@ matlabpool open local 8;
 % F-measure  = 0.693209
 USETRAIN = 0
 k = 1;
-dataTrainRaw = getTrainData(1);
+dataTrainRaw = getTrainData(2);
 for i=1:size(dataTrainRaw,1)
     for j=1:size(dataTrainRaw,2)
         dataTrain{k,1} = dataTrainRaw{i,j};
@@ -42,8 +42,8 @@ end;
 if USETRAIN == 1
 k_1 = 1;
 k_2 = 1;
-row = 16;
-col = 16;
+row = 32;
+col = 32;
 epohs = 500;
 dataTrainForClass = cell(size(dataTrainRaw,1),1);
 for i=1:size(dataTrain,1)  
@@ -69,7 +69,6 @@ save('GraphGmodelG.mat','GraphGmodelG');
 save('GraphWmodelW.mat','GraphWmodelW');
 
 %% вычисляем матрицу А (матрицу выходов) для каждого класса
-
 Probability = cell(size(cellNetKox,1),1);
 DistKohonen = cell(size(cellNetKox,1),1);
 for i=1:size(cellNetKox,1);
@@ -79,10 +78,9 @@ for i=1:size(cellNetKox,1);
 end;
 
 index = 1;
-g = graph;
 numNeurons = size(cellNetKox{i}.iw{1,1},1);
 neighborsold = repmat(0,numNeurons,numNeurons);
-parfor i=1:size(dataTrainRaw,1)   
+for i=1:size(dataTrainRaw,1)   
     for j=1:size(dataTrainRaw,2)        
            array = sim(cellNetKox{i},dataTrainRaw{i,j});          
           
@@ -123,7 +121,7 @@ end;
 
 %% тест
 arrayLogLikDataSetTest = cell(1,1);
-dataTest =  getTestDataOnTest(1);
+dataTest =  getTrainData(2);
 
 for i=1:size(dataTest,1)
     for j=1:size(dataTest,2)       
@@ -153,7 +151,101 @@ for i = 1:size(dataTest,1)
        Ar(:,rows) = GraphGmodelG{m}(:,rows);
        GraphG = Ar;
        GraphW = sparse(GraphG > 0);
-       arrayLLFldVec(index,m) = matchingGraphs(GraphGmodelG{m},GraphWmodelW{m},GraphG,GraphW);      
+       neighbors = tril(cellNetKox{m}.layers{1}.distances <= 1.001) - eye(S);
+       arrayLLFldVec(index,m) = matchingGraphs(neighbors,GraphGmodelG{m},GraphWmodelW{m},GraphG,GraphW);      
+            
+               
+
+      [logB scale] = normalizeLogspace(n');      
+       B = exp(logB');
+       %B = logB';
+       pi = repmat(5,1,size(w',1));
+       pi(1,rows(1,1)) = 10;
+       pi = normalizeLogspace(pi);
+       pi = exp(pi);
+       A =  Probability{m}.A;
+       [alpha, logp] = FilterFwdC(A,B,pi);
+       logp = logp + sum(scale);     
+       arrayLL(index,m) = logp;
+      % arrayLL(index,m) = sumLik + sum(scale);
+    end;
+    index = index + 1;
+  end;
+end;
+save('arrayLogLikDataSetTest.mat', 'arrayLogLikDataSetTest');
+%arrayLL = exp(normalizeLogspace(arrayLL));
+arrayLL = arrayLL';
+for i=1:size(arrayLL,2)
+    [c index] = max(arrayLL(:,i));
+     arrayLabelDetect(1,i) = index-1; 
+     HHl(1,i) = c;
+end;
+arrayLLFldVec = arrayLLFldVec';
+for i=1:size(arrayLLFldVec,2)
+    [c index] = max(arrayLLFldVec(:,i));
+     arrayLabelDetectLaplas(1,i) = index-1;   
+     HHfg(1,i) = c;
+end;
+for i =1:size(labelTest,1)
+    for j=1:size(labelTest,2)
+     arrayLabelTrue(1,(i-1)*size(labelTest,2)+j) = labelTest{i,j}(1,1); 
+    end;
+end;
+[ff,gg, fmear,qual] = calculateQuality(arrayLabelDetect,arrayLabelTrue,size(arrayLL,1));
+[ff,gg, fmear,qual] = calculateQuality(arrayLabelDetectLaplas,arrayLabelTrue,size(arrayLL,1));
+save('lastTest.dat','-ascii','qual','-double');
+
+trainEnsemble = repmat(0,size(arrayLL,1)*2,size(arrayLL,2));
+for i=1:size(arrayLabelDetect,2)
+    trainEnsemble(1:size(arrayLL,1),i) = -arrayLL(:,i)./sum(arrayLL(:,i));
+    trainEnsemble(size(arrayLL,1)+1:size(arrayLL,1)*2,i) = arrayLLFldVec(:,i)./sum(arrayLLFldVec(:,i));
+end;
+label = repmat(0,size(arrayLL,1),size(arrayLL,2));
+for i=1:size(arrayLabelTrue,2)
+    label(arrayLabelTrue(1,i)+1,i) = 1;
+end;
+%tree = classregtree(trainEnsemble',arrayLabelTrue','method','classification');
+%tree1 = TreeBagger(1,trainEnsemble',arrayLabelTrue','Method', 'classification');
+net = patternnet(size(arrayLL,1)*2);
+view(net)
+[net,tr] = train(net,trainEnsemble,label);
+nntraintool
+plotperform(tr)
+clear('labelTest','dataTest','arrayLL','arrayLLFldVec','arrayLabelTrue','arrayLabelDetect','arrayLabelDetectLaplas');
+%% тест
+arrayLogLikDataSetTest = cell(1,1);
+dataTest =  getTestDataOnTest(2);
+
+for i=1:size(dataTest,1)
+    for j=1:size(dataTest,2)       
+        labelTest{i,j}(1,1) = i-1;        
+    end;
+end;
+index = 1;
+for i = 1:size(dataTest,1)
+  for j = 1:size(dataTest,2)    
+     p = dataTest{i,j};
+    parfor m = 1:size(cellNetKox,1)
+       w= cellNetKox{m}.iw{1,1};       
+       [S,R11] = size(w);
+       [R2,Q] = size(p);
+       z = zeros(S,Q);
+       w = w';
+       copies = zeros(1,Q);
+       for ii=1:S
+         z(ii,:) = sum((w(:,ii+copies)-p).^2,1); % l2-norm
+       % z(ii,:) = sum(abs(w(:,ii+copies)-p),1); % l1 -norm
+       end;
+       z = -z.^0.5;
+      % z = -z;
+       n= z;
+      [maxn,rows] = max(z,[],1);
+       Ar = repmat(0,size(GraphGmodelG{m},1),size(GraphGmodelG{m},2));
+       Ar(:,rows) = GraphGmodelG{m}(:,rows);
+       GraphG = Ar;
+       GraphW = sparse(GraphG > 0);
+       neighbors = tril(cellNetKox{m}.layers{1}.distances <= 1.001) - eye(S);
+       arrayLLFldVec(index,m) = matchingGraphs(neighbors,GraphGmodelG{m},GraphWmodelW{m},GraphG,GraphW);      
             
                
 
@@ -192,6 +284,17 @@ for i =1:size(labelTest,1)
 end;
 [ff,gg, fmear,qual] = calculateQuality(arrayLabelDetect,arrayLabelTrue,size(arrayLL,1));
 [ff,gg, fmear,qual] = calculateQuality(arrayLabelDetectLaplas,arrayLabelTrue,size(arrayLL,1));
-save('lastTest.dat','-ascii','qual','-double');
+testEnsemble = repmat(0,size(arrayLL,1)*2,size(arrayLL,2));
+for i=1:size(arrayLabelDetect,2)
+    testEnsemble(1:size(arrayLL,1),i) = -arrayLL(:,i)./sum(arrayLL(:,i));
+    testEnsemble(size(arrayLL,1)+1:size(arrayLL,1)*2,i) = arrayLLFldVec(:,i)./sum(arrayLLFldVec(:,i));
+end;
+%yPredicted = eval(tree, testEnsemble');
+%yPredicted1 = tree1.predict(testEnsemble');
+%yP = str2double(yPredicted);
+testY  = sim(net,testEnsemble);
+testIndices = vec2ind(testY);
+testIndicesL = testIndices-ones(1,size(testIndices,2));
+[ff,gg, fmear,qual] = calculateQuality(testIndicesL,arrayLabelTrue,size(arrayLL,1));
 
 
