@@ -6,10 +6,10 @@ clc;
 %   классификация  с помощью HMM pmtk library
 %% init
 
-nstates = 7;
+nstates = 5;
 setSeed(0); 
 
-NUM = 2
+NUM = 1
 %% train
 dataTrainArabicDigit = getTrainData(NUM);
 %dataTrainArabicDigit = getTestDataOnTest(NUM);
