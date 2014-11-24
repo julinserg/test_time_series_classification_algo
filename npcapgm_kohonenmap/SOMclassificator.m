@@ -1,11 +1,11 @@
 clc;
 clear;
 load sampleData;
-% isOpen = matlabpool('size') > 0;
-% if isOpen
-%    matlabpool close; 
-% end;
-% matlabpool open local 6;
+isOpen = matlabpool('size') > 0;
+if isOpen
+   matlabpool close; 
+end;
+matlabpool open local 8;
 %load initDataTransHMMtoHCRF
 %paramsData.weightsPerSequence = ones(1,128) ;
 %paramsData.factorSeqWeights = 1;
@@ -27,9 +27,9 @@ load sampleData;
 % Average Pricision  = 0.749645
 % Average Recall  = 0.644676
 % F-measure  = 0.693209
-USETRAIN = 0
+USETRAIN = 1
 k = 1;
-dataTrainRaw = getTrainData(2);
+dataTrainRaw = getTrainData(1);
 for i=1:size(dataTrainRaw,1)
     for j=1:size(dataTrainRaw,2)
         %DR = featureNormalize(dataTrainRaw{i,j}');
@@ -191,7 +191,7 @@ end;
 %% тест
 arrayLogLikDataSetTest = cell(1,1);
 %dataTest =  getTestDataOnTest(2);
-dataTest = getTestDataOnTest(2);
+dataTest = getTestDataOnTest(1);
 %dataTest = getTestDataOnTest(4);
 for i=1:size(dataTest,1)
     for j=1:size(dataTest,2)       

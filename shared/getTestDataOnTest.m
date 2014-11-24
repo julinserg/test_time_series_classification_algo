@@ -1,5 +1,5 @@
 function [D] = getTestDataOnTest(NUMBER)
-SELECTDATASET = 1;
+SELECTDATASET = 7;
 %% arabic digit
 if SELECTDATASET == 1
  load dataTrainArabicDigit;
@@ -150,6 +150,15 @@ end;
 if SELECTDATASET == 6
     load higgsTest.mat;
     D = dataTestArabicDigit;
+    if NUMBER == 1
+        D = D(:,:);
+    end;
+end;
+
+if SELECTDATASET == 7
+    %http://archive.ics.uci.edu/ml/datasets/Dataset+for+ADL+Recognition+with+Wrist-worn+Accelerometer#
+    load dataTestAccelerometer.mat;
+    D = dataTest;
     if NUMBER == 1
         D = D(:,:);
     end;

@@ -1,5 +1,8 @@
 clc;
 clear;
+
+
+
 load sampleData;
 isOpen = matlabpool('size') > 0;
 if isOpen
@@ -29,7 +32,7 @@ matlabpool open local 8;
 % F-measure  = 0.693209
 USETRAIN = 0
 k = 1;
-dataTrainRaw = getTrainData(2);
+dataTrainRaw = getTrainData(1);
 for i=1:size(dataTrainRaw,1)
     for j=1:size(dataTrainRaw,2)
         dataTrain{k,1} = dataTrainRaw{i,j};
@@ -121,7 +124,7 @@ end;
 
 %% тест
 arrayLogLikDataSetTest = cell(1,1);
-dataTest =  getTrainData(2);
+dataTest =  getTrainData(1);
 
 for i=1:size(dataTest,1)
     for j=1:size(dataTest,2)       
@@ -195,26 +198,47 @@ end;
 [ff,gg, fmear,qual] = calculateQuality(arrayLabelDetectLaplas,arrayLabelTrue,size(arrayLL,1));
 save('lastTest.dat','-ascii','qual','-double');
 
-trainEnsemble = repmat(0,size(arrayLL,1)*2,size(arrayLL,2));
-for i=1:size(arrayLabelDetect,2)
-    trainEnsemble(1:size(arrayLL,1),i) = -arrayLL(:,i)./sum(arrayLL(:,i));
-    trainEnsemble(size(arrayLL,1)+1:size(arrayLL,1)*2,i) = arrayLLFldVec(:,i)./sum(arrayLLFldVec(:,i));
-end;
-label = repmat(0,size(arrayLL,1),size(arrayLL,2));
-for i=1:size(arrayLabelTrue,2)
-    label(arrayLabelTrue(1,i)+1,i) = 1;
-end;
-%tree = classregtree(trainEnsemble',arrayLabelTrue','method','classification');
-%tree1 = TreeBagger(1,trainEnsemble',arrayLabelTrue','Method', 'classification');
-net = patternnet(size(arrayLL,1)*2);
-view(net)
-[net,tr] = train(net,trainEnsemble,label);
-nntraintool
-plotperform(tr)
+%% объединение оубчением нейронной сети
+% trainEnsemble = repmat(0,size(arrayLL,1)*2,size(arrayLL,2));
+% for i=1:size(arrayLabelDetect,2)
+%     %trainEnsemble(1:size(arrayLL,1),i) = -arrayLL(:,i)./sum(arrayLL(:,i));   
+%     trainEnsemble(1:size(arrayLL,1),i) = arrayLL(:,i);
+%     %trainEnsemble(size(arrayLL,1)+1:size(arrayLL,1)*2,i) = arrayLLFldVec(:,i)./sum(arrayLLFldVec(:,i));
+%     trainEnsemble(size(arrayLL,1)+1:size(arrayLL,1)*2,i) = arrayLLFldVec(:,i);
+% end;
+% label = repmat(0,size(arrayLL,1),size(arrayLL,2));
+% for i=1:size(arrayLabelTrue,2)
+%     label(arrayLabelTrue(1,i)+1,i) = 1;
+% end;
+% %tree = classregtree(trainEnsemble',arrayLabelTrue','method','classification');
+% %tree1 = TreeBagger(1,trainEnsemble',arrayLabelTrue','Method', 'classification');
+% net = patternnet(size(arrayLL,1)*2);
+% view(net)
+% [net,tr] = train(net,trainEnsemble,label);
+% nntraintool
+% plotperform(tr)
+%% Ensemble Toolbox
+CLF_Train_output(1).Abstract_level_output = arrayLabelDetect;
+CLF_Train_output(2).Abstract_level_output = arrayLabelDetectLaplas;
+DP=mapminmax(arrayLL',0,1);
+CLF_Train_output(1).Measurment_level_output = DP;
+DP=mapminmax(arrayLLFldVec',0,1);
+CLF_Train_output(2).Measurment_level_output = DP;
+[temp,Ranked_class]=sort(arrayLL,'descend');
+CLF_Train_output(1).Rank_level_output = Ranked_class;
+[temp,Ranked_class]=sort(arrayLLFldVec,'descend');
+CLF_Train_output(2).Rank_level_output = Ranked_class;
+Confusion_Matrix = calculateQualityForEnsemble(arrayLabelDetect,arrayLabelTrue,size(arrayLL,1));
+CLF_Train_output(1).ConfusionMatrix = Confusion_Matrix;
+Confusion_Matrix = calculateQualityForEnsemble(arrayLabelDetectLaplas,arrayLabelTrue,size(arrayLL,1));
+CLF_Train_output(2).ConfusionMatrix = Confusion_Matrix;
+
+N_train = size(arrayLL,2);
+TrainTargets = arrayLabelTrue;
 clear('labelTest','dataTest','arrayLL','arrayLLFldVec','arrayLabelTrue','arrayLabelDetect','arrayLabelDetectLaplas');
 %% тест
 arrayLogLikDataSetTest = cell(1,1);
-dataTest =  getTestDataOnTest(2);
+dataTest =  getTestDataOnTest(1);
 
 for i=1:size(dataTest,1)
     for j=1:size(dataTest,2)       
@@ -284,17 +308,40 @@ for i =1:size(labelTest,1)
 end;
 [ff,gg, fmear,qual] = calculateQuality(arrayLabelDetect,arrayLabelTrue,size(arrayLL,1));
 [ff,gg, fmear,qual] = calculateQuality(arrayLabelDetectLaplas,arrayLabelTrue,size(arrayLL,1));
-testEnsemble = repmat(0,size(arrayLL,1)*2,size(arrayLL,2));
-for i=1:size(arrayLabelDetect,2)
-    testEnsemble(1:size(arrayLL,1),i) = -arrayLL(:,i)./sum(arrayLL(:,i));
-    testEnsemble(size(arrayLL,1)+1:size(arrayLL,1)*2,i) = arrayLLFldVec(:,i)./sum(arrayLLFldVec(:,i));
-end;
-%yPredicted = eval(tree, testEnsemble');
-%yPredicted1 = tree1.predict(testEnsemble');
-%yP = str2double(yPredicted);
-testY  = sim(net,testEnsemble);
-testIndices = vec2ind(testY);
-testIndicesL = testIndices-ones(1,size(testIndices,2));
-[ff,gg, fmear,qual] = calculateQuality(testIndicesL,arrayLabelTrue,size(arrayLL,1));
+%% объединение оубчением нейронной сети
+% testEnsemble = repmat(0,size(arrayLL,1)*2,size(arrayLL,2));
+% for i=1:size(arrayLabelDetect,2)
+%     testEnsemble(1:size(arrayLL,1),i) = -arrayLL(:,i)./sum(arrayLL(:,i));
+%     testEnsemble(size(arrayLL,1)+1:size(arrayLL,1)*2,i) = arrayLLFldVec(:,i)./sum(arrayLLFldVec(:,i));
+% end;
+% %yPredicted = eval(tree, testEnsemble');
+% %yPredicted1 = tree1.predict(testEnsemble');
+% %yP = str2double(yPredicted);
+% testY  = sim(net,testEnsemble);
+% testIndices = vec2ind(testY);
+% testIndicesL = testIndices-ones(1,size(testIndices,2));
+% [ff,gg, fmear,qual] = calculateQuality(testIndicesL,arrayLabelTrue,size(arrayLL,1));
+%% Ensemble Toolbox
+CLF_Test_output(1).Abstract_level_output = arrayLabelDetect;
+CLF_Test_output(2).Abstract_level_output = arrayLabelDetectLaplas;
+DP=mapminmax(arrayLL',0,1);
+CLF_Test_output(1).Measurment_level_output = DP;
+DP=mapminmax(arrayLLFldVec',0,1);
+CLF_Test_output(2).Measurment_level_output = DP;
+[temp,Ranked_class]=sort(arrayLL,'descend');
+CLF_Test_output(1).Rank_level_output = Ranked_class;
+[temp,Ranked_class]=sort(arrayLLFldVec,'descend');
+CLF_Test_output(2).Rank_level_output = Ranked_class;
 
-
+CombinitionMethods=[1,2,3,4,5,6,7,8,9]; 
+N_classifiers = 2;
+N_test = size(arrayLL,2);
+N_class = size(arrayLL,1);
+TestTargets = arrayLabelTrue;
+ for C=1:length(CombinitionMethods);
+      CombinitionMethod=CombinitionMethods(C);
+      Ensemble_decisions=CombineCLFs(CombinitionMethod,...
+        CLF_Train_output,CLF_Test_output,N_classifiers,N_test,N_train,N_class,TrainTargets);
+      Accuracy_fold_Ensemble(C)=sum(Ensemble_decisions'==TestTargets)/N_test;
+ end
+Accuracy_Ensemble= mean(Accuracy_fold_Ensemble,1);      %N_runs * N_combinationMethods 

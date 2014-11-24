@@ -3,8 +3,8 @@ clear;
 dataTrainRaw = getTrainData(2);
 
 
-row = 16;
-col = 16;
+row = 25;
+col = 25;
 epohs = 500;
 dataTrainForClass = cell(size(dataTrainRaw,1),1);
 porydok = randperm(row*col);
@@ -70,7 +70,7 @@ for i=1:size(dataTest,1)
            Ar(:,rows) = GraphGmodelG{m}(:,rows);
            GraphG = Ar;
             GraphW = sparse(GraphG > 0);
-            arrayLLFldVec(index,m) = matchingGraphs(GraphGmodelG{m},GraphWmodelW{m},GraphG,GraphW);    
+            arrayLLFldVec(index,m) = matchingGraphs(0,GraphGmodelG{m},GraphWmodelW{m},GraphG,GraphW);    
          end;
           index = index + 1;
          
