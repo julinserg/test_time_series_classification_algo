@@ -1,9 +1,6 @@
 clc;
 clear;
-
-
-
-load sampleData;
+%load sampleData;
 isOpen = matlabpool('size') > 0;
 if isOpen
    matlabpool close; 
@@ -30,7 +27,7 @@ matlabpool open local 8;
 % Average Pricision  = 0.749645
 % Average Recall  = 0.644676
 % F-measure  = 0.693209
-USETRAIN = 0
+USETRAIN = 1
 k = 1;
 dataTrainRaw = getTrainData(1);
 for i=1:size(dataTrainRaw,1)
@@ -45,8 +42,8 @@ end;
 if USETRAIN == 1
 k_1 = 1;
 k_2 = 1;
-row = 32;
-col = 32;
+row = 16;
+col = 16;
 epohs = 500;
 dataTrainForClass = cell(size(dataTrainRaw,1),1);
 for i=1:size(dataTrain,1)  
@@ -194,9 +191,11 @@ for i =1:size(labelTest,1)
      arrayLabelTrue(1,(i-1)*size(labelTest,2)+j) = labelTest{i,j}(1,1); 
     end;
 end;
-[ff,gg, fmear,qual] = calculateQuality(arrayLabelDetect,arrayLabelTrue,size(arrayLL,1));
-[ff,gg, fmear,qual] = calculateQuality(arrayLabelDetectLaplas,arrayLabelTrue,size(arrayLL,1));
-save('lastTest.dat','-ascii','qual','-double');
+%[ff,gg, fmear,qual] = calculateQuality(arrayLabelDetect,arrayLabelTrue,size(arrayLL,1));
+%[ff,gg, fmear,qual] = calculateQuality(arrayLabelDetectLaplas,arrayLabelTrue,size(arrayLL,1));
+Train_Accuracy_KOH =sum(arrayLabelDetect==arrayLabelTrue)/size(arrayLL,2)
+Train_Accuracy_GRA =sum(arrayLabelDetectLaplas==arrayLabelTrue)/size(arrayLL,2)
+%save('lastTest.dat','-ascii','qual','-double');
 
 %% объединение оубчением нейронной сети
 % trainEnsemble = repmat(0,size(arrayLL,1)*2,size(arrayLL,2));
@@ -218,16 +217,16 @@ save('lastTest.dat','-ascii','qual','-double');
 % nntraintool
 % plotperform(tr)
 %% Ensemble Toolbox
-CLF_Train_output(1).Abstract_level_output = arrayLabelDetect;
-CLF_Train_output(2).Abstract_level_output = arrayLabelDetectLaplas;
+CLF_Train_output(1).Abstract_level_output = (arrayLabelDetect + ones(size(arrayLabelDetect,1),size(arrayLabelDetect,2)))';
+CLF_Train_output(2).Abstract_level_output = (arrayLabelDetectLaplas + ones(size(arrayLabelDetectLaplas,1),size(arrayLabelDetectLaplas,2)))';
 DP=mapminmax(arrayLL',0,1);
 CLF_Train_output(1).Measurment_level_output = DP;
 DP=mapminmax(arrayLLFldVec',0,1);
 CLF_Train_output(2).Measurment_level_output = DP;
 [temp,Ranked_class]=sort(arrayLL,'descend');
-CLF_Train_output(1).Rank_level_output = Ranked_class;
+CLF_Train_output(1).Rank_level_output = Ranked_class';
 [temp,Ranked_class]=sort(arrayLLFldVec,'descend');
-CLF_Train_output(2).Rank_level_output = Ranked_class;
+CLF_Train_output(2).Rank_level_output = Ranked_class';
 Confusion_Matrix = calculateQualityForEnsemble(arrayLabelDetect,arrayLabelTrue,size(arrayLL,1));
 CLF_Train_output(1).ConfusionMatrix = Confusion_Matrix;
 Confusion_Matrix = calculateQualityForEnsemble(arrayLabelDetectLaplas,arrayLabelTrue,size(arrayLL,1));
@@ -306,8 +305,10 @@ for i =1:size(labelTest,1)
      arrayLabelTrue(1,(i-1)*size(labelTest,2)+j) = labelTest{i,j}(1,1); 
     end;
 end;
-[ff,gg, fmear,qual] = calculateQuality(arrayLabelDetect,arrayLabelTrue,size(arrayLL,1));
-[ff,gg, fmear,qual] = calculateQuality(arrayLabelDetectLaplas,arrayLabelTrue,size(arrayLL,1));
+%[ff,gg, fmear,qual] = calculateQuality(arrayLabelDetect,arrayLabelTrue,size(arrayLL,1));
+%[ff,gg, fmear,qual] = calculateQuality(arrayLabelDetectLaplas,arrayLabelTrue,size(arrayLL,1));
+Test_Accuracy_KOH =sum(arrayLabelDetect==arrayLabelTrue)/size(arrayLL,2)
+Test_Accuracy_GRA =sum(arrayLabelDetectLaplas==arrayLabelTrue)/size(arrayLL,2)
 %% объединение оубчением нейронной сети
 % testEnsemble = repmat(0,size(arrayLL,1)*2,size(arrayLL,2));
 % for i=1:size(arrayLabelDetect,2)
@@ -322,26 +323,26 @@ end;
 % testIndicesL = testIndices-ones(1,size(testIndices,2));
 % [ff,gg, fmear,qual] = calculateQuality(testIndicesL,arrayLabelTrue,size(arrayLL,1));
 %% Ensemble Toolbox
-CLF_Test_output(1).Abstract_level_output = arrayLabelDetect;
-CLF_Test_output(2).Abstract_level_output = arrayLabelDetectLaplas;
+CLF_Test_output(1).Abstract_level_output = (arrayLabelDetect + ones(size(arrayLabelDetect,1),size(arrayLabelDetect,2)))';
+CLF_Test_output(2).Abstract_level_output = (arrayLabelDetectLaplas + ones(size(arrayLabelDetectLaplas,1),size(arrayLabelDetectLaplas,2)))';
 DP=mapminmax(arrayLL',0,1);
 CLF_Test_output(1).Measurment_level_output = DP;
 DP=mapminmax(arrayLLFldVec',0,1);
 CLF_Test_output(2).Measurment_level_output = DP;
 [temp,Ranked_class]=sort(arrayLL,'descend');
-CLF_Test_output(1).Rank_level_output = Ranked_class;
+CLF_Test_output(1).Rank_level_output = Ranked_class';
 [temp,Ranked_class]=sort(arrayLLFldVec,'descend');
-CLF_Test_output(2).Rank_level_output = Ranked_class;
+CLF_Test_output(2).Rank_level_output = Ranked_class';
 
 CombinitionMethods=[1,2,3,4,5,6,7,8,9]; 
 N_classifiers = 2;
 N_test = size(arrayLL,2);
 N_class = size(arrayLL,1);
-TestTargets = arrayLabelTrue;
+TestTargets = (arrayLabelTrue + ones(size(arrayLabelTrue,1),size(arrayLabelTrue,2)));
  for C=1:length(CombinitionMethods);
       CombinitionMethod=CombinitionMethods(C);
       Ensemble_decisions=CombineCLFs(CombinitionMethod,...
         CLF_Train_output,CLF_Test_output,N_classifiers,N_test,N_train,N_class,TrainTargets);
-      Accuracy_fold_Ensemble(C)=sum(Ensemble_decisions'==TestTargets)/N_test;
+      Accuracy_fold_Ensemble(C)=sum(Ensemble_decisions==TestTargets)/N_test;
  end
-Accuracy_Ensemble= mean(Accuracy_fold_Ensemble,1);      %N_runs * N_combinationMethods 
+Accuracy_fold_Ensemble

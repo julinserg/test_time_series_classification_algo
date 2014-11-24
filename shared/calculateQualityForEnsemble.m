@@ -1,4 +1,4 @@
-function [AveragePricision, AverageRecall, F_measure, accuracy] =  calculateQualityForEnsemble(arrayLabelDetect,arrayLabelTrue,numberClass)
+function [Confusion_Matrix] =  calculateQualityForEnsemble(arrayLabelDetect,arrayLabelTrue,numberClass)
     
 % вычисляем количество ошибок первого и второго рода, суммируем их и делим на 
 % общее количесвто тестовых примеров
@@ -33,16 +33,6 @@ for i=1:numberClass
       Recall(1,i) = Confusion_Matrix(i,i) / sum(Confusion_Matrix(:,i));  
     end;   
 end;
-% выводим матрицу неоднородностей 
-Confusion_Matrix
-% вычисляем среднюю F-меру по всем классам
-AveragePricision = sum(Pricision) / numberClass;
-AverageRecall = sum(Recall) / numberClass;
-F_measure = 2*AveragePricision*AverageRecall / (AveragePricision + AverageRecall);
-fprintf('Average Pricision  = %f\n', AveragePricision);
-fprintf('Average Recall  = %f\n', AverageRecall);
-fprintf('F-measure  = %f\n', F_measure);
-
 
 
 
