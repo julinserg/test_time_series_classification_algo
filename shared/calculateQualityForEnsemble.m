@@ -1,4 +1,4 @@
-function [Confusion_Matrix] =  calculateQualityForEnsemble(arrayLabelDetect,arrayLabelTrue,numberClass)
+function [Confusion_Matrix,CM_per] =  calculateQualityForEnsemble(arrayLabelDetect,arrayLabelTrue,numberClass)
     
 % вычисляем количество ошибок первого и второго рода, суммируем их и делим на 
 % общее количесвто тестовых примеров
@@ -33,12 +33,17 @@ for i=1:numberClass
       Recall(1,i) = Confusion_Matrix(i,i) / sum(Confusion_Matrix(:,i));  
     end;   
 end;
-
-
-
-
-
-
+arrayLabelDetect = arrayLabelDetect + ones(size(arrayLabelDetect,1),size(arrayLabelDetect,2));
+indexesLabelDetect = repmat(0,numberClass,size(arrayLabelDetect,2));
+for i=1:size(arrayLabelDetect,2)
+    indexesLabelDetect(arrayLabelDetect(i),i) = 1;
+end;
+arrayLabelTrue  = arrayLabelTrue + ones(size(arrayLabelTrue,1),size(arrayLabelTrue,2));
+indexesLabelTrue = repmat(0,numberClass,size(arrayLabelTrue,2));
+for i=1:size(arrayLabelTrue,2)
+    indexesLabelTrue(arrayLabelTrue(i),i) = 1;
+end;
+[TrainError,ConfusionMatrix,CM_ind,CM_per]=confusion(indexesLabelTrue,indexesLabelDetect);
 
 
 

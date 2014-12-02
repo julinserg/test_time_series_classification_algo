@@ -1,5 +1,6 @@
 clc;
 clear;
+
 %load sampleData;
 isOpen = matlabpool('size') > 0;
 if isOpen
@@ -42,9 +43,9 @@ end;
 if USETRAIN == 1
 k_1 = 1;
 k_2 = 1;
-row = 16;
-col = 16;
-epohs = 500;
+row = 50;
+col = 50;
+epohs = 5000;
 dataTrainForClass = cell(size(dataTrainRaw,1),1);
 for i=1:size(dataTrain,1)  
     u = size(dataTrain{i},2);
@@ -227,9 +228,9 @@ CLF_Train_output(2).Measurment_level_output = DP;
 CLF_Train_output(1).Rank_level_output = Ranked_class';
 [temp,Ranked_class]=sort(arrayLLFldVec,'descend');
 CLF_Train_output(2).Rank_level_output = Ranked_class';
-Confusion_Matrix = calculateQualityForEnsemble(arrayLabelDetect,arrayLabelTrue,size(arrayLL,1));
+[Confusion_Matrix TpTnPerCl] = calculateQualityForEnsemble(arrayLabelDetect,arrayLabelTrue,size(arrayLL,1));
 CLF_Train_output(1).ConfusionMatrix = Confusion_Matrix;
-Confusion_Matrix = calculateQualityForEnsemble(arrayLabelDetectLaplas,arrayLabelTrue,size(arrayLL,1));
+[Confusion_Matrix TpTnPerCl] = calculateQualityForEnsemble(arrayLabelDetectLaplas,arrayLabelTrue,size(arrayLL,1));
 CLF_Train_output(2).ConfusionMatrix = Confusion_Matrix;
 
 N_train = size(arrayLL,2);
@@ -341,8 +342,11 @@ N_class = size(arrayLL,1);
 TestTargets = (arrayLabelTrue + ones(size(arrayLabelTrue,1),size(arrayLabelTrue,2)));
  for C=1:length(CombinitionMethods);
       CombinitionMethod=CombinitionMethods(C);
-      Ensemble_decisions=CombineCLFs(CombinitionMethod,...
+      Ensemble_decisions(C,:)=CombineCLFs(CombinitionMethod,...
         CLF_Train_output,CLF_Test_output,N_classifiers,N_test,N_train,N_class,TrainTargets);
-      Accuracy_fold_Ensemble(C)=sum(Ensemble_decisions==TestTargets)/N_test;
+      Accuracy_fold_Ensemble(C)=sum(Ensemble_decisions(C,:)==TestTargets)/N_test;
  end
+[best Ibest] =  max(Accuracy_fold_Ensemble);
+[Confusion_Matrix TpTnPerCl] = calculateQualityForEnsemble(Ensemble_decisions(Ibest,:) - ones(size(arrayLabelTrue,1),size(arrayLabelTrue,2)),arrayLabelTrue,N_class);
 Accuracy_fold_Ensemble
+TpTnPerCl
