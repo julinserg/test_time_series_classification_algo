@@ -1,5 +1,5 @@
 function [D] = getTrainData(NUMBER)
-SELECTDATASET = 2;
+SELECTDATASET = 7;
 if SELECTDATASET == 1
 %% arabic digit
  load dataTrainArabicDigit;
@@ -77,8 +77,8 @@ D = mixoutNew(1:20,1:50);
 D(1:20,51:100) = mixoutNew(21:40,1:50);
 
 if NUMBER == 1
- % D = D(1:20,1:50);
-  D = D(1:10,1:20);
+  D = D(1:20,1:50);
+ % D = D(1:2,1:2);
 end;
 if NUMBER == 2
   D = horzcat(D(1:20,1:10),D(1:20,21:100));
@@ -150,6 +150,15 @@ end;
 if SELECTDATASET == 6
     load higgsTrain.mat;
     D = dataTrainArabicDigit;
+    if NUMBER == 1
+        D = D(:,:);
+    end;
+end;
+
+if SELECTDATASET == 7
+    %http://archive.ics.uci.edu/ml/datasets/Dataset+for+ADL+Recognition+with+Wrist-worn+Accelerometer#
+    load dataTrainAccelerometer.mat;
+    D = dataTrain;
     if NUMBER == 1
         D = D(:,:);
     end;
