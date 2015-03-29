@@ -1,11 +1,11 @@
 clc;
 clear;
-dataTrainRaw = getTrainData(2);
+dataTrainRaw = getTrainData(1);
 
 
-row = 25;
-col = 25;
-epohs = 500;
+row = 5;
+col = 5;
+epohs = 100;
 dataTrainForClass = cell(size(dataTrainRaw,1),1);
 porydok = randperm(row*col);
 k = 1;
@@ -39,7 +39,7 @@ for i=1:size(dataTrainForClass,1)
   
 end;
 
-dataTest =  getTestDataOnTest(2);
+dataTest =  getTestDataOnTest(1);
 %dataTest = getTrainData(1);
 %dataTest = getTestDataOnTest(4);
 for i=1:size(dataTest,1)

@@ -2,11 +2,11 @@ clc;
 clear;
 
 %load sampleData;
-isOpen = matlabpool('size') > 0;
-if isOpen
-   matlabpool close; 
-end;
-matlabpool open local 8;
+%isOpen = matlabpool('size') > 0;
+%if isOpen
+%   matlabpool close; 
+%end;
+%matlabpool open local 4;
 %load initDataTransHMMtoHCRF
 %paramsData.weightsPerSequence = ones(1,128) ;
 %paramsData.factorSeqWeights = 1;
@@ -28,7 +28,7 @@ matlabpool open local 8;
 % Average Pricision  = 0.749645
 % Average Recall  = 0.644676
 % F-measure  = 0.693209
-USETRAIN = 1
+USETRAIN = 0
 k = 1;
 dataTrainRaw = getTrainData(1);
 for i=1:size(dataTrainRaw,1)
@@ -43,9 +43,9 @@ end;
 if USETRAIN == 1
 k_1 = 1;
 k_2 = 1;
-row = 50;
-col = 50;
-epohs = 5000;
+row = 5;
+col = 5;
+epohs = 100;
 dataTrainForClass = cell(size(dataTrainRaw,1),1);
 for i=1:size(dataTrain,1)  
     u = size(dataTrain{i},2);
@@ -55,15 +55,15 @@ for i=1:size(dataTrain,1)
     k_1 = k_1+size(a,2);  
 end; 
 cellNetKox = cell(size(dataTrainRaw,1),1);
-parfor i=1:size(dataTrainForClass,1)
-  i
-  net = newsom(dataTrainForClass{i},[row col],'hextop','dist');
+for ij=1:size(dataTrainForClass,1)
+  ij
+  net = newsom(dataTrainForClass{ij},[row col],'hextop','dist');
   net.trainParam.epochs = epohs;
-  [net,tr] = train(net,dataTrainForClass{i}); 
-  cellNetKox{i} = net;
+  [net,tr] = train(net,dataTrainForClass{ij}); 
+  cellNetKox{ij} = net;
   distArray = calculateDist(net);
-  GraphGmodelG{i} = distArray;
-  GraphWmodelW{i} = sparse(distArray > 0);
+  GraphGmodelG{ij} = distArray;
+  GraphWmodelW{ij} = sparse(distArray > 0);
 end;
 save('modelKohonen.mat', 'cellNetKox');
 save('GraphGmodelG.mat','GraphGmodelG');
@@ -133,7 +133,7 @@ index = 1;
 for i = 1:size(dataTest,1)
   for j = 1:size(dataTest,2)    
      p = dataTest{i,j};
-    parfor m = 1:size(cellNetKox,1)
+    for m = 1:size(cellNetKox,1)
        w= cellNetKox{m}.iw{1,1};       
        [S,R11] = size(w);
        [R2,Q] = size(p);
@@ -249,7 +249,7 @@ index = 1;
 for i = 1:size(dataTest,1)
   for j = 1:size(dataTest,2)    
      p = dataTest{i,j};
-    parfor m = 1:size(cellNetKox,1)
+    for m = 1:size(cellNetKox,1)
        w= cellNetKox{m}.iw{1,1};       
        [S,R11] = size(w);
        [R2,Q] = size(p);
