@@ -6,7 +6,7 @@ clc;
 %   классификация  с помощью HMM pmtk library
 %% init
 
-nstates = 5;
+nstates = 7;
 setSeed(0); 
 
 NUM = 1
@@ -54,6 +54,9 @@ for i =1:size(label,1)
     end;
 end;
 calculateQuality(arrayLabelDetect,arrayLabelTrue,size(label,1));
+save('arrayLabelDetectTrainHMM.mat','arrayLabelDetect');
+save('arrayLLTrainHMM.mat','arrayLL');
+save('arrayLabelTrueTrainHMM.mat','arrayLabelTrue');
 %% test on test data
 clear('arrayLabelDetect','arrayLabelTrue','arrayLabel','arrayLL');
 load modelHMM;
@@ -90,4 +93,6 @@ for i =1:size(label,1)
     end;
 end;
 calculateQuality(arrayLabelDetect,arrayLabelTrue,size(label,1));
-
+save('arrayLabelDetectTestHMM.mat','arrayLabelDetect');
+save('arrayLLTestHMM.mat','arrayLL');
+save('arrayLabelTrueTestHMM.mat','arrayLabelTrue');

@@ -42,6 +42,7 @@ F_measure = 2*AveragePricision*AverageRecall / (AveragePricision + AverageRecall
 fprintf('Average Pricision  = %f\n', AveragePricision);
 fprintf('Average Recall  = %f\n', AverageRecall);
 fprintf('F-measure  = %f\n', F_measure);
+fprintf('Accuracy  = %f\n', sum(arrayLabelDetect==arrayLabelTrue)/size(arrayLabelDetect,2));
 
 
 

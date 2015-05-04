@@ -22,7 +22,7 @@ clear;
 %%
 USETRAIN = 1
 k = 1;
-dataTrainRaw = getTrainData(2);
+dataTrainRaw = getTrainData(1);
 for i=1:size(dataTrainRaw,1)
     for j=1:size(dataTrainRaw,2)
         dataTrain{k,1} = dataTrainRaw{i,j};       
@@ -43,16 +43,18 @@ end;
 if USETRAIN == 1
 k_1 = 1;
 k_2 = 1;
-row = 5;
-col = 5;
-epohs = 10;
+row = 20;
+col = 20;
+epohs = 1000;
 dataTrainForClass = cell(size(dataTrainRaw,1),1);
 for i=1:size(dataTrain,1)  
-    u = size(dataTrain{i},2);
-    a = dataTrain{i};
-    t = size(dataTrainForClass{labelTrain(i)+1},2) +1;        
-    dataTrainForClass{labelTrain(i)+1}(:,t:t+u-1) = a;       
-    k_1 = k_1+size(a,2);  
+    if ( ~isempty(dataTrain{i}))    
+        u = size(dataTrain{i},2);
+        a = dataTrain{i};
+        t = size(dataTrainForClass{labelTrain(i)+1},2) +1;        
+        dataTrainForClass{labelTrain(i)+1}(:,t:t+u-1) = a;       
+        k_1 = k_1+size(a,2);        
+    end;      
 end; 
 cellNetKox = cell(size(dataTrainRaw,1),1);
 for i=1:size(dataTrainForClass,1)
@@ -178,8 +180,8 @@ end;
 
 %% тест
 arrayLogLikDataSetTest = cell(1,1);
-%dataTest =  getTestDataOnTest(1);
-dataTest = getTestDataOnTrain(1);
+dataTest =  getTestDataOnTest(1);
+%dataTest = getTestDataOnTrain(1);
 %dataTest = getTestDataOnTest(4);
 for i=1:size(dataTest,1)
     for j=1:size(dataTest,2)       
@@ -191,6 +193,9 @@ index = 1;
 for i = 1:size(dataTest,1)
   for j = 1:size(dataTest,2)
     for m = 1:size(cellNetKox,1)
+       if isempty(dataTest{i,j})
+           break;
+       end;
        w= cellNetKox{m}.iw{1,1};
        p = dataTest{i,j};
        [S,R11] = size(w);

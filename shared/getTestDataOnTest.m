@@ -1,5 +1,5 @@
 function [D] = getTestDataOnTest(NUMBER)
-SELECTDATASET = 7;
+SELECTDATASET = 9;
 %% arabic digit
 if SELECTDATASET == 1
  load dataTrainArabicDigit;
@@ -77,7 +77,7 @@ D = mixoutNew(1:20,1:50);
 D(1:20,51:100) = mixoutNew(21:40,1:50);
 C = D;
 if NUMBER == 1   
-   %D = C(1:20,1:10);
+  % D = C(1:2,1:40);
    D = D(1:20,51:100);
 end;
 if NUMBER == 2   
@@ -159,6 +159,22 @@ if SELECTDATASET == 7
     %http://archive.ics.uci.edu/ml/datasets/Dataset+for+ADL+Recognition+with+Wrist-worn+Accelerometer#
     load dataTestAccelerometer.mat;
     D = dataTest;
+    if NUMBER == 1
+        D = D(:,:);
+    end;
+end;
+
+if SELECTDATASET == 8    
+    load TestCinCECGtorso.mat;
+    D = TestCinCECGtorso;
+    if NUMBER == 1
+        D = D(:,:);
+    end;
+end;
+
+if SELECTDATASET == 9    
+    load TestInlineSkate.mat;
+    D = TestInlineSkate;
     if NUMBER == 1
         D = D(:,:);
     end;

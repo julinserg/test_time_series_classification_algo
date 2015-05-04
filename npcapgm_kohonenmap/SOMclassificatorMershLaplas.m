@@ -43,9 +43,9 @@ end;
 if USETRAIN == 1
 k_1 = 1;
 k_2 = 1;
-row = 50;
-col = 50;
-epohs = 5000;
+row = 16;
+col = 16;
+epohs = 1000;
 dataTrainForClass = cell(size(dataTrainRaw,1),1);
 for i=1:size(dataTrain,1)  
     u = size(dataTrain{i},2);
@@ -235,6 +235,11 @@ CLF_Train_output(2).ConfusionMatrix = Confusion_Matrix;
 
 N_train = size(arrayLL,2);
 TrainTargets = arrayLabelTrue;
+
+save('arrayLabelDetectTrainSP.mat','arrayLabelDetectLaplas');
+save('arrayLLTrainSP.mat','arrayLLFldVec');
+save('arrayLabelTrueTrainSP.mat','arrayLabelTrue');
+
 clear('labelTest','dataTest','arrayLL','arrayLLFldVec','arrayLabelTrue','arrayLabelDetect','arrayLabelDetectLaplas');
 %% тест
 arrayLogLikDataSetTest = cell(1,1);
@@ -350,3 +355,6 @@ TestTargets = (arrayLabelTrue + ones(size(arrayLabelTrue,1),size(arrayLabelTrue,
 [Confusion_Matrix TpTnPerCl] = calculateQualityForEnsemble(Ensemble_decisions(Ibest,:) - ones(size(arrayLabelTrue,1),size(arrayLabelTrue,2)),arrayLabelTrue,N_class);
 Accuracy_fold_Ensemble
 TpTnPerCl
+save('arrayLabelDetectTestSP.mat','arrayLabelDetectLaplas');
+save('arrayLLTestSP.mat','arrayLLFldVec');
+save('arrayLabelTrueTestSP.mat','arrayLabelTrue');

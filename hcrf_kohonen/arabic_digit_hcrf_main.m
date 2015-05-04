@@ -9,7 +9,7 @@ clc;
 clear;
 NUM = 1;
 steps = 0;
-for NUM12=1:20
+for NUM12=1:1
  clear('arrayLabelDetect','arrayLabelTrue','fileLable','R{2}.model', 'R{2}.stats','post','arrayLL','arrayLabel','arrayLL_old','ll', 'label','net','net2','tr','distanseKox','newLableMapKohonen','newLableMapKohonenNormal','distanseKoxNew','lableMinDistanse','res');   
 
 %% about
@@ -125,7 +125,9 @@ for i =1:size(label,1)
     end;
 end;
  [AveragePricisionT, AverageRecallT, F_measureT] =calculateQuality(arrayLabelDetect,arrayLabelTrue,size(label,1));
-
+save('arrayLabelDetectTrainHCRF.mat','arrayLabelDetect');
+save('arrayLLTrainHCRF.mat','arrayLL');
+save('arrayLabelTrueTrainHCRF.mat','arrayLabelTrue');
 %% test on test data
 %figure(hF2);
 clear('arrayLabelDetect','arrayLabelTrue');
@@ -208,6 +210,9 @@ end;
 FmearAll(NUM) = F_measure;
 FmearAllT(NUM) = F_measureT;
 steps = steps +1;
+save('arrayLabelDetectTestHCRF.mat','arrayLabelDetect');
+save('arrayLLTestHCRF.mat','arrayLL');
+save('arrayLabelTrueTestHCRF.mat','arrayLabelTrue');
 end;
 ResFmear = sum(FmearAll) / steps
 ResFmearT = sum(FmearAllT) / steps

@@ -23,8 +23,8 @@ W = compute_matchingW(G1,W1,G2,W2,F12,E12,f,options);
 
 
 options.constraintMode='both'; %'both' for 1-1 graph matching
-%options.isAffine=0;% affine constraint
-%options.isOrth=0;%orthonormalization before discretization
+options.isAffine=1;% affine constraint
+options.isOrth=0;%orthonormalization before discretization
 %options.normalization='iterative';%bistochastic kronecker normalization
  options.normalization='none'; %we can also see results without normalization
 %options.discretisation=@discretisationGradAssignment; %function for discretization
