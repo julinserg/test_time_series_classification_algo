@@ -5,7 +5,7 @@ isOpen = matlabpool('size') > 0;
 if isOpen
    matlabpool close; 
 end;
-matlabpool open local 8;
+matlabpool open local 4;
 %load initDataTransHMMtoHCRF
 %paramsData.weightsPerSequence = ones(1,128) ;
 %paramsData.factorSeqWeights = 1;
@@ -52,8 +52,8 @@ end;
 if USETRAIN == 1
 k_1 = 1;
 k_2 = 1;
-row = 16;
-col = 16;
+row = 10;
+col = 10;
 epohs = 100;
 dataTrainForClass = cell(size(dataTrainRaw,1),1);
 for i=1:size(dataTrain,1)  
@@ -206,7 +206,8 @@ for i = 1:size(dataTest,1)
      % p = DR';
      p = dataTest{i,j};
     for m = 1:size(cellNetKox,1)
-       w= cellNetKox{m}.iw{1,1};       
+       w= cellNetKox{m}.iw{1,1};
+       csverite('matrixW.csv',w);
        [S,R11] = size(w);
        [R2,Q] = size(p);
        z = zeros(S,Q);
