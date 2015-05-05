@@ -40,7 +40,7 @@ for i=1:size(testData,1)
         seq = seq + 1;        
     end;
 end;
-dlmwrite('characterTrainData.csv', trainDataForCSV, 'delimiter', ',', 'precision', 9); 
-dlmwrite('characterTestData.csv', testDataForCSV, 'delimiter', ',', 'precision', 9);
+dlmwrite('TrainAccelerometer.csv', trainDataForCSV, 'delimiter', ',', 'precision', 9); 
+dlmwrite('TestAccelerometer.csv', testDataForCSV, 'delimiter', ',', 'precision', 9);
 
 display('Stop');

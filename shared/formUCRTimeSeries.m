@@ -1,5 +1,5 @@
-TRAIN = load('InlineSkate_TRAIN'); % Only these two lines need to be changed to test a different dataset. %
-TEST  = load('InlineSkate_TEST' ); % Only these two lines need to be changed to test a different dataset. %
+TRAIN = load('Haptics_TRAIN'); % Only these two lines need to be changed to test a different dataset. %
+TEST  = load('Haptics_TEST' ); % Only these two lines need to be changed to test a different dataset. %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 
@@ -26,20 +26,20 @@ disp(['The time series are of length ', int2str(size(TRAIN,2))])
 disp(['The error rate was ',num2str((length(TEST_class_labels)-correct )/length(TEST_class_labels))])
 %%%%%%%%%%%%%%%%% End Report %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-TrainInlineSkate = cell(1,1);
+TrainHaptics = cell(1,1);
 rowsIndexTr = repmat(0,1,length(unique(TRAIN_class_labels)));
 for i = 1 : length(TRAIN_class_labels)
     rowClass = TRAIN_class_labels(i);
     rowsIndexTr(1,rowClass) = rowsIndexTr(1,rowClass) + 1;
-    TrainInlineSkate(rowClass,rowsIndexTr(1,rowClass)) = {TRAIN(i,:)};
+    TrainHaptics(rowClass,rowsIndexTr(1,rowClass)) = {TRAIN(i,:)};
 end;
-TestInlineSkate = cell(1,1);
+TestHaptics = cell(1,1);
 rowsIndexTs = repmat(0,1,length(unique(TEST_class_labels)));
 for i = 1 : length(TEST_class_labels)
     rowClass = TEST_class_labels(i);
     rowsIndexTs(1,rowClass) = rowsIndexTs(1,rowClass) + 1;
-    TestInlineSkate(rowClass,rowsIndexTs(1,rowClass)) = {TEST(i,:)};
+    TestHaptics(rowClass,rowsIndexTs(1,rowClass)) = {TEST(i,:)};
 end;
-save ('TrainInlineSkate.mat','TrainInlineSkate');
-save ('TestInlineSkate.mat','TestInlineSkate');
+save ('TrainHaptics.mat','TrainHaptics');
+save ('TestHaptics.mat','TestHaptics');
 g = 0;

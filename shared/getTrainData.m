@@ -1,5 +1,5 @@
 function [D] = getTrainData(NUMBER)
-SELECTDATASET = 9;
+SELECTDATASET = 7;
 if SELECTDATASET == 1
 %% arabic digit
  load dataTrainArabicDigit;
@@ -174,7 +174,17 @@ end;
 
 if SELECTDATASET == 9  
     load TrainInlineSkate.mat;
+    % InlineSkate http://www.cs.ucr.edu/~eamonn/time_series_data/
     D = TrainInlineSkate;
+    if NUMBER == 1
+        D = D(:,:);
+    end;
+end;
+
+if SELECTDATASET == 10  
+    load TrainHaptics.mat;
+    % Haptics http://www.cs.ucr.edu/~eamonn/time_series_data/
+    D = TrainHaptics;
     if NUMBER == 1
         D = D(:,:);
     end;

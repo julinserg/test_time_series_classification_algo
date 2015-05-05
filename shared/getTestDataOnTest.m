@@ -1,5 +1,5 @@
 function [D] = getTestDataOnTest(NUMBER)
-SELECTDATASET = 9;
+SELECTDATASET = 7;
 %% arabic digit
 if SELECTDATASET == 1
  load dataTrainArabicDigit;
@@ -175,6 +175,15 @@ end;
 if SELECTDATASET == 9    
     load TestInlineSkate.mat;
     D = TestInlineSkate;
+    if NUMBER == 1
+        D = D(:,:);
+    end;
+end;
+
+if SELECTDATASET == 10  
+    load TestHaptics.mat;
+    % Haptics http://www.cs.ucr.edu/~eamonn/time_series_data/
+    D = TestHaptics;
     if NUMBER == 1
         D = D(:,:);
     end;

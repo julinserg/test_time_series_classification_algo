@@ -1,11 +1,11 @@
 clc;
 clear;
  load sampleData;
-% isOpen = matlabpool('size') > 0;
-% if isOpen
-%    matlabpool close; 
-% end;
-% matlabpool open local 12;
+ isOpen = matlabpool('size') > 0;
+ if isOpen
+    matlabpool close; 
+ end;
+ matlabpool open local 8;
 %load initDataTransHMMtoHCRF
 %paramsData.weightsPerSequence = ones(1,128) ;
 %paramsData.factorSeqWeights = 1;
@@ -43,8 +43,8 @@ end;
 if USETRAIN == 1
 k_1 = 1;
 k_2 = 1;
-row = 20;
-col = 20;
+row = 25;
+col = 25;
 epohs = 1000;
 dataTrainForClass = cell(size(dataTrainRaw,1),1);
 for i=1:size(dataTrain,1)  
@@ -57,7 +57,7 @@ for i=1:size(dataTrain,1)
     end;      
 end; 
 cellNetKox = cell(size(dataTrainRaw,1),1);
-for i=1:size(dataTrainForClass,1)
+parfor i=1:size(dataTrainForClass,1)
   i
   net = newsom(dataTrainForClass{i},[row col],'hextop','dist');
   net.trainParam.epochs = epohs;
@@ -192,10 +192,10 @@ end;
 index = 1;
 for i = 1:size(dataTest,1)
   for j = 1:size(dataTest,2)
-    for m = 1:size(cellNetKox,1)
-       if isempty(dataTest{i,j})
-           break;
-       end;
+    if isempty(dataTest{i,j})
+       break;
+    end;
+    parfor m = 1:size(cellNetKox,1)       
        w= cellNetKox{m}.iw{1,1};
        p = dataTest{i,j};
        [S,R11] = size(w);
