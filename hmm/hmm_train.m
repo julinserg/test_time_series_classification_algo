@@ -1,4 +1,4 @@
-function [model] = hmm_train(nstates,dataTrainArabicDigit)
+function [model] = hmm_train(nstates,dataTrainArabicDigit,nmix)
 %% about
 %   классификация арабских цифр с помощью HMM pmtk library - обучение модели
 
@@ -17,14 +17,17 @@ for i=1:size(dataTrainArabicDigit,1)
 end;
 
 %% train
-pi0 = [1, 0, 0, 0, 0, 0, 0];
+pi0 = repmat(0,1,nstates);
+pi0(1,1) = 1;
 transmat0 = normalize(diag(ones(nstates, 1)) + ...
             diag(ones(nstates-1, 1), 1), 2);
-%fitArgs = {'pi0', pi0, 'trans0', transmat0, 'maxIter', 1000, 'verbose', true};
-%nmix    = 24; 
-%fitArgs = [fitArgs, {'nmix', nmix}];
-%fitFn   = @(X)hmmFit(X, nstates, 'mixGaussTied', fitArgs{:});
-fitArgs = {'pi0', pi0, 'trans0', transmat0, 'maxIter', 500, 'verbose', true};
-fitFn   = @(X)hmmFit(X, nstates, 'gauss', fitArgs{:}); 
+if nmix > 0
+    fitArgs = {'pi0', pi0, 'trans0', transmat0, 'maxIter', 1000, 'verbose', true};    
+    fitArgs = [fitArgs, {'nmix', nmix}];
+    fitFn   = @(X)hmmFit(X, nstates, 'mixGaussTied', fitArgs{:});
+else    
+    fitArgs = {'pi0', pi0, 'trans0', transmat0, 'maxIter', 500, 'verbose', true};
+    fitFn   = @(X)hmmFit(X, nstates, 'gauss', fitArgs{:}); 
+end;
 model = generativeClassifierFit(fitFn, dataTrain, labelTrain);
 fprintf('..........Stop train\n');

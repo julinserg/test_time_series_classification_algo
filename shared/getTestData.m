@@ -1,5 +1,4 @@
-function [D] = getTestDataOnTest(NUMBER)
-SELECTDATASET = 7;
+function [D] = getTestData(NUMBER,SELECTDATASET)
 %% arabic digit
 if SELECTDATASET == 1
  load dataTrainArabicDigit;

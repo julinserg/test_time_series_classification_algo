@@ -1,4 +1,4 @@
-function [post labelTest] = hmm_test(dataTestArabicDigit,model)
+function [post] = hmm_test(dataTestArabicDigit,model)
 %% about
 %   классификация  с помощью HCRF laybrary - тестирование
 
@@ -6,12 +6,10 @@ function [post labelTest] = hmm_test(dataTestArabicDigit,model)
 fprintf('..........Start test\n');
 
 dataTest = cell(1,1);
-labelTest = cell(1,1);
 k = 1;
 for i=1:size(dataTestArabicDigit,1)
     for j=1:size(dataTestArabicDigit,2)
-        dataTest{k,1} = dataTestArabicDigit{i,j};
-        labelTest{i,j}(1,1) = i-1; 
+        dataTest{k,1} = dataTestArabicDigit{i,j};       
         k = k+1;
     end;
 end;
