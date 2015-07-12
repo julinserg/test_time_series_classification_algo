@@ -1,4 +1,4 @@
-function [AveragePricision, AverageRecall, F_measure, error] = npmpgm_main(dataTrainRaw,dataTest,row_map,col_map,epohs_map,val_dirichlet)
+function [PrecisionT, RecallT, F_mT, errorT, PrecisionTR, RecallTR, F_mTR, errorTR] = npmpgm_main(dataTrainRaw,dataTest,row_map,col_map,epohs_map,val_dirichlet)
 
 % чтение обучающих данных
 % подготовка обучающих данных для карты Кохонена
@@ -49,7 +49,14 @@ load ProbabilityTransaction;
 %       примеров для каждого класса; каждая ячейка содержит массив -
 %       временную последовательность DxT - D - размерность ветора признаков
 %       , T - длина последовательности
-%load dataTest; 
+
+%% test on test data
+[PrecisionT, RecallT, F_mT, errorT] = npmpgm_test_l(dataTest,Probability,cellNetKox);
+%% test on train data
+[PrecisionTR, RecallTR, F_mTR, errorTR] = npmpgm_test_l(dataTrainRaw,Probability,cellNetKox);
+
+function [AveragePrecision, AverageRecall, F_measure, error] = npmpgm_test_l(dataTest,Probability,cellNetKox)
+k = 1;
 for i=1:size(dataTest,1)
     for j=1:size(dataTest,2)       
         labelTest{i,j}(1,1) = i-1; 
@@ -68,7 +75,6 @@ arrayLabelTrue = cell2mat(labelTest(:));
 arrayLabelTrue = arrayLabelTrue';
 
 %% Оценка качества классификации
-[AveragePricision, AverageRecall, F_measure, error] = calculateQuality(arrayLabelDetect,arrayLabelTrue,size(arrayLL,1));
-%save('lastTest.dat','-ascii','fmear','-double');
+[AveragePrecision, AverageRecall, F_measure, error] = calculateQuality(arrayLabelDetect,arrayLabelTrue,size(arrayLL,1));
 
 

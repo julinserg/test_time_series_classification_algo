@@ -1,4 +1,4 @@
-function [AveragePricision, AverageRecall, F_measure, error] =  calculateQuality(arrayLabelDetect,arrayLabelTrue,numberClass)
+function [AveragePrecision, AverageRecall, F_measure, error] =  calculateQuality(arrayLabelDetect,arrayLabelTrue,numberClass)
     
 % вычисляем количество ошибок первого и второго рода, суммируем их и делим на 
 % общее количесвто тестовых примеров
@@ -30,6 +30,6 @@ end;
 % выводим матрицу неоднородностей 
 %Confusion_Matrix
 % вычисляем среднюю F-меру по всем классам
-AveragePricision = sum(Pricision) / numberClass;
+AveragePrecision = sum(Pricision) / numberClass;
 AverageRecall = sum(Recall) / numberClass;
-F_measure = 2*AveragePricision*AverageRecall / (AveragePricision + AverageRecall);
+F_measure = 2*AveragePrecision*AverageRecall / (AveragePrecision + AverageRecall);

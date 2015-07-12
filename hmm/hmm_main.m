@@ -1,4 +1,4 @@
-function [AveragePricision, AverageRecall, F_measure, error] = hmm_main(dataTrainArabicDigit,dataTestArabicDigit,nstates,nmix)
+function [PrecisionT, RecallT, F_mT, errorT, PrecisionTR, RecallTR, F_mTR, errorTR] = hmm_main(dataTrainArabicDigit,dataTestArabicDigit,nstates,nmix)
 
 %% about
 %   классификация  с помощью HMM pmtk library
@@ -7,26 +7,25 @@ function [AveragePricision, AverageRecall, F_measure, error] = hmm_main(dataTrai
 setSeed(0); 
 
 %% train
-%dataTrainArabicDigit = getTestDataOnTest(NUM);
-
 model = hmm_train(nstates,dataTrainArabicDigit,nmix);
-
-%calcDataForInitHCRF(model);
-%[model] = hmm_train_koh(nstates,dataTrainArabicDigit);
 save('modelHMM', 'model');
 
-
-%% test on train data
-
+%% load model
 load modelHMM;
-%dataTestArabicDigit = getTestDataOnTest(NUM);
-[ll] = hmm_test(dataTestArabicDigit,model);
-%[ll label] = hmm_test_koh(dataTestArabicDigit,model);
+
+%% test on test data
+[PrecisionT, RecallT, F_mT, errorT] = hmm_test_l(dataTestArabicDigit,model);
+%% test on train data
+[PrecisionTR, RecallTR, F_mTR, errorTR] = hmm_test_l(dataTrainArabicDigit,model);
+
+function [AveragePrecision, AverageRecall, F_measure, error] = hmm_test_l(dataTest,model)
+
+[ll] = hmm_test(dataTest,model);
 arrayLL = ll';
 label = cell(1,1);
 k = 1;
-for i=1:size(dataTestArabicDigit,1)
-    for j=1:size(dataTestArabicDigit,2)       
+for i=1:size(dataTest,1)
+    for j=1:size(dataTest,2)       
         label{i,j}(1,1) = i-1; 
         k = k+1;
     end;
@@ -41,5 +40,4 @@ for i =1:size(label,1)
      arrayLabelTrue(1,(i-1)*size(label,2)+j) = label{i,j}(1,1); 
     end;
 end;
-[AveragePricision, AverageRecall, F_measure, error] =calculateQuality(arrayLabelDetect,arrayLabelTrue,size(label,1));
-
+[AveragePrecision, AverageRecall, F_measure, error] =calculateQuality(arrayLabelDetect,arrayLabelTrue,size(label,1));
