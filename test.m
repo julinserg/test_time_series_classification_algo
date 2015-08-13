@@ -2,11 +2,11 @@ clc;
 clear;
 fprintf('..........START TEST\n');
 %%
-useHMM = 1;
+useHMM = 0;
 useHCRF = 0;
-useNPMPGM = 0;
+useNPMPGM = 1;
 UCIDATASET = 2;
-TRAINFOLDSIZE = 20;
+TRAINFOLDSIZE = 10;
 dataTrainUCI = getTrainData(1,UCIDATASET);
 dataTest = getTestData(1,UCIDATASET);
 %%
@@ -17,6 +17,8 @@ while (endD + TRAINFOLDSIZE) <= size(dataTrainUCI,2)
     dataTrain = dataTrainUCI(:,1:endD);  
     index = index + 1;
     RESULTMATRIX_X(1,index) = size(dataTrain,2);
+    RESULTMATRIX_X(2,index) = size(dataTrain,2);
+    RESULTMATRIX_X(3,index) = size(dataTrain,2);
     if (useHMM == 1)
         nstates = 18;
         nmix = 5;

@@ -31,7 +31,7 @@ for i = 1:size(dataTest,1)
        % normalizeLogspace - функция из matlab-пакета Probabilistic Modeling Toolkit for
        % Matlab/Octave https://github.com/probml/pmtk3
        [logB scale] = normalizeLogspace(n');
-       B = exp(logB');
+       B = exp(n);
        pi = repmat(5,1,size(w',1));
        pi(1,rows(1,1)) = 10;
        pi = normalizeLogspace(pi);
