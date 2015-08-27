@@ -25,22 +25,19 @@ for i = 1:size(dataTest,1)
        for ii=1:S
          z(ii,:) = sum((w(:,ii+copies)-p).^2,1);
        end;
-       z = -z.^0.5;
+       %z = -z.^0.5;
+       z = -z.^2;
        n= z;
-       [maxn,rows] = max(n,[],1);
-       % normalizeLogspace - функция из matlab-пакета Probabilistic Modeling Toolkit for
-       % Matlab/Octave https://github.com/probml/pmtk3
-       [logB scale] = normalizeLogspace(n');
        B = exp(n);
-       pi = repmat(5,1,size(w',1));
-       pi(1,rows(1,1)) = 10;
-       pi = normalizeLogspace(pi);
-       pi = exp(pi);
+       [maxn,rows] = max(n,[],1);
+       pih = repmat(5,1,size(w',1));
+       pih(1,rows(1,1)) = 10;
+       pih = normalizeLogspace(pih);
+       pih = exp(pih);
        A =  Probability{m}.A;
        % hmmFilter - функция из matlab-пакета Probabilistic Modeling Toolkit for
        % Matlab/Octave https://github.com/probml/pmtk3
-       logp = hmmFilter(pi, A, B);
-       logp = logp + sum(scale);     
+       logp = hmmFilter(pih, A, B);
        arrayLL(i,m) = logp;          
     end;
 end;
