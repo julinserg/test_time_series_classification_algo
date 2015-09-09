@@ -9,9 +9,9 @@ end;
 
 fprintf('..........START TEST\n');
 %%
-use = 3; % HMM - 1  HCRF - 2 NPMPGM - 3
-UCIDATASET = 2;
-TRAINFOLDSIZE = 5;
+use = 1; % HMM - 1  HCRF - 2 NPMPGM - 3
+UCIDATASET = 1;
+TRAINFOLDSIZE = 50;
 dataTrainUCI = getTrainData(1,UCIDATASET);
 dataTest = getTestData(1,UCIDATASET);
 %%
@@ -25,7 +25,7 @@ while (endD + TRAINFOLDSIZE) <= size(dataTrainUCI,2)
     RESULTMATRIX_X(use,index) = size(dataTrain,2);
     RESULTMATRIX_X(use,index) = size(dataTrain,2);
     if (use == 1)
-        nstates = 7;
+        nstates = 5;
         nmix = 0;
         [PrecisionT, RecallT, F_mT, errorT, PrecisionTR, RecallTR, F_mTR, errorTR] = hmm_main(dataTrain,dataTest,nstates,nmix);
         RESULTMATRIX_TRAIN(use,index) = errorTR;   
