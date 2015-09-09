@@ -10,8 +10,8 @@ end;
 fprintf('..........START TEST\n');
 %%
 use = 3; % HMM - 1  HCRF - 2 NPMPGM - 3
-UCIDATASET = 2;
-TRAINFOLDSIZE = 5;
+UCIDATASET = 1;
+TRAINFOLDSIZE = 50;
 dataTrainUCI = getTrainData(1,UCIDATASET);
 dataTest = getTestData(1,UCIDATASET);
 %%
@@ -25,8 +25,8 @@ while (endD + TRAINFOLDSIZE) <= size(dataTrainUCI,2)
     RESULTMATRIX_X(use,index) = size(dataTrain,2);
     RESULTMATRIX_X(use,index) = size(dataTrain,2);
     if (use == 1)
-        nstates = 7;
-        nmix = 0;
+        nstates = 5;
+        nmix = 8;
         [PrecisionT, RecallT, F_mT, errorT, PrecisionTR, RecallTR, F_mTR, errorTR] = hmm_main(dataTrain,dataTest,nstates,nmix);
         RESULTMATRIX_TRAIN(use,index) = errorTR;   
         RESULTMATRIX_TEST(use,index) = errorT;
@@ -48,7 +48,7 @@ while (endD + TRAINFOLDSIZE) <= size(dataTrainUCI,2)
         %paramsData.factorSeqWeights = 1;
         R{2}.params = paramsNodHCRF;
         %R{2}.params.rangeWeights = [-1,1];
-        R{2}.params.nbHiddenStates = 7;
+        R{2}.params.nbHiddenStates = 5;
         R{2}.params.modelType = 'hcrf';
         R{2}.params.GaussianHCRF = 0;
         R{2}.params.windowRecSize = 0;
@@ -75,7 +75,7 @@ while (endD + TRAINFOLDSIZE) <= size(dataTrainUCI,2)
         %% Инициализация параметров классификатора    
         row_map = 12; % колличество строк карты Кохонена
         col_map = 12; % колличество столбцов карты Кохонена
-        epohs_map = 200; % колличество эпох обучения карты Кохонена
+        epohs_map = 400; % колличество эпох обучения карты Кохонена
         val_dirichlet = 0; % параметр распределения Дирихле
         [PrecisionT, RecallT, F_mT, errorT, PrecisionTR, RecallTR, F_mTR, errorTR] = npmpgm_main(dataTrain,dataTest,row_map,col_map,epohs_map,val_dirichlet);
         RESULTMATRIX_TRAIN(use,index) = errorTR;   
