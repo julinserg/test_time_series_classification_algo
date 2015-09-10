@@ -9,9 +9,9 @@ end;
 
 fprintf('..........START TEST\n');
 %%
-use = 3; % HMM - 1  HCRF - 2 NPMPGM - 3
-UCIDATASET = 1;
-TRAINFOLDSIZE = 50;
+use = 2; % HMM - 1  HCRF - 2 NPMPGM - 3
+UCIDATASET = 7;
+TRAINFOLDSIZE = 20;
 dataTrainUCI = getTrainData(1,UCIDATASET);
 dataTest = getTestData(1,UCIDATASET);
 %%
@@ -48,7 +48,7 @@ while (endD + TRAINFOLDSIZE) <= size(dataTrainUCI,2)
         %paramsData.factorSeqWeights = 1;
         R{2}.params = paramsNodHCRF;
         %R{2}.params.rangeWeights = [-1,1];
-        R{2}.params.nbHiddenStates = 5;
+        R{2}.params.nbHiddenStates = 9;
         R{2}.params.modelType = 'hcrf';
         R{2}.params.GaussianHCRF = 0;
         R{2}.params.windowRecSize = 0;
