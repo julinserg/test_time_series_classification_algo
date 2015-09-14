@@ -25,9 +25,9 @@ for i = 1:size(dataTest,1)
        for ii=1:S
          z(ii,:) = sum((w(:,ii+copies)-p).^2,1);
        end;
-       %z = -z.^0.5;
+       n = -z.^0.5;
        %z = -z.^2;
-       n= -z;
+       %n= -z;
        B = exp(n);
        [maxn,rows] = max(n,[],1);
        pih = repmat(5,1,size(w',1));
