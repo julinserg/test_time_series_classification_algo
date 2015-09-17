@@ -9,9 +9,9 @@ end;
 
 fprintf('..........START TEST\n');
 %%
-use = 3; % HMM - 1  HCRF - 2 NPMPGM - 3
-UCIDATASET = 1;
-TRAINFOLDSIZE = 660;
+use = 1; % HMM - 1  HCRF - 2 NPMPGM - 3
+UCIDATASET = 7;
+TRAINFOLDSIZE = 20;
 dataTrainUCI = getTrainData(1,UCIDATASET);
 dataTest = getTestData(1,UCIDATASET);
 %%
