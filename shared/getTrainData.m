@@ -187,6 +187,14 @@ if SELECTDATASET == 10
     end;
 end;
 
+if SELECTDATASET == 11  
+    load dataTrainProfilogr.mat;
+    % https://github.com/gokcemay/trib
+    D = dataTrainProfilogr;
+    if NUMBER == 1
+        D = D(:,:);
+    end;
+end;
 
 
 

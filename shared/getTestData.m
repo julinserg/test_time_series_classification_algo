@@ -185,3 +185,12 @@ if SELECTDATASET == 10
         D = D(:,:);
     end;
 end;
+
+if SELECTDATASET == 11  
+    load dataTestProfilogr.mat;
+    % https://github.com/gokcemay/trib
+    D = dataTestProfilogr;
+    if NUMBER == 1
+        D = D(:,:);
+    end;
+end;
