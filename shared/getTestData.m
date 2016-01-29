@@ -188,7 +188,7 @@ end;
 
 if SELECTDATASET == 11  
     load dataTestProfilogr.mat;
-    % https://github.com/gokcemay/trib
+    % ס ךאפוהנû
     D = dataTestProfilogr;
     if NUMBER == 1
         D = D(:,:);

@@ -9,9 +9,9 @@ end;
 
 fprintf('..........START TEST\n');
 %%
-use = 1; % HMM - 1  HCRF - 2 NPMPGM - 3
-UCIDATASET = 1;
-TRAINFOLDSIZE = 50;
+use = 2; % HMM - 1  HCRF - 2 NPMPGM - 3
+UCIDATASET = 11;
+TRAINFOLDSIZE = 1;
 dataTrainUCI = getTrainData(1,UCIDATASET);
 dataTest = getTestData(1,UCIDATASET);
 %%
@@ -25,8 +25,8 @@ while (endD + TRAINFOLDSIZE) <= size(dataTrainUCI,2)
     RESULTMATRIX_X(use,index) = size(dataTrain,2);
     RESULTMATRIX_X(use,index) = size(dataTrain,2);
     if (use == 1)
-        nstates = 5;
-        nmix = 0;
+        nstates = 7;
+        nmix = 2;
         [PrecisionT, RecallT, F_mT, errorT, PrecisionTR, RecallTR, F_mTR, errorTR] = hmm_main(dataTrain,dataTest,nstates,nmix);
         RESULTMATRIX_TRAIN(use,index) = errorTR;   
         RESULTMATRIX_TEST(use,index) = errorT;
@@ -48,7 +48,7 @@ while (endD + TRAINFOLDSIZE) <= size(dataTrainUCI,2)
         %paramsData.factorSeqWeights = 1;
         R{2}.params = paramsNodHCRF;
         %R{2}.params.rangeWeights = [-1,1];
-        R{2}.params.nbHiddenStates = 9;
+        R{2}.params.nbHiddenStates = 7;
         R{2}.params.modelType = 'hcrf';
         R{2}.params.GaussianHCRF = 0;
         R{2}.params.windowRecSize = 0;
