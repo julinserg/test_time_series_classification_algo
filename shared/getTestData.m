@@ -194,3 +194,12 @@ if SELECTDATASET == 11
         D = D(:,:);
     end;
 end;
+
+if SELECTDATASET == 12  
+    load dataTestTelem.mat;
+    % Ò ¡À¿
+    D = dataTestTelem;
+    if NUMBER == 1
+        D = D(:,:);
+    end;
+end;

@@ -196,6 +196,15 @@ if SELECTDATASET == 11
     end;
 end;
 
+if SELECTDATASET == 12 
+    load dataTrainTelem.mat;
+    % Ò ¡À¿
+    D = dataTrainTelem;
+    if NUMBER == 1
+        D = D(:,:);
+    end;
+end;
+
 
 
 

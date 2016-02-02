@@ -1,9 +1,9 @@
 clear;
 clc;
 display('Start');
-path_train = 'd:\bitbucket_proj\p_train\';
+path_train = 'd:\bitbucket_proj\t_train\';
 list = dir(path_train);
-dataTrainProfilogr = cell(1,1);
+dataTrainTelem = cell(1,1);
 for i=1:length(list)
     if list(i).isdir() == 0
         disp(list(i).name);
@@ -14,13 +14,13 @@ for i=1:length(list)
         class = str2num(classStr);
         inst = str2num(instansStr);
         Profil = csvread([path_train list(i).name]);  
-        dataTrainProfilogr{class,inst} = Profil';
+        dataTrainTelem{class,inst} = Profil';
     end
 end
 
-path_test = 'd:\bitbucket_proj\p_test\';
+path_test = 'd:\bitbucket_proj\t_test\';
 list = dir(path_test);
-dataTestProfilogr = cell(1,1);
+dataTestTelem = cell(1,1);
 for i=1:length(list)
     if list(i).isdir() == 0
         disp(list(i).name);
@@ -31,11 +31,11 @@ for i=1:length(list)
         class = str2num(classStr);
         inst = str2num(instansStr);
         Profil = csvread([path_test list(i).name]);  
-        dataTestProfilogr{class,inst} = Profil';
+        dataTestTelem{class,inst} = Profil';
     end
 end
 
-save('dataTrainProfilogr.mat', 'dataTrainProfilogr','-v7.3');
-save('dataTestProfilogr.mat', 'dataTestProfilogr','-v7.3');
+save('dataTrainTelem.mat', 'dataTrainTelem','-v7.3');
+save('dataTestTelem.mat', 'dataTestTelem','-v7.3');
 
 display('Stop');
