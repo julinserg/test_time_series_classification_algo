@@ -1,4 +1,4 @@
-function [PrecisionT, RecallT, F_mT, errorT, PrecisionTR, RecallTR, F_mTR, errorTR] = hmm_main(dataTrainArabicDigit,dataTestArabicDigit,nstates,nmix)
+function [PrecisionT, RecallT, F_mT, errorT, PrecisionTR, RecallTR, F_mTR, errorTR] = hmm_main(dataTrainArabicDigit,dataTestArabicDigit,nstates,nmix,diag)
 
 %% about
 %   классификация  с помощью HMM pmtk library
@@ -8,6 +8,26 @@ setSeed(0);
 
 %% train
 model = hmm_train(nstates,dataTrainArabicDigit,nmix);
+if (diag ~= 0)
+    for i=1:size(model.classConditionals,1)
+        for j=1:size(model.classConditionals{i,1}.emission.Sigma,3)
+            g = 0;
+            for k=1:size(model.classConditionals{i,1}.emission.Sigma,2)            
+                for m=1:size(model.classConditionals{i,1}.emission.Sigma,1)
+                    if (k ~= m)
+                        model.classConditionals{i,1}.emission.Sigma(k,m,j) = 0;
+                    else
+                        g = g + model.classConditionals{i,1}.emission.Sigma(k,m,j);
+                    end;
+                end;           
+            end;
+            % g = g / size(model.classConditionals{i,1}.emission.Sigma,1);
+            % gg = repmat(0.00001,1,size(model.classConditionals{i,1}.emission.Sigma,1));
+            % model.classConditionals{i,1}.emission.Sigma(:,:,j) = diag(gg);
+        end;
+    end;
+end;
+
 save('modelHMM', 'model');
 
 %% load model
