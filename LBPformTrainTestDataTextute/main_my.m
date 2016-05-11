@@ -1,13 +1,13 @@
 clear all;
 clc;
-rootpic = 'd:\bitbucket_proj\phd_codesourse\LBPformTrainTestDataTextute';
+rootpic = 'd:\git\phd_codesourse\LBPformTrainTestDataTextute\';
 picNum = 1; 
 row_map = 10;
 col_map = 10;
-epohs_map = 100;
+epohs_map = 400;
 for i=1:picNum;
     % filename = sprintf('%s\\images\\%06d.png', rootpic, i-1);
-    filename = sprintf('%s\\images\\%s', rootpic,  '000000.png');
+    filename = sprintf('%s\\images\\%s', rootpic,  '000007.png');
     Gray = imread(filename);
     Gray = rgb2gray(Gray);
     nrows = size(Gray,1);
@@ -59,4 +59,4 @@ for i=1:length(w)
         plot(X,f1);
     end;
 end;
-plot(X,Fsum,'-r');
+%plot(X,Fsum,'-r');
