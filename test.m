@@ -12,7 +12,8 @@ fprintf('..........START TEST\n');
 use = 3; % HMM - 1  HCRF - 2 NPMPGM - 3
 UCIDATASET = 2;
 %TRAINFOLDSIZE = [10, 20, 30, 40, 50, 60, 70, 80, 90, 100, 150, 200, 250, 300, 350, 400, 450, 500, 550, 600, 660];
-TRAINFOLDSIZE = [6, 12, 18, 24, 30, 36, 42, 48];
+%TRAINFOLDSIZE = [6, 12, 18, 24, 30, 36, 42, 48];
+TRAINFOLDSIZE = [10, 20, 30, 40, 50, 60, 70, 80];
 dataTrainUCI = getTrainData(1,UCIDATASET);
 dataTest = getTestData(1,UCIDATASET);
 %%
