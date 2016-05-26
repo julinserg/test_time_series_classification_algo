@@ -24,10 +24,12 @@ cellNetKox = cell(size(dataTrainRaw,1),1);
 % обучение карт Кохонена
 % !!!! обучение карты внутри parfor возможно только наиная с версии R2013a 
 for i=1:size(dataTrainForClass,1)
-  i % вывод текущего номера класса в консоль
-  net = newsom(dataTrainForClass{i},[row_map col_map],'hextop','dist');
+   i % вывод текущего номера класса в консоль
+  F = dataTrainForClass{i};
+  net = newsom(F,[row_map col_map],'hextop','dist');
   net.trainParam.epochs = epohs_map;
-  [net] = train(net,dataTrainForClass{i}); 
+  net.trainParam.showWindow = false;
+  [net] = train(net,F); 
   cellNetKox{i} = net;
 end;
 % вычисляем распределение вероятностей переходов между узлами карты для каждого класса

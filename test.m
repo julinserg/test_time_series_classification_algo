@@ -4,7 +4,7 @@ clear;
 % обычно количества потоков = количеству ядер процессора
 isOpen = matlabpool('size') > 0;
 if ~isOpen
-   matlabpool open local;
+   matlabpool open 4;
 end;
 
 fprintf('..........START TEST\n');
@@ -78,7 +78,7 @@ for ii = 1: size(TRAINFOLDSIZE,2)
         %% Инициализация параметров классификатора    
         row_map = 1; % колличество строк карты Кохонена
         col_map = 7; % колличество столбцов карты Кохонена
-        epohs_map = 500; % колличество эпох обучения карты Кохонена
+        epohs_map = 1000; % колличество эпох обучения карты Кохонена
         val_dirichlet = 0; % параметр распределения Дирихле
         [PrecisionT, RecallT, F_mT, errorT, PrecisionTR, RecallTR, F_mTR, errorTR] = npmpgm_main(dataTrain,dataTest,row_map,col_map,epohs_map,val_dirichlet);
         RESULTMATRIX_TRAIN(use,index) = errorTR;   
