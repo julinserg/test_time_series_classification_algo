@@ -206,6 +206,17 @@ if SELECTDATASET == 12
     end;
 end;
 
+if SELECTDATASET == 13
+    load dataMovementAAL.mat;
+    % Indoor User Movement Prediction from RSS data Data Set 
+    % http://archive.ics.uci.edu/ml/datasets/Indoor+User+Movement+Predictio
+    % n+from+RSS+data
+    D = dataMovementAAL;
+    if NUMBER == 1
+        D = D(1:2,1:100);
+    end;
+end;
+
 
 
 
