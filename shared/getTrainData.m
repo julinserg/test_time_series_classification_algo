@@ -155,10 +155,10 @@ end;
 
 if SELECTDATASET == 7
     %http://archive.ics.uci.edu/ml/datasets/Dataset+for+ADL+Recognition+with+Wrist-worn+Accelerometer#
-    load dataTrainAccelerometer.mat;
-    D = dataTrain;
+    load dataTestAccelerometer.mat;
+    D = dataTest;
     if NUMBER == 1
-        D = D(:,:);
+        D = D(1:6,:);
     end;
 end;
 
