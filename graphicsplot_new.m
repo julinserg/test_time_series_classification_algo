@@ -25,11 +25,14 @@ y_char_test_hmm_full_5_0 = [0.550000000000000 0.492500000000000 0.37750000000000
 y_char_train_hmm_diag_7_0 = [0.0450000000000000,0.0525000000000000,0.0866666666666667,0.0837500000000000,0.0780000000000000,0.145000000000000,0.178571428571429,0.165625000000000];
 y_char_test_hmm_diag_7_0 = [0.450000000000000,0.395000000000000,0.410000000000000,0.402500000000000,0.370000000000000,0.282500000000000,0.290000000000000,0.215000000000000];
 
+y_char_train_hmm_diag_5_0 = [0.155000000000000 0.140000000000000 0.113333333333333 0.122500000000000 0.139000000000000 0.195000000000000 0.186428571428571 0.282500000000000];
+y_char_test_hmm_diag_5_0 = [0.570000000000000 0.452500000000000 0.400000000000000 0.525000000000000 0.467500000000000 0.227500000000000 0.292500000000000 0.282500000000000];
+
 y_char_train_hcrf_7_0 = [0 0 0 0 0.00208333333333333 0 0 0];
 y_char_test_hcrf_7_0 = [0.4486 0.383 0.3596 0.3344 0.279000000000000 0.241000000000000 0.249 0.2566 ];
 
-y_char_train_hcrf_5_0 = [0 0.00250000000000000 0.00333333333333333 0.0162500000000000 0.00800000000000000 0.0458333333333333];
-y_char_test_hcrf_5_0 = [0.405000000000000 0.447500000000000 0.282500000000000 0.360000000000000 0.302500000000000 0.215000000000000];
+y_char_train_hcrf_5_0 = [0 0.00250000000000000 0.00333333333333333 0.0162500000000000 0.00800000000000000 0.0458333333333333 0.0121428571428571 0.0121428571428571];
+y_char_test_hcrf_5_0 = [0.405000000000000 0.447500000000000 0.282500000000000 0.360000000000000 0.302500000000000 0.215000000000000 0.102500000000000 0.102500000000000];
 
 y_char_train_npmpgm_7_0 = [0.0550000000000000,0.0725000000000000,0.0700000000000000,0.0875000000000000,0.0770000000000000,0.102500000000000,0.112857142857143,0.112857142857143];
 y_char_test_npmpgm_7_0 = [0.385000000000000,0.357500000000000,0.335000000000000,0.342500000000000,0.362500000000000,0.290000000000000,0.217500000000000,0.217500000000000];
@@ -102,21 +105,21 @@ else
     %y2 = y_speech_test_hmm_diag_5_0;
     %y3 = y_speech_test_hcrf_5_0;
     %y4 = y_speech_test_npmpgm_5_0;
-    %x1 = x_char;
-    %y1 = y_char_test_hmm_full_7_0;
-    %y2 = y_char_test_hmm_diag_7_0;
-    %y3 = y_char_test_hmm_diag_7_0;
-    %y4 = y_char_test_npmpgm_7_0;
+    x1 = x_char;
+    y1 = y_char_test_hmm_full_5_0;
+    y2 = y_char_test_hmm_diag_5_0;
+    y3 = y_char_test_hcrf_5_0;
+    y4 = y_char_test_npmpgm_5_0;
     %x1 = x_sensor;
     %y1 = y_sensor_test_hmm_full_5_0;
     %y2 = y_sensor_test_hmm_diag_6_0;
     %y3 = y_sensor_test_hcrf_5_0;
     %y4 = y_sensor_test_npmpgm_5_0;
-    x1 = x_accelerometer;
-    y1 = y_accelerometer_test_hmm_full_5_2;
-    y2 = y_accelerometer_test_hmm_full_5_2;
-    y3 = y_accelerometer_test_npmpgm_5_0;
-    y4 = y_accelerometer_test_npmpgm_5_0;
+    %x1 = x_accelerometer;
+    %y1 = y_accelerometer_test_hmm_full_5_2;
+    %y2 = y_accelerometer_test_hmm_full_5_2;
+    %y3 = y_accelerometer_test_npmpgm_5_0;
+    %y4 = y_accelerometer_test_npmpgm_5_0;
     set(0,'DefaultAxesFontSize',14,'DefaultAxesFontName','Times New Roman');
     set(0,'DefaultTextFontSize',14,'DefaultTextFontName','Times New Roman');
     %figure('Units', 'normalized', 'OuterPosition', [0 0 1 1]);
@@ -135,12 +138,12 @@ else
     %xlim([0,660])
     %ylim([0,0.6])
     %set(gca, 'XTick',0:50:660);
-    %xlim([10,80])
-    %ylim([0,0.6])
-    %set(gca, 'XTick',10:10:80);
-     xlim([10,100])
-     ylim([0,0.6])
-     set(gca, 'XTick',10:10:100);
+    xlim([10,80])
+    ylim([0,0.6])
+    set(gca, 'XTick',10:10:80);
+     %xlim([10,100])
+     %ylim([0,0.6])
+     %set(gca, 'XTick',10:10:100);
 end;
 %%
 %xlabel('Количество обучающих данных','Position',[BX(size(BX,2)) BY(1)])
