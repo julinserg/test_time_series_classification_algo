@@ -87,9 +87,9 @@ y_accelerometer_test_npmpgm_30_0 = [0.233333333333333 0.275000000000000 0.266666
 TYPE = 0;
 %%
 if TYPE == 1
-    x1 = x_char;
-    y1 = y_char_train_hmm_full_15_3;
-    y2 = y_char_test_hmm_full_15_3;   
+    x1 = x_sensor;
+    y1 = y_sensor_train_npmpgm_6_0;
+    y2 = y_sensor_test_npmpgm_6_0;   
     y3 = 0;
     title('HMM-SSOM');
     set(0,'DefaultAxesFontSize',14,'DefaultAxesFontName','Times New Roman');
@@ -107,26 +107,28 @@ if TYPE == 1
     BX=get(gca,'XTick');
     BY=get(gca,'YTick');
 else
+    title('Spoken Arabic Digit Data Set');    
     %x1 = x_speech;
     %y1 = y_speech_test_hmm_full_5_0;
     %y2 = y_speech_test_hmm_diag_5_0;
     %y3 = y_speech_test_hcrf_5_0;
-    %y4 = y_speech_test_npmpgm_5_0;
-    x1 = x_char;
-    y1 = y_char_test_hmm_full_20_3;
-    y2 = y_char_test_hmm_diag_7_0;
-    y3 = y_char_test_hcrf_7_0;
-    y4 = y_char_test_npmpgm_7_0;
+    %y4 = y_speech_test_npmpgm_5_0;    
+    %x1 = x_char;
+    %y1 = y_char_test_hmm_full_20_3;
+    %y2 = y_char_test_hmm_diag_7_0;
+    %y3 = y_char_test_hcrf_7_0;
+    %y4 = y_char_test_npmpgm_7_0;
+    %title('Indoor User Movement Prediction from RSS data Data Set');
     %x1 = x_sensor;
-    %y1 = y_sensor_test_hmm_full_5_0;
+    %y1 = y_sensor_test_hmm_full_6_0;
     %y2 = y_sensor_test_hmm_diag_6_0;
-    %y3 = y_sensor_test_hcrf_5_0;
-    %y4 = y_sensor_test_npmpgm_5_0;
-    %x1 = x_accelerometer;
-    %y1 = y_accelerometer_test_hmm_full_15_2;
-    %y2 = y_accelerometer_test_hmm_full_15_2;
-    %y3 = y_accelerometer_test_npmpgm_30_0;
-    %y4 = y_accelerometer_test_npmpgm_30_0;
+    %y3 = y_sensor_test_hcrf_6_0;
+    %y4 = y_sensor_test_npmpgm_6_0;
+    x1 = x_accelerometer;
+    y1 = y_accelerometer_test_hmm_full_5_2;
+    y2 = y_accelerometer_test_hmm_full_5_2;
+    y3 = y_accelerometer_test_npmpgm_30_0;
+    y4 = y_accelerometer_test_npmpgm_30_0;
     set(0,'DefaultAxesFontSize',14,'DefaultAxesFontName','Times New Roman');
     set(0,'DefaultTextFontSize',14,'DefaultTextFontName','Times New Roman');
     %figure('Units', 'normalized', 'OuterPosition', [0 0 1 1]);
@@ -148,9 +150,9 @@ else
     %xlim([10,80])
     %ylim([0,0.6])
     %set(gca, 'XTick',10:10:80);
-     xlim([10,100])
-     ylim([0,0.6])
-     set(gca, 'XTick',10:10:100);
+    xlim([10,100])
+    ylim([0,0.6])
+    set(gca, 'XTick',10:10:100);
 end;
 %%
 %xlabel('Количество обучающих данных','Position',[BX(size(BX,2)) BY(1)])

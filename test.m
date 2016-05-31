@@ -9,11 +9,11 @@ end;
 
 fprintf('..........START TEST\n');
 %%
-use = 1; % HMM - 1  HCRF - 2 NPMPGM - 3
-UCIDATASET = 2;
+use = 2; % HMM - 1  HCRF - 2 NPMPGM - 3
+UCIDATASET = 7;
 %TRAINFOLDSIZE = [10, 20, 30, 40, 50, 60, 70, 80, 90, 100, 150, 200, 250, 300, 350, 400, 450, 500, 550, 600, 660];
-TRAINFOLDSIZE = [10, 20, 30, 40, 50, 60, 70, 80];
-%TRAINFOLDSIZE = [10, 20, 30, 40, 50, 60, 70, 80, 90, 100];
+%TRAINFOLDSIZE = [10, 20, 30, 40, 50, 60, 70, 80];
+TRAINFOLDSIZE = [10, 20, 30, 40, 50, 60, 70, 80, 90, 100];
 %TRAINFOLDSIZE = [70 80];
 dataTrainUCI = getTrainData(1,UCIDATASET);
 dataTest = getTestData(1,UCIDATASET);
@@ -52,7 +52,7 @@ for ii = 1: size(TRAINFOLDSIZE,2)
         %paramsData.factorSeqWeights = 1;
         R{2}.params = paramsNodHCRF;
         %R{2}.params.rangeWeights = [-1,1];
-        R{2}.params.nbHiddenStates = 5;
+        R{2}.params.nbHiddenStates = 15;
         R{2}.params.modelType = 'hcrf';
         R{2}.params.GaussianHCRF = 0;
         R{2}.params.windowRecSize = 0;
