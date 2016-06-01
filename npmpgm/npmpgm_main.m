@@ -27,7 +27,7 @@ for i=1:size(dataTrain,1)
     t = size(dataTrainForClass{labelTrain(i)+1},2) +1;        
     dataTrainForClass{labelTrain(i)+1}(:,t:t+u-1) = a;       
     k_1 = k_1+size(a,2);  
-end; 
+end;
 
 %% Обучение модели
 if USETRAIN == 1    
