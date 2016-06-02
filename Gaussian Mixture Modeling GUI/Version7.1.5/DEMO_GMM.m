@@ -17,7 +17,8 @@ function varargout = DEMO_GMM(varargin)
 
 % Copyright @ D. Ververidis Version 7.1.4
 % Last Modified by GUIDE v2.5 04-May-2009 22:43:01
-
+clc;
+clear gloabal;
 gui_Singleton = 1;
 gui_State = struct('gui_Name',       mfilename, ...
                    'gui_Singleton',  gui_Singleton, ...
@@ -72,7 +73,8 @@ cd('Main')
 [MixtWeight, MixtMean, MixtCov, EmRep, Tlapsed, ProbMixt] =...
           PropEMPdfEstim(patterns, 1, handles.VisualizationEMStep);
 cd('..')
-
+EmRep
+MixtWeight
 set(findobj(gcf,'Tag','SaveResult'), 'Enable', 'on');
 guidata(hObject, handles);
 

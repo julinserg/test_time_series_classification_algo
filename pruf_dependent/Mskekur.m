@@ -168,29 +168,31 @@ end
 
 %Chi-square quantile-quantile (Q-Q) plot of the squared Mahalanobis
 %distances of the observations from the mean vector.
-% [d,t] = sort(diag(D));   %squared Mahalanobis distances
-% r = tiedrank(d);  %ranks of the squared Mahalanobis distances
-% lb = input('Are you interested to get the object labels? (y/n): ','s');
-% if lb == 'y'
-%     figure;
-%     labels = strread(sprintf('%d ',t),'%s').';
-%     disp(' ')
-%     disp('Note: At the end of the program execution. On the generated figures you can turn-on active button')
-%     disp('''Edit Plot''(fifth icon from left to right:white arrow), do click on the selected label and drag')
-%     disp('it to fix it on the desired position. Then turn-off active ''Edit Plot''.')
-%     disp(' ')
-%     chi2q=chi2inv((r-0.5)./n,p);  %chi-square quantiles  
-%     plot(chi2q,d,'*b')
-%     text(chi2q,d,labels)
-%     axis([0 max(chi2q)+1 0 max(d)+1])
-%     xlabel('Chi-square quantile')
-%     ylabel('Squared Mahalanobis distance')
-%     title ('Chi-square Q-Q plot')
-% else
-%     chi2q=chi2inv((r-0.5)./n,p);  %chi-square quantiles  
-%     plot(chi2q,d,'*b')
-%     axis([0 max(chi2q)+1 0 max(d)+1])
-%     xlabel('Chi-square quantile')
-%     ylabel('Squared Mahalanobis distance')
-%     title ('Chi-square Q-Q plot')  
-% end
+[d,t] = sort(diag(D));   %squared Mahalanobis distances
+r = tiedrank(d);  %ranks of the squared Mahalanobis distances
+lb = input('Are you interested to get the object labels? (y/n): ','s');
+if lb == 'y'
+    figure;
+    labels = strread(sprintf('%d ',t),'%s').';
+    disp(' ')
+    disp('Note: At the end of the program execution. On the generated figures you can turn-on active button')
+    disp('''Edit Plot''(fifth icon from left to right:white arrow), do click on the selected label and drag')
+    disp('it to fix it on the desired position. Then turn-off active ''Edit Plot''.')
+    disp(' ')
+    chi2q=chi2inv((r-0.5)./n,p);  %chi-square quantiles  
+    plot(chi2q,d,'*b')
+    text(chi2q,d,labels)
+    axis([0 max(chi2q)+1 0 max(d)+1])
+    xlabel('Chi-square quantile')
+    ylabel('Squared Mahalanobis distance')
+    title ('Chi-square Q-Q plot')
+else
+    chi2q=chi2inv((r-0.5)./n,p);  %chi-square quantiles  
+    hold on;
+    plot(chi2q,d,'*b')
+    plot(chi2q, chi2q,'-r','LineWidth',2);
+    axis([0 max(chi2q)+1 0 max(d)+1])
+    xlabel('Chi-square quantile')
+    ylabel('Squared Mahalanobis distance')
+    title ('Chi-square Q-Q plot')  
+end
