@@ -217,6 +217,16 @@ if SELECTDATASET == 13
     end;
 end;
 
+if SELECTDATASET == 14
+    load dataTrainISE100.mat;
+    % ISTANBUL STOCK EXCHANGE Data Set 
+    % http://archive.ics.uci.edu/ml/datasets/ISTANBUL+STOCK+EXCHANGE
+    D = dataTrainISE100;
+    if NUMBER == 1
+        D = D(:,:);
+    end;
+end;
+
 
 
 
