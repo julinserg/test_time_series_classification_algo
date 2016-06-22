@@ -36,10 +36,10 @@ for i=1:size(patterns,2)
    patterns(:,i) = (patterns(:,i) - minV) / (maxV - minV); 
 end;
 save('saveDataGMM','patterns');
-patterns = patterns(1:536,3:9);
+%patterns = patterns(1:536,3:9);
 %Roystest(patterns);
 %HZmvntest(patterns);
-%Mskekur(patterns,1);
+Mskekur(patterns,1);
 x = A(9,:);
 minX = min(x);
 maxX = max(x);
