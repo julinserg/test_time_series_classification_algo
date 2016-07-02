@@ -158,7 +158,7 @@ if SELECTDATASET == 7
     load dataTrainAccelerometer.mat;
     D = dataTrain;
     if NUMBER == 1
-        D = D(1:6,:);
+        D = D(:,:);
     end;
 end;
 

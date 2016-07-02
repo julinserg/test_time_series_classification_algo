@@ -158,7 +158,7 @@ if SELECTDATASET == 7
     load dataTestAccelerometer.mat;
     D = dataTest;
     if NUMBER == 1
-        D = D(1:6,:);
+        D = D(:,:);
     end;
 end;
 

@@ -9,12 +9,12 @@ end;
 
 fprintf('..........START TEST\n');
 %%
-use = 3; % HMM - 1  HCRF - 2 NPMPGM - 3
-UCIDATASET = 1;
+use = 2; % HMM - 1  HCRF - 2 NPMPGM - 3
+UCIDATASET = 7;
 %TRAINFOLDSIZE = [10, 20, 30, 40, 50, 60, 70, 80, 90, 100, 150, 200, 250, 300, 350, 400, 450, 500, 550, 600, 660];
 %TRAINFOLDSIZE = [10, 20, 30, 40, 50, 60, 70, 80];
 %TRAINFOLDSIZE = [10, 20, 30, 40, 50, 60, 70, 80, 90, 100];
-TRAINFOLDSIZE = 80;
+TRAINFOLDSIZE = [70, 80, 90, 100];
 dataTrainUCI = getTrainData(1,UCIDATASET);
 dataTest = getTestData(1,UCIDATASET);
 %%
@@ -28,9 +28,9 @@ for ii = 1: size(TRAINFOLDSIZE,2)
     RESULTMATRIX_X(use,index) = size(dataTrain,2);
     RESULTMATRIX_X(use,index) = size(dataTrain,2);
     if (use == 1)
-        nstates = 20;
-        nmix = 3;
-        diag = 0;
+        nstates = 15;
+        nmix = 2;
+        diag = 1;
         [PrecisionT, RecallT, F_mT, errorT, PrecisionTR, RecallTR, F_mTR, errorTR] = hmm_main(dataTrain,dataTest,nstates,nmix,diag);
         RESULTMATRIX_TRAIN(use,index) = errorTR;   
         RESULTMATRIX_TEST(use,index) = errorT;
@@ -78,8 +78,8 @@ for ii = 1: size(TRAINFOLDSIZE,2)
      if (use == 3)        
         %% Инициализация параметров классификатора    
         row_map = 1; % колличество строк карты Кохонена
-        col_map = 10; % колличество столбцов карты Кохонена
-        epohs_map = 500; % колличество эпох обучения карты Кохонена
+        col_map = 15; % колличество столбцов карты Кохонена
+        epohs_map = 1000; % колличество эпох обучения карты Кохонена
         val_dirichlet = 0; % параметр распределения Дирихле
         [PrecisionT, RecallT, F_mT, errorT, PrecisionTR, RecallTR, F_mTR, errorTR] = npmpgm_main(dataTrain,dataTest,row_map,col_map,epohs_map,val_dirichlet);
         RESULTMATRIX_TRAIN(use,index) = errorTR;   
