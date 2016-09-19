@@ -1,7 +1,7 @@
 clc;
 clear;
-UCIDATASET = 1;
-TRAINFOLDSIZE = 660;
+UCIDATASET = 13;
+TRAINFOLDSIZE = 100;
 
 dataTrainUCI = getTrainData(1,UCIDATASET);
 dataTrainRaw = dataTrainUCI(:,1:TRAINFOLDSIZE);
