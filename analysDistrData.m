@@ -1,7 +1,7 @@
 clc;
 clear;
-UCIDATASET = 14;
-TRAINFOLDSIZE = 1;
+UCIDATASET = 1;
+TRAINFOLDSIZE = 660;
 
 dataTrainUCI = getTrainData(1,UCIDATASET);
 dataTrainRaw = dataTrainUCI(:,1:TRAINFOLDSIZE);
@@ -27,8 +27,6 @@ end;
 
 %% /////////////////////////////////
 A = dataTrainForClass{1,1};
-InputISE = A(3:9,:);
-TargetISE = A(2,:);
 patterns = A(:,:)';
 for i=1:size(patterns,2)
    minV = min(patterns(:,i));
@@ -36,11 +34,11 @@ for i=1:size(patterns,2)
    patterns(:,i) = (patterns(:,i) - minV) / (maxV - minV); 
 end;
 save('saveDataGMM','patterns');
-%patterns = patterns(1:536,3:9);
+patterns = patterns(1:2000,:);
 %Roystest(patterns);
 %HZmvntest(patterns);
 Mskekur(patterns,1);
-x = A(9,:);
+x = A(1,:);
 minX = min(x);
 maxX = max(x);
 x = (x - minX) / (maxX - minX);

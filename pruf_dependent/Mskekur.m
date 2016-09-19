@@ -188,9 +188,13 @@ if lb == 'y'
     title ('Chi-square Q-Q plot')
 else
     chi2q=chi2inv((r-0.5)./n,p);  %chi-square quantiles  
-    hold on;
-    plot(chi2q,d,'*b')
-    plot(chi2q, chi2q,'-r','LineWidth',2);
+    qqplot(chi2q,d);
+    %hold on;
+    %plot(chi2q,d,'*b')
+    %meanX = mean(chi2q);
+    %disp1 = cov(chi2q);
+    %li = disp1*chi2q+meanX;
+    %plot(chi2q, li,'-r','LineWidth',2);
     axis([0 max(chi2q)+1 0 max(d)+1])
     xlabel('Chi-square quantile')
     ylabel('Squared Mahalanobis distance')
