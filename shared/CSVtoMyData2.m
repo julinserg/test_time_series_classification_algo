@@ -1,7 +1,7 @@
 clear;
 clc;
 display('Start');
-path_train = 'd:\bitbucket_proj\t_train\';
+path_train = 'd:\scienceProject\telem\train\';
 list = dir(path_train);
 dataTrainTelem = cell(1,1);
 for i=1:length(list)
@@ -18,7 +18,7 @@ for i=1:length(list)
     end
 end
 
-path_test = 'd:\bitbucket_proj\t_test\';
+path_test = 'd:\scienceProject\telem\train\';
 list = dir(path_test);
 dataTestTelem = cell(1,1);
 for i=1:length(list)
@@ -35,7 +35,7 @@ for i=1:length(list)
     end
 end
 
-save('dataTrainTelem.mat', 'dataTrainTelem','-v7.3');
-save('dataTestTelem.mat', 'dataTestTelem','-v7.3');
+save('dataTrainTelemF.mat', 'dataTrainTelem','-v7.3');
+save('dataTestTelemF.mat', 'dataTestTelem','-v7.3');
 
 display('Stop');
