@@ -215,3 +215,19 @@ if SELECTDATASET == 13
         D = D(1:2,101:156);
     end;
 end;
+
+if SELECTDATASET == 15
+    load dataTestRndGaussHmm.mat;   
+    D = dataTest;
+    if NUMBER == 1
+        D = D(:,:);
+    end;
+end;
+
+if SELECTDATASET == 16
+    load dataTestRndDiscreteHmm.mat;   
+    D = dataTest;
+    if NUMBER == 1
+        D = D(:,:);
+    end;
+end;

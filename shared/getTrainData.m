@@ -227,6 +227,22 @@ if SELECTDATASET == 14
     end;
 end;
 
+if SELECTDATASET == 15
+    load dataTrainRndGaussHmm.mat;   
+    D = dataTrain;
+    if NUMBER == 1
+        D = D(:,:);
+    end;
+end;
+
+if SELECTDATASET == 16
+    load dataTrainRndDiscreteHmm.mat;   
+    D = dataTrain;
+    if NUMBER == 1
+        D = D(:,:);
+    end;
+end;
+
 
 
 

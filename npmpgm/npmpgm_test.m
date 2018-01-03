@@ -1,4 +1,4 @@
-function [arrayLL] = testModel(Probability,cellNetKox,dataTest)
+function [arrayLL] = npmpgm_test(Probability,cellNetKox,dataTest)
 %% ‘ункци€ классификации
 % ¬ходные данные:
 %       Probability - массив €чеек((Nx1)- N - количество классов), кажда€ €чейка это матрица условных распределений вер€отностей перехода
@@ -15,7 +15,7 @@ function [arrayLL] = testModel(Probability,cellNetKox,dataTest)
 %%
 for i = 1:size(dataTest,1)
     p = dataTest{i};
-    parfor m = 1:size(cellNetKox,1)
+    for m = 1:size(cellNetKox,1)
        w= cellNetKox{m}.iw{1,1};       
        [S,R11] = size(w);
        [R2,Q] = size(p);
@@ -37,7 +37,29 @@ for i = 1:size(dataTest,1)
        A =  Probability{m}.A;
        % hmmFilter - функци€ из matlab-пакета Probabilistic Modeling Toolkit for
        % Matlab/Octave https://github.com/probml/pmtk3
-       logp = hmmFilter(pih, A, B);
+       %logp = hmmFilter(pih, A, B);
+       %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%  
+       %logp2 = A( rows(1), rows(1) ) * B( rows(1), 1 );      
+       %for ii=1:S
+       % for jj=1:S
+       %     for t=2:Q
+       %         logp2 = logp2 + (  A( ii, jj ) * B( jj, t ) );
+       %     end
+       % end
+       %end
+       %logp2 = log (logp2);
+       %%%%%%%%%%%%%%%%%%%%%%%%%%%%%% 
+       [K T] = size(B);   
+       scale = zeros(T,1);
+       alpha = zeros(K,T); 
+       AT = A';
+       [alpha, scale(1)] = normalize(pih(:) .* B(:,1));
+       for t=2:T
+           [alpha, scale(t)] = normalize((AT * alpha) .* B(:,t));
+       end
+       logp = sum(log(scale+eps));
+       %logp2 = log(prob_all);
+       %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
        arrayLL(i,m) = logp;          
     end;
 end;

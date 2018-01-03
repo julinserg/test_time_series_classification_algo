@@ -2,102 +2,109 @@ clc;
 clear;
 %% Инициализация пула потоков (задание количества потоков)
 % обычно количества потоков = количеству ядер процессора
-isOpen = matlabpool('size') > 0;
-if ~isOpen
-   matlabpool open 4;
-end;
+%isOpen = parpool('size') > 0;
+%if ~isOpen
+%   parpool open 4;
+%end;
 
-fprintf('..........START TEST\n');
+fprintf('..........START EXPERIMENT\n');
 %%
-use = 2; % HMM - 1  HCRF - 2 NPMPGM - 3
-UCIDATASET = 7;
+N_STATES = 5;
+N_MIX = 0;
+use = 3; % HMM - 1  HCRF - 2 NPMPGM - 3 LSTM - 4 KNN - 5 HMMSOM - 6
+UCIDATASET = 1;
 %TRAINFOLDSIZE = [10, 20, 30, 40, 50, 60, 70, 80, 90, 100, 150, 200, 250, 300, 350, 400, 450, 500, 550, 600, 660];
-%TRAINFOLDSIZE = [10, 20, 30, 40, 50, 60, 70, 80];
+%TRAINFOLDSIZE = [ 20, 30, 40, 50, 60, 70, 80];
 %TRAINFOLDSIZE = [10, 20, 30, 40, 50, 60, 70, 80, 90, 100];
-TRAINFOLDSIZE = [70, 80, 90, 100];
+TRAINFOLDSIZE = [40];
 dataTrainUCI = getTrainData(1,UCIDATASET);
 dataTest = getTestData(1,UCIDATASET);
 %%
 endD = 0;
 index = 0;
+RESULTMATRIX_TRAIN = zeros(6, size(TRAINFOLDSIZE,2));
+RESULTMATRIX_TEST = zeros(6, size(TRAINFOLDSIZE,2));
 for ii = 1: size(TRAINFOLDSIZE,2) 
     endD = TRAINFOLDSIZE(ii);
     dataTrain = dataTrainUCI(:,1:endD);  
     index = index + 1;
-    RESULTMATRIX_X(use,index) = size(dataTrain,2);
-    RESULTMATRIX_X(use,index) = size(dataTrain,2);
-    RESULTMATRIX_X(use,index) = size(dataTrain,2);
-    if (use == 1)
-        nstates = 15;
-        nmix = 2;
-        diag = 1;
-        [PrecisionT, RecallT, F_mT, errorT, PrecisionTR, RecallTR, F_mTR, errorTR] = hmm_main(dataTrain,dataTest,nstates,nmix,diag);
-        RESULTMATRIX_TRAIN(use,index) = errorTR;   
-        RESULTMATRIX_TEST(use,index) = errorT;
-        fprintf('T HMM Average Precision  = %f\n', PrecisionT);
-        fprintf('T HMM Average Recall  = %f\n', RecallT);
-        fprintf('T HMM F-measure  = %f\n', F_mT);
-        fprintf('T HMM Error  = %f\n', errorT);
-        fprintf('TR HMM Average Precision  = %f\n', PrecisionTR);
-        fprintf('TR HMM Average Recall  = %f\n', RecallTR);
-        fprintf('TR HMM F-measure  = %f\n', F_mTR);
-        fprintf('TR HMM Error  = %f\n', errorTR);
-        save('RESULTMATRIX_TRAIN.mat', 'RESULTMATRIX_TRAIN');
-        save('RESULTMATRIX_TEST.mat', 'RESULTMATRIX_TEST');
-    end;
-    if (use == 2)
-        load sampleData;
-        %load initDataTransHMMtoHCRF
-        %paramsData.weightsPerSequence = ones(1,512);
-        %paramsData.factorSeqWeights = 1;
-        R{2}.params = paramsNodHCRF;
-        %R{2}.params.rangeWeights = [-1,1];
-        R{2}.params.nbHiddenStates = 15;
-        R{2}.params.modelType = 'hcrf';
-        R{2}.params.GaussianHCRF = 0;
-        R{2}.params.windowRecSize = 0;
-        R{2}.params.windowSize = 0;
-        R{2}.params.optimizer = 'bfgs';
-        R{2}.params.regFactorL2 = 1;
-        R{2}.params.regFactorL1 = 0;
-        % R{2}.params.initWeights = initDataTransHMMtoHCRF;
-        [PrecisionT, RecallT, F_mT, errorT, PrecisionTR, RecallTR, F_mTR, errorTR] = hcrf_main(dataTrain,dataTest,R);
-        RESULTMATRIX_TRAIN(use,index) = errorTR;  
-        RESULTMATRIX_TEST(use,index) = errorT;
-        fprintf('T HCRF Average Precision  = %f\n', PrecisionT);
-        fprintf('T HCRF Average Recall  = %f\n', RecallT);
-        fprintf('T HCRF F-measure  = %f\n', F_mT);
-        fprintf('T HCRF Error  = %f\n', errorT);
-        fprintf('TR HCRF Average Precision  = %f\n', PrecisionTR);
-        fprintf('TR HCRF Average Recall  = %f\n', RecallTR);
-        fprintf('TR HCRF F-measure  = %f\n', F_mTR);
-        fprintf('TR HCRF Error  = %f\n', errorTR);
-        save('RESULTMATRIX_TRAIN.mat', 'RESULTMATRIX_TRAIN');
-        save('RESULTMATRIX_TEST.mat', 'RESULTMATRIX_TEST');
-     end;
-     if (use == 3)        
-        %% Инициализация параметров классификатора    
-        row_map = 1; % колличество строк карты Кохонена
-        col_map = 15; % колличество столбцов карты Кохонена
-        epohs_map = 1000; % колличество эпох обучения карты Кохонена
-        val_dirichlet = 0; % параметр распределения Дирихле
-        [PrecisionT, RecallT, F_mT, errorT, PrecisionTR, RecallTR, F_mTR, errorTR] = npmpgm_main(dataTrain,dataTest,row_map,col_map,epohs_map,val_dirichlet);
-        RESULTMATRIX_TRAIN(use,index) = errorTR;   
-        RESULTMATRIX_TEST(use,index) = errorT;
-        fprintf('T NPMPGM Average Precision  = %f\n', PrecisionT);
-        fprintf('T NPMPGM Average Recall  = %f\n', RecallT);
-        fprintf('T NPMPGM F-measure  = %f\n', F_mT);
-        fprintf('T NPMPGM Error  = %f\n', errorT);
-        fprintf('TR NPMPGM Average Precision  = %f\n', PrecisionTR);
-        fprintf('TR NPMPGM Average Recall  = %f\n', RecallTR);
-        fprintf('TR NPMPGM F-measure  = %f\n', F_mTR);
-        fprintf('TR NPMPGM Error  = %f\n', errorTR);
-        save('RESULTMATRIX_TRAIN.mat', 'RESULTMATRIX_TRAIN');
-        save('RESULTMATRIX_TEST.mat', 'RESULTMATRIX_TEST');
-     end;    
-end;
+    RESULTMATRIX_X(use,index) = endD;
+    RESULTMATRIX_X(use,index) = endD;
+    RESULTMATRIX_X(use,index) = endD;
+    K_FOLD = size(dataTrainUCI,2)/TRAINFOLDSIZE;    
+    Indices = mycrosvalid( size(dataTrainUCI,2), K_FOLD );
+    K_FOLD = 1;
+    for cros_iter = 1 : K_FOLD
+        dataTrainCross = dataTrainUCI(:,Indices == cros_iter );        
+        if (use == 1)
+            diag = 0;
+            [PrecisionT, RecallT, F_mT, errorT, PrecisionTR, RecallTR, F_mTR, errorTR] = hmm_main(dataTrainCross,dataTest,N_STATES,N_MIX,diag); 
+            fprintf('Test HMM Error  = %f\n', errorT);
+            fprintf('Train HMM Error  = %f\n', errorTR);   
+        end
+        if (use == 2)
+            load sampleData;
+            %load initDataTransHMMtoHCRF
+            %paramsData.weightsPerSequence = ones(1,512);
+            %paramsData.factorSeqWeights = 1;
+            R{2}.params = paramsNodHCRF;
+            %R{2}.params.rangeWeights = [-1,1];
+            R{2}.params.nbHiddenStates = N_STATES;
+            R{2}.params.modelType = 'hcrf';
+            R{2}.params.GaussianHCRF = 0;
+            R{2}.params.windowRecSize = 0;
+            R{2}.params.windowSize = 0;
+            R{2}.params.optimizer = 'bfgs';
+            R{2}.params.regFactorL2 = 1;
+            R{2}.params.regFactorL1 = 0;
+            % R{2}.params.initWeights = initDataTransHMMtoHCRF;
+            [PrecisionT, RecallT, F_mT, errorT, PrecisionTR, RecallTR, F_mTR, errorTR] = hcrf_main(dataTrainCross,dataTest,R);
+            fprintf('Test HCRF Error  = %f\n', errorT); 
+            fprintf('Train HCRF Error  = %f\n', errorTR);     
+        end
+        if (use == 3)        
+            %% Инициализация параметров классификатора    
+            row_map = 5; % колличество строк карты Кохонена
+            col_map = 5; % колличество столбцов карты Кохонена
+            epohs_map = 1000; % колличество эпох обучения карты Кохонена
+            val_dirichlet = 0; % параметр распределения Дирихле
+            [PrecisionT, RecallT, F_mT, errorT, PrecisionTR, RecallTR, F_mTR, errorTR] = npmpgm_main(dataTrainCross,dataTest,row_map,col_map,epohs_map,val_dirichlet);            
+            fprintf('Test NPMPGM Error  = %f\n', errorT);  
+            fprintf('Train NPMPGM Error  = %f\n', errorTR);
+            
+        end
+        if (use == 4)        
+            [PrecisionT, RecallT, F_mT, errorT, PrecisionTR, RecallTR, F_mTR, errorTR] = lstm_main(dataTrainCross,dataTest); 
+            fprintf('Test LSTM Error  = %f\n', errorT);
+            fprintf('Train LSTM Error  = %f\n', errorTR);   
+        end
+        if (use == 5)        
+            [PrecisionT, RecallT, F_mT, errorT, PrecisionTR, RecallTR, F_mTR, errorTR] = knn_main(dataTrainCross,dataTest); 
+            fprintf('Test KNN Error  = %f\n', errorT);
+            fprintf('Train KNN Error  = %f\n', errorTR);   
+        end
+        if (use == 6)        
+            %% Инициализация параметров классификатора    
+            row_map = 10; % колличество строк карты Кохонена
+            col_map = 10; % колличество столбцов карты Кохонена
+            epohs_map = 1000; % колличество эпох обучения карты Кохонена           
+            [PrecisionT, RecallT, F_mT, errorT, PrecisionTR, RecallTR, F_mTR, errorTR] = hmmsom_main(dataTrainCross,dataTest,row_map,col_map,epohs_map,N_STATES);            
+            fprintf('Test HMMSOM Error  = %f\n', errorT);  
+            fprintf('Train HMMSOM Error  = %f\n', errorTR);
+            
+        end
+        RESULTMATRIX_TRAIN(use,index) = RESULTMATRIX_TRAIN(use,index) + errorTR;   
+        RESULTMATRIX_TEST(use,index) =  RESULTMATRIX_TEST(use,index) + errorT;
+    end
+    RESULTMATRIX_TRAIN(use,index) =  RESULTMATRIX_TRAIN(use,index) / K_FOLD;
+    RESULTMATRIX_TEST(use,index) =  RESULTMATRIX_TEST(use,index) / K_FOLD;
+    fprintf('Test CrossValidation Error  = %f\n', RESULTMATRIX_TEST(use,index));  
+    fprintf('Train CrossValidation Error  = %f\n', RESULTMATRIX_TRAIN(use,index));
+    save('RESULTMATRIX_TRAIN.mat', 'RESULTMATRIX_TRAIN');
+    save('RESULTMATRIX_TEST.mat', 'RESULTMATRIX_TEST');
+end
 %%
-fprintf('..........STOP TEST\n');
+fprintf('..........STOP EXPERIMENT\n');
 
 %% PLOT
 set(0,'DefaultAxesFontSize',14,'DefaultAxesFontName','Times New Roman');
