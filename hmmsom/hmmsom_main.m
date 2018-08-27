@@ -1,4 +1,4 @@
-function [PrecisionT, RecallT, F_mT, errorT, PrecisionTR, RecallTR, F_mTR, errorTR] = hmmsom_main(dataTrainRaw,dataTest,row_map,col_map,epohs_map,nstates)
+function [PrecisionT, RecallT, F_mT, errorT, PrecisionTR, RecallTR, F_mTR, errorTR] = hmmsom_main(dataTrainRaw,dataTest,row_map,col_map,epohs_map,nstates, use_k_means)
 
 % чтение обучающих данных
 % подготовка обучающих данных для карты Кохонена
@@ -32,7 +32,7 @@ end;
 %% Обучение модели
 if USETRAIN == 1    
    [model, cellNetKox] = hmmsom_train(dataTrainRaw,dataTrainForClass, ...
-   row_map,col_map,epohs_map,nstates);
+   row_map,col_map,epohs_map,nstates,use_k_means);
    % Сохранение карт Кхонена в файл
    save('model.mat', 'model');
    save('cellNetKox.mat', 'cellNetKox');
@@ -42,12 +42,12 @@ end;
 load model;
 load cellNetKox;
 %% test on test data
-[PrecisionT, RecallT, F_mT, errorT] = hmmsom_test_l(dataTest,model,cellNetKox);
+[PrecisionT, RecallT, F_mT, errorT] = hmmsom_test_l(dataTest,model,cellNetKox,use_k_means);
 %% test on train data
-[PrecisionTR, RecallTR, F_mTR, errorTR] = hmmsom_test_l(dataTrainRaw,model,cellNetKox);
+[PrecisionTR, RecallTR, F_mTR, errorTR] = hmmsom_test_l(dataTrainRaw,model,cellNetKox,use_k_means);
 
-function [AveragePrecision, AverageRecall, F_measure, error] = hmmsom_test_l(dataTest,model,cellNetKox)
-[ll] = hmmsom_test(dataTest,model,cellNetKox);
+function [AveragePrecision, AverageRecall, F_measure, error] = hmmsom_test_l(dataTest,model,cellNetKox,use_k_means)
+[ll] = hmmsom_test(dataTest,model,cellNetKox,use_k_means);
 arrayLL = ll';
 label = cell(1,1);
 k = 1;

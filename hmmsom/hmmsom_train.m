@@ -1,4 +1,4 @@
-function [model, cellNetKox] = hmmsom_train(dataTrainRaw,dataTrainForClass, row_map, col_map, epohs_map, nstates)
+function [model, cellNetKox] = hmmsom_train(dataTrainRaw,dataTrainForClass, row_map, col_map, epohs_map, nstates,use_k_means)
 %% Функция обучения модели 
 % Входняе данные:
 %       dataTrainRaw - массив ячеек (cell) содежащий обучающие данные,
@@ -23,24 +23,56 @@ function [model, cellNetKox] = hmmsom_train(dataTrainRaw,dataTrainForClass, row_
 cellNetKox = cell(size(dataTrainRaw,1),1);
 % обучение карт Кохонена
 % !!!! обучение карты внутри parfor возможно только наиная с версии R2013a 
-for i=1:size(dataTrainForClass,1)
-   i % вывод текущего номера класса в консоль
-  F = dataTrainForClass{i};
-  net = newsom(F,[row_map col_map],'hextop','dist');
-  net.trainParam.epochs = epohs_map;
-  net.trainParam.showWindow = false;
-  [net] = train(net,F); 
-  cellNetKox{i} = net;
-end
-dataTrainForHMM = cell(1,1);
-for i=1:size(dataTrainRaw,1)
-    for j=1:size(dataTrainRaw,2)
-       array = sim(cellNetKox{i},dataTrainRaw{i,j});           
-       array = vec2ind(array);
-       dataTrainForHMM{i,j} = array;
+if use_k_means == 0
+    parfor i=1:size(dataTrainForClass,1)
+       i % вывод текущего номера класса в консоль
+      F = dataTrainForClass{i};
+      net = newsom(F,[row_map col_map],'hextop','dist');
+      net.trainParam.epochs = epohs_map;
+      net.trainParam.showWindow = false;
+      [net] = train(net,F); 
+      cellNetKox{i} = net;
+    end
+else
+    parfor i=1:size(dataTrainForClass,1)
+       i % вывод текущего номера класса в консоль
+      F = dataTrainForClass{i};
+      [idx, net] = kmeans(F',row_map * col_map);
+      %[idx,net,sumd,D] = kmeans(F',row_map * col_map,'MaxIter',10000,...
+       % 'Display','final','Replicates',10);
+      cellNetKox{i} = net;
     end
 end
-
+dataTrainForHMM = cell(1,1);
+if use_k_means == 0
+    for i=1:size(dataTrainRaw,1)
+        for j=1:size(dataTrainRaw,2)
+           array = sim(cellNetKox{i},dataTrainRaw{i,j});           
+           array = vec2ind(array);
+           dataTrainForHMM{i,j} = array;
+        end
+    end
+else
+    for i=1:size(dataTrainRaw,1)
+        for j=1:size(dataTrainRaw,2)
+          % array = sim(cellNetKox{i},dataTrainRaw{i,j});           
+          % array = vec2ind(array);
+            p = dataTrainRaw{i,j};
+            w= cellNetKox{i};       
+            [S,R11] = size(w);
+            [R2,Q] = size(p);
+            z = zeros(S,Q);
+            w = w';
+            copies = zeros(1,Q);
+            for ii=1:S
+              z(ii,:) = sum((w(:,ii+copies)-p).^2,1);
+            end
+            n = -z.^0.5;
+            [maxn,array] = max(n,[],1);
+           dataTrainForHMM{i,j} = array;
+        end
+    end
+end
 dataTrain = cell(1,1);
 k = 1;
 for i=1:size(dataTrainForHMM,1)

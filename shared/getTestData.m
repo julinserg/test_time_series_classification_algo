@@ -212,7 +212,7 @@ if SELECTDATASET == 13
     % n+from+RSS+data
     D = dataMovementAAL;
     if NUMBER == 1
-        D = D(1:2,101:156);
+        D = D(1:2,106:156);
     end;
 end;
 
@@ -231,3 +231,20 @@ if SELECTDATASET == 16
         D = D(:,:);
     end;
 end;
+
+if SELECTDATASET == 17
+    load dataTestRndNoiseGaussHmm.mat;   
+    D = dataTest;
+    if NUMBER == 1
+        D = D(:,:);
+    end;
+end;
+
+if SELECTDATASET == 18
+    load dataTestTextureImage.mat;   
+    D = dataTest;
+    if NUMBER == 1
+        D = D(:,:);
+    end;
+end;
+

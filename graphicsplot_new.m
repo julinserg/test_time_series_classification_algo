@@ -92,7 +92,7 @@ y_accelerometer_test_npmpgm_5_0 = [0.233333333333333 0.358333333333333 0.3666666
 y_accelerometer_train_npmpgm_30_0 = [0 0.0416666666666667 0.0666666666666667 0.104166666666667 0.116666666666667 0.0944444444444444 0.0976190476190476 0.127083333333333 0.138888888888889 0.173333333333333];
 y_accelerometer_test_npmpgm_30_0 = [0.233333333333333 0.275000000000000 0.266666666666667 0.225000000000000 0.216666666666667 0.183333333333333 0.191666666666667 0.191666666666667 0.150000000000000 0.141666666666667];
 %%
-TYPE = 1;
+TYPE = 2;
 %%
 if TYPE == 1
     x1 = x_accelerometer;
@@ -111,7 +111,7 @@ if TYPE == 1
     %plot(x1, repmat(min(y2),size(x1,1),size(x1,2)),'black','LineWidth',1);
     plot(x1, repmat(y3,size(x1,1),size(x1,2)),'-.','Color','black','LineWidth',1);
     axis([min(x1),max(x1),0,0.6])
-    legend('Ошибка на обучающей выборке','Ошибка на тестовой выборке', 1);
+    legend('Ошибка на обучающей выборке','Ошибка на тестовой выборке');
     BX=get(gca,'XTick');
     BY=get(gca,'YTick');
 else
@@ -167,43 +167,43 @@ end;
 %%
 %xlabel('Количество обучающих данных','Position',[BX(size(BX,2)) BY(1)])
 %ylabel('Ошибка классификации','Rotation',0,'Position',[BX(1) BY(size(BY,2))])
-xlabel('Количество обучающих данных')
-ylabel('Ошибка классификации')
-
-XA=get(gca,'XTickLabel');%
-
-for i=1:size(XA,1)
-
-    z=rem(i,2);
-    if z==0;
-        if XA(i,1)~='0' && XA(i,2)~=0
-            XA(i,:)=char(0);
-        end
-    end
-    
-end
-
-XA(size(XA,1),:)=char(0);
-
-set(gca,'XTickLabel',XA);
-
-YA=get(gca,'YTickLabel');%
-
-for i=1:size(YA,1)
-
-    z=strfind(YA(i,:),'.');
-    YA(i,z)=',';
-    clear z;
-    z=rem(i,2);
-    if z~=0; 
-        YA(i,:)=char(0);
-    end
-    
-end
-
-YA(size(YA,1),:)=char(0);
-
-set(gca,'YTickLabel',YA);
+% xlabel('Количество обучающих данных')
+% ylabel('Ошибка классификации')
+% 
+% XA=get(gca,'XTickLabel');%
+% 
+% for i=1:size(XA,1)
+% 
+%     z=rem(i,2);
+%     if z==0;
+%         if XA(i,1)~='0' && XA(i,2)~=0
+%             XA(i,:)=char(0);
+%         end
+%     end
+%     
+% end
+% 
+% XA(size(XA,1),:)=char(0);
+% 
+% set(gca,'XTickLabel',XA);
+% 
+% YA=get(gca,'YTickLabel');%
+% 
+% for i=1:size(YA,1)
+% 
+%     z=strfind(YA(i,:),'.');
+%     YA(i,z)=',';
+%     clear z;
+%     z=rem(i,2);
+%     if z~=0; 
+%         YA(i,:)=char(0);
+%     end
+%     
+% end
+% 
+% YA(size(YA,1),:)=char(0);
+% 
+% set(gca,'YTickLabel',YA);
 
 %xlabel('Sample Size');
 %ylabel('Error');

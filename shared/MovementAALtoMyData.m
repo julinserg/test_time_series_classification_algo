@@ -1,10 +1,10 @@
 clear;
 clc;
 display('Start');
-pathL = 'd:\bitbucket_proj\phd_codesourse\shared\MovementAAL\MovementAAL_target.csv';
+pathL = 'c:\Users\sergey\Downloads\MovementAAL\MovementAAL_target.csv';
 TargetLable = csvread(pathL,1,0);
 
-path = 'd:\bitbucket_proj\phd_codesourse\shared\MovementAAL\dataset\';
+path = 'c:\Users\sergey\Downloads\MovementAAL\dataset\';
 list = dir(path);
 dataMovementAAL = cell(1,1);
 inst0 = 0;
@@ -27,6 +27,6 @@ for i=1:length(list)
     end
 end
 
-save('dataMovementAAL.mat', 'dataMovementAAL','-v7.3');
+%save('dataMovementAAL.mat', 'dataMovementAAL','-v7.3');
 
 display('Stop');

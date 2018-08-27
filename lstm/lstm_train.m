@@ -29,12 +29,13 @@ layers = [ ...
     fullyConnectedLayer(numClasses)
     softmaxLayer
     classificationLayer];
-maxEpochs = 150;
-miniBatchSize = 27;
+maxEpochs = 200;
+miniBatchSize = 35;
 shuffle = 'never';
 
 options = trainingOptions('sgdm', ...
-    'MaxEpochs',maxEpochs, ...   
+    'MaxEpochs',maxEpochs, ...
+    'MiniBatchSize',miniBatchSize, ...
     'Shuffle', shuffle);
 labelTrain_c = categorical(labelTrain);
 lstm_net = trainNetwork(dataTrain,labelTrain_c,layers,options);

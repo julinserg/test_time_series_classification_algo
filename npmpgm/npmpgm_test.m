@@ -38,15 +38,11 @@ for i = 1:size(dataTest,1)
        % hmmFilter - функция из matlab-пакета Probabilistic Modeling Toolkit for
        % Matlab/Octave https://github.com/probml/pmtk3
        %logp = hmmFilter(pih, A, B);
-       %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%  
-       %logp2 = A( rows(1), rows(1) ) * B( rows(1), 1 );      
-       %for ii=1:S
-       % for jj=1:S
-       %     for t=2:Q
-       %         logp2 = logp2 + (  A( ii, jj ) * B( jj, t ) );
-       %     end
-       % end
-       %end
+       %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%        logp2 = log( A( rows(1), rows(1) ) * B( rows(1), 1 ) );
+%        for t=2:size(rows,2)
+%            logp2 = logp2 + log( A( rows(t-1), rows(t) ) * B( rows(t), t ) );
+%        end
        %logp2 = log (logp2);
        %%%%%%%%%%%%%%%%%%%%%%%%%%%%%% 
        [K T] = size(B);   
