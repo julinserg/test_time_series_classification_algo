@@ -248,3 +248,11 @@ if SELECTDATASET == 18
     end;
 end;
 
+if SELECTDATASET == 19
+    load dataTestSeqFromImage.mat;   
+    D = dataTestTelem;
+    if NUMBER == 1
+        D = D(:,:);
+    end
+end
+

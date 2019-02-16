@@ -259,6 +259,14 @@ if SELECTDATASET == 18
     end
 end
 
+if SELECTDATASET == 19
+    load dataTrainSeqFromImage.mat;   
+    D = dataTrainTelem;
+    if NUMBER == 1
+        D = D(:,:);
+    end
+end
+
 
 
 
