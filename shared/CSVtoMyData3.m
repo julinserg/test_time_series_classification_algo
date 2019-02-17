@@ -2,7 +2,7 @@ clear;
 clc;
 display('Start');
 
-% path_train = 'd:\scienceProject\seq_from_image\test\';
+% path_train = 'd:\scienceProject\seq_from_image\train\';
 % list = dir(path_train);
 % dataTrainTelem = cell(1,1);
 % for i=1:length(list)
@@ -15,8 +15,19 @@ display('Start');
 %     end
 % end
 
+%% толстые  и тонкие полоски
+% Tw = 40; %analysis frame duration (ms)
+% Ts = 5;           % analysis frame shift (ms)
+% fs = 4000;
+%% черные и серые полоски
+% Tw = 20; %analysis frame duration (ms)
+% Ts = 2;           % analysis frame shift (ms)
+% fs = 16000;
+%% текстуры
 Tw = 40; %analysis frame duration (ms)
 Ts = 5;           % analysis frame shift (ms)
+fs = 4000;
+%%
 alpha = 0.97;      % preemphasis coefficient
 R = [ 1 700 ];  % frequency range to consider
 M = 20;            % number of filterbank channels 
@@ -26,9 +37,7 @@ L = 22;            % cepstral sine lifter parameter
 % hamming window (see Eq. (5.2) on p.73 of [1])
 hamming = @(N)(0.54-0.46*cos(2*pi*[0:N-1].'/(N-1)));
 
-% Read speech samples, sampling rate and precision from file
-[ speech, fs ] = audioread( 'sp10.wav' );
-fs = 4000;
+
 % Feature extraction (feature vectors as columns)
 
           
