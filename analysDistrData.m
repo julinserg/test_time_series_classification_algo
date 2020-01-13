@@ -1,12 +1,12 @@
 clc;
 clear;
-UCIDATASET = 17;
-TRAINFOLDSIZE = 80;
+UCIDATASET = 8;
+%TRAINFOLDSIZE = 40;
 
 Apdf = normpdf([-10:0.1:10], -1, 1);
 
 dataTrainUCI = getTrainData(1,UCIDATASET);
-dataTrainRaw = dataTrainUCI(:,1:TRAINFOLDSIZE);
+dataTrainRaw = dataTrainUCI(:,:);
 
 k = 1;
 for i=1:size(dataTrainRaw,1)

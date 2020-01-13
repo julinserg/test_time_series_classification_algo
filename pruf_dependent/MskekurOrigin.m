@@ -1,4 +1,4 @@
-function [] = Mskekur(X,c,alpha,text)
+function [MskekurOrigin] = MskekurOrigin(X,c,alpha)
 %Mardia's multivariate skewness and kurtosis.
 %Calculates the Mardia's multivariate skewness and kurtosis coefficients
 %as well as their corresponding statistical test. For large sample size 
@@ -22,7 +22,6 @@ function [] = Mskekur(X,c,alpha,text)
 %      -The file ask you whether or not are you interested to label the n
 %       data points on the Q-Q plot:
 %          Are you interested to explore all the n data points? (y/n):
-
 %
 %    Example:For the example of Pope et al. (1980) given by Stevens (1992, p. 249), 
 %            with 12 cases (n = 12) and three variables (p = 3). We are interested
@@ -93,48 +92,39 @@ function [] = Mskekur(X,c,alpha,text)
 %  Mardia, K. V. (1970), Measures of multivariate skewnees and kurtosis with
 %         applications. Biometrika, 57(3):519-530.
 %  Mardia, K. V. (1974), Applications of some measures of multivariate skewness
-%         and kurtosis for testing normality and robustness studies. Sankhyâ A,
+%         and kurtosis for testing normality and robustness studies. Sankhyï¿½ A,
 %         36:115-128
 %  Stevens, J. (1992), Applied Multivariate Statistics for Social Sciences. 2nd. ed.
 %         New-Jersey:Lawrance Erlbaum Associates Publishers. pp. 247-248.
 %
-
 if nargin < 3, 
     alpha = 0.05;  %(default)
 end 
-
 if nargin < 2, 
     error('Requires at least two input arguments.'); 
 end 
-
 [n,p] = size(X);
-
 difT = [];
 for	j = 1:p
    eval(['difT=[difT,(X(:,j)-mean(X(:,j)))];']);
 end
-
 if c == 1  %covariance matrix normalizes by (n) [=default]
     S = cov(X,1);
 else   %covariance matrix normalizes by (n-1)
     S = cov(X);
 end
-
 D = difT*inv(S)*difT';  %squared-Mahalanobis' distances matrix
 b1p = (sum(sum(D.^3)))/n^2;  %multivariate skewness coefficient
 b2p=trace(D.^2)/n;  %multivariate kurtosis coefficient
-
 k = ((p+1)*(n+1)*(n+3))/(n*(((n+1)*(p+1))-6));  %small sample correction
 v = (p*(p+1)*(p+2))/6;  %degrees of freedom
 g1c = (n*b1p*k)/6;  %skewness test statistic corrected for small sample:it approximates to a chi-square distribution
 g1 = (n*b1p)/6;  %skewness test statistic:it approximates to a chi-square distribution
 P1 = 1 - chi2cdf(g1,v);  %significance value associated to the skewness
 P1c = 1 - chi2cdf(g1c,v);  %significance value associated to the skewness corrected for small sample
-
 g2 = (b2p-(p*(p+2)))/(sqrt((8*p*(p+2))/n));  %kurtosis test statistic:it approximates to
                                              %a unit-normal distribution
 P2 = 2*(1-normcdf(abs(g2)));  %significance value associated to the kurtosis
-
 disp(' ');
 disp('Analysis of the Mardia''s multivariate asymmetry skewness and kurtosis.')
 disp(['[No. of data = ',num2str(n) ', ' 'Variables = ',num2str(p) ']']);
@@ -153,25 +143,21 @@ if P1 >= alpha;
 else 
    fprintf('The multivariate skewness results significative.\n');
 end
-
 if P1c >= alpha;
    fprintf('The multivariate skewness corrected for small sample results not significative.\n');
 else 
    fprintf('The multivariate skewness corrected for small sample results significative.\n');
 end
-
 if P2 >= alpha;
    fprintf('The multivariate kurtosis results not significative.\n\n');
 else 
    fprintf('The multivariate kurtosis results significative.\n\n');
 end
-
 %Chi-square quantile-quantile (Q-Q) plot of the squared Mahalanobis
 %distances of the observations from the mean vector.
 [d,t] = sort(diag(D));   %squared Mahalanobis distances
 r = tiedrank(d);  %ranks of the squared Mahalanobis distances
-%lb = input('Are you interested to get the object labels? (y/n): ','s');
-lb = 'n';
+lb = input('Are you interested to get the object labels? (y/n): ','s');
 if lb == 'y'
     figure;
     labels = strread(sprintf('%d ',t),'%s').';
@@ -189,15 +175,10 @@ if lb == 'y'
     title ('Chi-square Q-Q plot')
 else
     chi2q=chi2inv((r-0.5)./n,p);  %chi-square quantiles  
-    qqplot(chi2q,d);
-    %hold on;
-    %plot(chi2q,d,'*b')
-    %meanX = mean(chi2q);
-    %disp1 = cov(chi2q);
-    %li = disp1*chi2q+meanX;
-    %plot(chi2q, li,'-r','LineWidth',2);
+    plot(chi2q,d,'*b')
     axis([0 max(chi2q)+1 0 max(d)+1])
     xlabel('Chi-square quantile')
     ylabel('Squared Mahalanobis distance')
-    title (text)  
+    title ('Chi-square Q-Q plot')  
 end
+return,
