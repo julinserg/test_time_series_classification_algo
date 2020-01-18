@@ -16,11 +16,13 @@ UCIDATASET = 17;
 %TRAINFOLDSIZE = [10, 20, 30, 40, 50, 60, 70, 80, 90, 100, 150, 200, 250, 300, 350, 400, 450, 500, 550, 600, 660];
 %TRAINFOLDSIZE = [ 20, 30, 40, 50, 60, 70, 80];
 %TRAINFOLDSIZE = [20, 30, 40, 50, 60, 70, 80, 90, 100, 110, 120, 130, 140, 150, 160, 170, 180, 190, 200];
-TRAINFOLDSIZE = [600];
+%TRAINFOLDSIZE = [50];
 %TRAINFOLDSIZE = [20, 30, 40, 50, 60, 70, 80, 90, 100, 110, 120,130,140,150,160,170,180,190,200];
-dataTrainUCI = getTrainData(1,UCIDATASET);
-dataTest = getTestData(1,UCIDATASET);
-
+%dataTrainUCI = getTrainData(1,UCIDATASET);
+%dataTest = getTestData(1,UCIDATASET);
+dataTrainUCI = getData2020('CharacterTrajectories_TRAIN.mat');
+dataTest = getData2020('CharacterTrajectories_TEST.mat');
+TRAINFOLDSIZE = [size(dataTrainUCI,2)];
 %%
 endD = 0;
 index = 0;

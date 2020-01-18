@@ -5,3 +5,7 @@
 *.jpg
 *.bmp
 *.
+*.arff
+*.pdf
+*.png
+*.db

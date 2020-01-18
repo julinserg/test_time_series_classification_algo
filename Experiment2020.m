@@ -24,8 +24,6 @@ r23 = getArrayExampleTrainData(1,7); % ADL Recognition with Wrist-worn Accelerom
 r23 = r23(1:20000,:);
 r24 = getArrayExampleTrainData(1,13); % Indoor User Movement 
 
-javaaddpath('c:\Program Files\Weka-3-8-4\weka.jar');
-wekaOBJ = loadARFF('d:\\git\\phd_codesourse\\Multivariate_arff\\CharacterTrajectories\\CharacterTrajectoriesDimension1_TRAIN.arff');
-[mdata,featureNames,targetNDX,stringVals,relationName] = weka2matlab(wekaOBJ,[]);
+
                                             
-Mskekur(r25,1,0.05,'Indoor User Movement');
+Mskekur(r24,1,0.05,'Indoor User Movement');
