@@ -2,11 +2,11 @@ clc;
 clear;
 fprintf('..........BEGIN\n');
 javaaddpath('c:\Program Files\Weka-3-8-4\weka.jar');
-path = 'd:\\git\\phd_codesourse\\Multivariate_arff\\';
+path = 'd:\\science\\phd_codesource\\Multivariate_arff\\';
 
 nameDataSet = 'CharacterTrajectories';
 maxDim = 3;
-trainOrTest = 'TRAIN';
+trainOrTest = 'TEST';
 
 result = cell(1,1);
 for dim = 1: maxDim
@@ -56,7 +56,7 @@ end
 
 CellMinNotNanIndex = min(CellDimNotNan);
 result = result(:,1:CellMinNotNanIndex);
-resultFileName = ['d:\\git\\phd_codesourse\\Multivariate_mat\\' nameDataSet '_' trainOrTest '.mat'];
+resultFileName = ['d:\\science\\phd_codesource\\Multivariate_mat\\' nameDataSet '_' trainOrTest '.mat'];
 save( resultFileName, 'result','-v7.3');
 fprintf('..........END\n');
 
