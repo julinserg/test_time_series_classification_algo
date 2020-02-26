@@ -1,6 +1,6 @@
-function [exemplars] = getArrayExampleTrainData(NUMBERCLASS,SELECTDATASET)
+function [exemplars] = getArrayExampleTrainData(NUMBERCLASS,NAMEDATASET)
 
-dataTrainUCI = getTrainData(1,SELECTDATASET);
+dataTrainUCI = getData2020(NAMEDATASET);
 dataTrainRaw = dataTrainUCI(:,:);
 
 k = 1;

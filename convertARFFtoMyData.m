@@ -4,13 +4,18 @@ fprintf('..........BEGIN\n');
 javaaddpath('c:\Program Files\Weka-3-8-4\weka.jar');
 path = 'd:\\science\\phd_codesource\\Multivariate_arff\\';
 
-nameDataSet = 'CharacterTrajectories';
-maxDim = 3;
+nameDataSet = 'Cricket';
 trainOrTest = 'TEST';
+%trainOrTest = 'TRAIN';
 
 result = cell(1,1);
-for dim = 1: maxDim
+dim = 0;
+while true
+    dim = dim + 1;
     str = [path nameDataSet '\\' nameDataSet 'Dimension' int2str(dim) '_' trainOrTest '.arff'];
+    if exist(str, 'file') == 0
+        break;
+    end
     wekaOBJ = loadARFF(str);
     [mdata,featureNames,targetNDX,stringVals,relationName] = weka2matlab(wekaOBJ,[]);
     inst = 0;

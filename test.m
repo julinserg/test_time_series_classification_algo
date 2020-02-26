@@ -9,10 +9,10 @@ clear;
 
 fprintf('..........START EXPERIMENT\n');
 %%
-N_STATES = 3;
+N_STATES = 5;
 N_MIX = 0;
 use = 1; % HMM - 1  HCRF - 2 NPMPGM_SOM - 3 LSTM - 4 KNN - 5 DHMM+SOM - 6 DHMM+KMEANS - 7 NPMPGM_KMEANS - 8 NPMPGM_EM - 9
-UCIDATASET = 17;
+
 %TRAINFOLDSIZE = [10, 20, 30, 40, 50, 60, 70, 80, 90, 100, 150, 200, 250, 300, 350, 400, 450, 500, 550, 600, 660];
 %TRAINFOLDSIZE = [ 20, 30, 40, 50, 60, 70, 80];
 %TRAINFOLDSIZE = [20, 30, 40, 50, 60, 70, 80, 90, 100, 110, 120, 130, 140, 150, 160, 170, 180, 190, 200];
@@ -20,13 +20,13 @@ UCIDATASET = 17;
 %TRAINFOLDSIZE = [20, 30, 40, 50, 60, 70, 80, 90, 100, 110, 120,130,140,150,160,170,180,190,200];
 %dataTrainUCI = getTrainData(1,UCIDATASET);
 %dataTest = getTestData(1,UCIDATASET);
-dataTrainUCI = getData2020('CharacterTrajectories_TRAIN.mat');
-dataTest = getData2020('CharacterTrajectories_TEST.mat');
+dataTrainUCI = getData2020('Cricket_TRAIN.mat');
+dataTest = getData2020('Cricket_TEST.mat');
 TRAINFOLDSIZE = [size(dataTrainUCI,2)];
 %%
 endD = 0;
 index = 0;
-RESULTMATRIX_TRAIN = zeros(9, size(TRAINFOLDSIZE,2));
+RESUTMATRIX_TRAIN = zeros(9, size(TRAINFOLDSIZE,2));
 RESULTMATRIX_TEST = zeros(9, size(TRAINFOLDSIZE,2));
 for ii = 1: size(TRAINFOLDSIZE,2) 
     endD = TRAINFOLDSIZE(ii);
