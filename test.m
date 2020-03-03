@@ -11,7 +11,7 @@ fprintf('..........START EXPERIMENT\n');
 %%
 N_STATES = 5;
 N_MIX = 0;
-use = 8; % 1-HMM 2-HCRF 3-NPMPGM_SOM 4-LSTM 5-KNN 6-DHMM+SOM 7-DHMM+KMEANS 8-NPMPGM_KMEANS 9-NPMPGM_EM
+use = 4; % 1-HMM 2-HCRF 3-NPMPGM_SOM 4-NPMPGM_KMEANS 5-KNN 6-DHMM+SOM 7-DHMM+KMEANS 8-NPMPGM_EM 9-LSTM
 
 %TRAINFOLDSIZE = [10, 20, 30, 40, 50, 60, 70, 80, 90, 100, 150, 200, 250, 300, 350, 400, 450, 500, 550, 600, 660];
 %TRAINFOLDSIZE = [ 20, 30, 40, 50, 60, 70, 80];
@@ -73,14 +73,19 @@ for ii = 1: size(TRAINFOLDSIZE,2)
             epohs_map = 1000; % колличество эпох обучения карты Кохонена
             val_dirichlet = 0; % параметр распределения Дирихле
             [PrecisionT, RecallT, F_mT, errorT, PrecisionTR, RecallTR, F_mTR, errorTR] = npmpgm_main(dataTrainCross,dataTest,row_map,col_map,epohs_map,val_dirichlet);            
-            fprintf('Test NPMPGM Error  = %f\n', errorT);  
-            fprintf('Train NPMPGM Error  = %f\n', errorTR);            
+            fprintf('Test NPMPGM_SOM Error  = %f\n', errorT);  
+            fprintf('Train NPMPGM_SOM Error  = %f\n', errorTR);            
         end
-        if (use == 4)        
-            [PrecisionT, RecallT, F_mT, errorT, PrecisionTR, RecallTR, F_mTR, errorTR] = lstm_main(dataTrainCross,dataTest); 
-            fprintf('Test LSTM Error  = %f\n', errorT);
-            fprintf('Train LSTM Error  = %f\n', errorTR);   
-        end
+         if (use == 4)        
+            %% Инициализация параметров классификатора    
+            row_map = 1; % колличество строк карты Кохонена
+            col_map = N_STATES; % колличество столбцов карты Кохонена
+            epohs_map = 1000; % колличество эпох обучения карты Кохонена
+            val_dirichlet = 0; % параметр распределения Дирихле
+            [PrecisionT, RecallT, F_mT, errorT, PrecisionTR, RecallTR, F_mTR, errorTR] = npmpgm_kmeans_main(dataTrainCross,dataTest,row_map,col_map,epohs_map,val_dirichlet);            
+            fprintf('Test NPMPGM_KMEANS Error  = %f\n', errorT);  
+            fprintf('Train NPMPGM_KMEANS Error  = %f\n', errorTR);            
+         end        
         if (use == 5)        
             [PrecisionT, RecallT, F_mT, errorT, PrecisionTR, RecallTR, F_mTR, errorTR] = knn_main(dataTrainCross,dataTest); 
             fprintf('Test KNN Error  = %f\n', errorT);
@@ -105,18 +110,8 @@ for ii = 1: size(TRAINFOLDSIZE,2)
             fprintf('Test DHMM+KMEANS Error  = %f\n', errorT);  
             fprintf('Train DHMM+KMEANS Error  = %f\n', errorTR);
             
-        end
+        end       
         if (use == 8)        
-            %% Инициализация параметров классификатора    
-            row_map = 1; % колличество строк карты Кохонена
-            col_map = N_STATES; % колличество столбцов карты Кохонена
-            epohs_map = 1000; % колличество эпох обучения карты Кохонена
-            val_dirichlet = 0; % параметр распределения Дирихле
-            [PrecisionT, RecallT, F_mT, errorT, PrecisionTR, RecallTR, F_mTR, errorTR] = npmpgm_kmeans_main(dataTrainCross,dataTest,row_map,col_map,epohs_map,val_dirichlet);            
-            fprintf('Test NPMPGM_KMEANS Error  = %f\n', errorT);  
-            fprintf('Train NPMPGM_KMEANS Error  = %f\n', errorTR);            
-        end
-        if (use == 9)        
             %% Инициализация параметров классификатора    
             row_map = 1; % колличество строк карты Кохонена
             col_map = N_STATES; % колличество столбцов карты Кохонена
@@ -125,6 +120,11 @@ for ii = 1: size(TRAINFOLDSIZE,2)
             [PrecisionT, RecallT, F_mT, errorT, PrecisionTR, RecallTR, F_mTR, errorTR] = npmpgm_em_main(dataTrainCross,dataTest,row_map,col_map,epohs_map,val_dirichlet);            
             fprintf('Test NPMPGM_EM Error  = %f\n', errorT);  
             fprintf('Train NPMPGM_EM Error  = %f\n', errorTR);            
+        end
+        if (use == 9)        
+            [PrecisionT, RecallT, F_mT, errorT, PrecisionTR, RecallTR, F_mTR, errorTR] = lstm_main(dataTrainCross,dataTest); 
+            fprintf('Test LSTM Error  = %f\n', errorT);
+            fprintf('Train LSTM Error  = %f\n', errorTR);   
         end
         RESULTMATRIX_TRAIN(use,index) = RESULTMATRIX_TRAIN(use,index) + errorTR;   
         RESULTMATRIX_TEST(use,index) =  RESULTMATRIX_TEST(use,index) + errorT;
