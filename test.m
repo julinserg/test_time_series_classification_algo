@@ -11,7 +11,7 @@ fprintf('..........START EXPERIMENT\n');
 %%
 N_STATES = 5;
 N_MIX = 0;
-use = 1; % HMM - 1  HCRF - 2 NPMPGM_SOM - 3 LSTM - 4 KNN - 5 DHMM+SOM - 6 DHMM+KMEANS - 7 NPMPGM_KMEANS - 8 NPMPGM_EM - 9
+use = 8; % 1-HMM 2-HCRF 3-NPMPGM_SOM 4-LSTM 5-KNN 6-DHMM+SOM 7-DHMM+KMEANS 8-NPMPGM_KMEANS 9-NPMPGM_EM
 
 %TRAINFOLDSIZE = [10, 20, 30, 40, 50, 60, 70, 80, 90, 100, 150, 200, 250, 300, 350, 400, 450, 500, 550, 600, 660];
 %TRAINFOLDSIZE = [ 20, 30, 40, 50, 60, 70, 80];
@@ -92,8 +92,8 @@ for ii = 1: size(TRAINFOLDSIZE,2)
             col_map = 10; % колличество столбцов карты Кохонена
             epohs_map = 1000; % колличество эпох обучения карты Кохонена           
             [PrecisionT, RecallT, F_mT, errorT, PrecisionTR, RecallTR, F_mTR, errorTR] = hmmsom_main(dataTrainCross,dataTest,row_map,col_map,epohs_map,N_STATES,0);            
-            fprintf('Test HMMSOM Error  = %f\n', errorT);  
-            fprintf('Train HMMSOM Error  = %f\n', errorTR);
+            fprintf('Test DHMM+SOM Error  = %f\n', errorT);  
+            fprintf('Train DHMM+SOM Error  = %f\n', errorTR);
             
         end
         if (use == 7)        
@@ -102,8 +102,8 @@ for ii = 1: size(TRAINFOLDSIZE,2)
             col_map = 10; % колличество столбцов карты Кохонена
             epohs_map = 1000; % колличество эпох обучения карты Кохонена           
             [PrecisionT, RecallT, F_mT, errorT, PrecisionTR, RecallTR, F_mTR, errorTR] = hmmsom_main(dataTrainCross,dataTest,row_map,col_map,epohs_map,N_STATES,1);            
-            fprintf('Test HMMSOM Error  = %f\n', errorT);  
-            fprintf('Train HMMSOM Error  = %f\n', errorTR);
+            fprintf('Test DHMM+KMEANS Error  = %f\n', errorT);  
+            fprintf('Train DHMM+KMEANS Error  = %f\n', errorTR);
             
         end
         if (use == 8)        
