@@ -1,13 +1,24 @@
 clc;
 clear;
-fprintf('..........BEGIN\n');
+
 javaaddpath('c:\Program Files\Weka-3-8-4\weka.jar');
 path = 'd:\\science\\phd_codesource\\Multivariate_arff\\';
-
-nameDataSet = 'Cricket';
-trainOrTest = 'TEST';
+%DuckDuckGeese
+groupDATA = {'ArticularyWordRecognition' 'AtrialFibrillation' 'BasicMotions' ...
+    'CharacterTrajectories' 'Cricket' 'EigenWorms' 'Epilepsy' ...
+    'EthanolConcentration' 'ERing' 'FaceDetection' 'FingerMovements' ...
+    'HandMovementDirection' 'Handwriting' 'Heartbeat' 'InsectWingbeat' ...
+    'JapaneseVowels' 'Libras' 'LSST' 'MotorImagery' 'NATOPS' 'PenDigits' ...
+    'PEMS-SF' 'Phoneme' 'RacketSports' 'SelfRegulationSCP1' 'SelfRegulationSCP2' ...
+    'SpokenArabicDigits' 'StandWalkJump' 'UWaveGestureLibrary' };
+for groupDATAId = 1:length(groupDATA)
+nameDataSet = groupDATA{groupDATAId};
+fprintf('..........BEGIN %s \n', nameDataSet);
+%trainOrTest = 'TEST';
 %trainOrTest = 'TRAIN';
-
+groupTT = {'TRAIN' 'TEST'};
+for groupTTId = 1:length(groupTT)
+trainOrTest = groupTT{groupTTId};
 result = cell(1,1);
 dim = 0;
 while true
@@ -63,6 +74,7 @@ CellMinNotNanIndex = min(CellDimNotNan);
 result = result(:,1:CellMinNotNanIndex);
 resultFileName = ['d:\\science\\phd_codesource\\Multivariate_mat\\' nameDataSet '_' trainOrTest '.mat'];
 save( resultFileName, 'result','-v7.3');
-fprintf('..........END\n');
-
+fprintf('..........END %s %s \n', trainOrTest, nameDataSet);
+end
+end
 

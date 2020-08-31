@@ -9,7 +9,7 @@ clear;
 
 fprintf('..........START EXPERIMENT\n');
 %%
-N_STATES = 5;
+N_STATES = 9;
 N_MIX = 0;
 use = 4; % 1-HMM 2-HCRF 3-NPMPGM_SOM 4-NPMPGM_KMEANS 5-KNN 6-DHMM+SOM 7-DHMM+KMEANS 8-NPMPGM_EM 9-LSTM
 
@@ -20,8 +20,8 @@ use = 4; % 1-HMM 2-HCRF 3-NPMPGM_SOM 4-NPMPGM_KMEANS 5-KNN 6-DHMM+SOM 7-DHMM+KME
 %TRAINFOLDSIZE = [20, 30, 40, 50, 60, 70, 80, 90, 100, 110, 120,130,140,150,160,170,180,190,200];
 %dataTrainUCI = getTrainData(1,UCIDATASET);
 %dataTest = getTestData(1,UCIDATASET);
-dataTrainUCI = getData2020('Cricket_TRAIN.mat');
-dataTest = getData2020('Cricket_TEST.mat');
+dataTrainUCI = getData2020('ArticularyWordRecognition_TRAIN.mat');
+dataTest = getData2020('ArticularyWordRecognition_TEST.mat');
 TRAINFOLDSIZE = [size(dataTrainUCI,2)];
 %%
 endD = 0;
