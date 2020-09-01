@@ -11,7 +11,7 @@ fprintf('..........START EXPERIMENT\n');
 %%
 N_STATES = 9;
 N_MIX = 0;
-use = 4; % 1-HMM 2-HCRF 3-NPMPGM_SOM 4-NPMPGM_KMEANS 5-KNN 6-DHMM+SOM 7-DHMM+KMEANS 8-NPMPGM_EM 9-LSTM
+currentModel = "NPMPGM_SOM"; % 1-HMM 2-HCRF 3-NPMPGM_SOM 4-NPMPGM_KMEANS 5-KNN 6-DHMM+SOM 7-DHMM+KMEANS 8-NPMPGM_EM 9-LSTM
 
 %TRAINFOLDSIZE = [10, 20, 30, 40, 50, 60, 70, 80, 90, 100, 150, 200, 250, 300, 350, 400, 450, 500, 550, 600, 660];
 %TRAINFOLDSIZE = [ 20, 30, 40, 50, 60, 70, 80];
@@ -20,33 +20,50 @@ use = 4; % 1-HMM 2-HCRF 3-NPMPGM_SOM 4-NPMPGM_KMEANS 5-KNN 6-DHMM+SOM 7-DHMM+KME
 %TRAINFOLDSIZE = [20, 30, 40, 50, 60, 70, 80, 90, 100, 110, 120,130,140,150,160,170,180,190,200];
 %dataTrainUCI = getTrainData(1,UCIDATASET);
 %dataTest = getTestData(1,UCIDATASET);
-dataTrainUCI = getData2020('ArticularyWordRecognition_TRAIN.mat');
-dataTest = getData2020('ArticularyWordRecognition_TEST.mat');
+groupDATA = {'ArticularyWordRecognition' 'AtrialFibrillation' 'BasicMotions' ...
+    'CharacterTrajectories' 'Cricket' 'EigenWorms' 'Epilepsy' ...
+    'EthanolConcentration' 'ERing' 'FaceDetection' 'FingerMovements' ...
+    'HandMovementDirection' 'Handwriting' 'Heartbeat' 'InsectWingbeat' ...
+    'JapaneseVowels' 'Libras' 'LSST' 'MotorImagery' 'NATOPS' 'PenDigits' ...
+    'PEMS-SF' 'Phoneme' 'RacketSports' 'SelfRegulationSCP1' 'SelfRegulationSCP2' ...
+    'SpokenArabicDigits' 'StandWalkJump' 'UWaveGestureLibrary' };
+
+%groupDATA = {'ArticularyWordRecognition' 'AtrialFibrillation' };
+c = cell(length(groupDATA), 3);
+nameDataSetIndex = 0;
+for groupDATAId = 1:length(groupDATA)
+nameDataSetTrain = append(groupDATA{groupDATAId}, '_TRAIN.mat') ;
+nameDataSetTest = append(groupDATA{groupDATAId}, '_TEST.mat') ;
+nameDataSetIndex = nameDataSetIndex + 1;
+
+dataTrainUCI = getData2020(nameDataSetTrain);
+dataTest = getData2020(nameDataSetTest);
 TRAINFOLDSIZE = [size(dataTrainUCI,2)];
 %%
 endD = 0;
 index = 0;
 RESUTMATRIX_TRAIN = zeros(9, size(TRAINFOLDSIZE,2));
 RESULTMATRIX_TEST = zeros(9, size(TRAINFOLDSIZE,2));
+
 for ii = 1: size(TRAINFOLDSIZE,2) 
     endD = TRAINFOLDSIZE(ii);
     dataTrain = dataTrainUCI(:,1:endD);  
     index = index + 1;
-    RESULTMATRIX_X(use,index) = endD;
-    RESULTMATRIX_X(use,index) = endD;
-    RESULTMATRIX_X(use,index) = endD;
+    %RESULTMATRIX_X(use,index) = endD;
+    %RESULTMATRIX_X(use,index) = endD;
+    %RESULTMATRIX_X(use,index) = endD;
     K_FOLD = size(dataTrainUCI,2)/endD;    
     Indices = mycrosvalid( size(dataTrainUCI,2), K_FOLD );
     K_FOLD = 1;
     for cros_iter = 1 : K_FOLD
         dataTrainCross = dataTrainUCI(:,Indices == cros_iter );        
-        if (use == 1)
+        if (currentModel == "HMM")
             diag = 0;
             [PrecisionT, RecallT, F_mT, errorT, PrecisionTR, RecallTR, F_mTR, errorTR] = hmm_main(dataTrainCross,dataTest,N_STATES,N_MIX,diag); 
-            fprintf('Test HMM Error  = %f\n', errorT);
-            fprintf('Train HMM Error  = %f\n', errorTR);   
+            fprintf('Test %s Error  = %f\n', currentModel, errorT);
+            fprintf('Train %s Error  = %f\n', currentModel, errorTR);   
         end
-        if (use == 2)
+        if (currentModel == "HCRF")
             load sampleData;
             %load initDataTransHMMtoHCRF
             %paramsData.weightsPerSequence = ones(1,512);
@@ -63,82 +80,88 @@ for ii = 1: size(TRAINFOLDSIZE,2)
             R{2}.params.regFactorL1 = 0;
             % R{2}.params.initWeights = initDataTransHMMtoHCRF;
             [PrecisionT, RecallT, F_mT, errorT, PrecisionTR, RecallTR, F_mTR, errorTR] = hcrf_main(dataTrainCross,dataTest,R);
-            fprintf('Test HCRF Error  = %f\n', errorT); 
-            fprintf('Train HCRF Error  = %f\n', errorTR);     
+            fprintf('Test %s Error  = %f\n', currentModel, errorT); 
+            fprintf('Train %s Error  = %f\n', currentModel, errorTR);     
         end
-        if (use == 3)        
+        if (currentModel == "NPMPGM_SOM")        
             %% Инициализация параметров классификатора    
             row_map = 1; % колличество строк карты Кохонена
             col_map = N_STATES; % колличество столбцов карты Кохонена
             epohs_map = 1000; % колличество эпох обучения карты Кохонена
             val_dirichlet = 0; % параметр распределения Дирихле
             [PrecisionT, RecallT, F_mT, errorT, PrecisionTR, RecallTR, F_mTR, errorTR] = npmpgm_main(dataTrainCross,dataTest,row_map,col_map,epohs_map,val_dirichlet);            
-            fprintf('Test NPMPGM_SOM Error  = %f\n', errorT);  
-            fprintf('Train NPMPGM_SOM Error  = %f\n', errorTR);            
+            fprintf('Test %s Error  = %f\n', currentModel, errorT);  
+            fprintf('Train %s Error  = %f\n', currentModel, errorTR);            
         end
-         if (use == 4)        
+         if (currentModel == "NPMPGM_KMEANS")        
             %% Инициализация параметров классификатора    
             row_map = 1; % колличество строк карты Кохонена
             col_map = N_STATES; % колличество столбцов карты Кохонена
             epohs_map = 1000; % колличество эпох обучения карты Кохонена
             val_dirichlet = 0; % параметр распределения Дирихле
             [PrecisionT, RecallT, F_mT, errorT, PrecisionTR, RecallTR, F_mTR, errorTR] = npmpgm_kmeans_main(dataTrainCross,dataTest,row_map,col_map,epohs_map,val_dirichlet);            
-            fprintf('Test NPMPGM_KMEANS Error  = %f\n', errorT);  
-            fprintf('Train NPMPGM_KMEANS Error  = %f\n', errorTR);            
+            fprintf('Test %s Error  = %f\n', currentModel, errorT);  
+            fprintf('Train %s Error  = %f\n', currentModel, errorTR);            
          end        
-        if (use == 5)        
+        if (currentModel == "KNN")        
             [PrecisionT, RecallT, F_mT, errorT, PrecisionTR, RecallTR, F_mTR, errorTR] = knn_main(dataTrainCross,dataTest); 
-            fprintf('Test KNN Error  = %f\n', errorT);
-            fprintf('Train KNN Error  = %f\n', errorTR);   
+            fprintf('Test KNN Error  = %f\n', currentModel, errorT);
+            fprintf('Train KNN Error  = %f\n', currentModel, errorTR);   
         end
-        if (use == 6)        
+        if (currentModel == "DHMM+SOM")        
             %% Инициализация параметров классификатора    
             row_map = 10; % колличество строк карты Кохонена
             col_map = 10; % колличество столбцов карты Кохонена
             epohs_map = 1000; % колличество эпох обучения карты Кохонена           
             [PrecisionT, RecallT, F_mT, errorT, PrecisionTR, RecallTR, F_mTR, errorTR] = hmmsom_main(dataTrainCross,dataTest,row_map,col_map,epohs_map,N_STATES,0);            
-            fprintf('Test DHMM+SOM Error  = %f\n', errorT);  
-            fprintf('Train DHMM+SOM Error  = %f\n', errorTR);
+            fprintf('Test %s Error  = %f\n', currentModel, errorT);  
+            fprintf('Train %s Error  = %f\n', currentModel, errorTR);
             
         end
-        if (use == 7)        
+        if (currentModel == "DHMM+KMEANS")        
             %% Инициализация параметров классификатора    
             row_map = 10; % колличество строк карты Кохонена
             col_map = 10; % колличество столбцов карты Кохонена
             epohs_map = 1000; % колличество эпох обучения карты Кохонена           
             [PrecisionT, RecallT, F_mT, errorT, PrecisionTR, RecallTR, F_mTR, errorTR] = hmmsom_main(dataTrainCross,dataTest,row_map,col_map,epohs_map,N_STATES,1);            
-            fprintf('Test DHMM+KMEANS Error  = %f\n', errorT);  
-            fprintf('Train DHMM+KMEANS Error  = %f\n', errorTR);
+            fprintf('Test %s Error  = %f\n', currentModel, errorT);  
+            fprintf('Train %s Error  = %f\n', currentModel, errorTR);
             
         end       
-        if (use == 8)        
+        if (currentModel == "NPMPGM_EM")        
             %% Инициализация параметров классификатора    
             row_map = 1; % колличество строк карты Кохонена
             col_map = N_STATES; % колличество столбцов карты Кохонена
             epohs_map = 1000; % колличество эпох обучения карты Кохонена
             val_dirichlet = 0; % параметр распределения Дирихле
             [PrecisionT, RecallT, F_mT, errorT, PrecisionTR, RecallTR, F_mTR, errorTR] = npmpgm_em_main(dataTrainCross,dataTest,row_map,col_map,epohs_map,val_dirichlet);            
-            fprintf('Test NPMPGM_EM Error  = %f\n', errorT);  
-            fprintf('Train NPMPGM_EM Error  = %f\n', errorTR);            
+            fprintf('Test %s Error  = %f\n', currentModel, errorT);  
+            fprintf('Train %s Error  = %f\n', currentModel, errorTR);            
         end
-        if (use == 9)        
+        if (currentModel == "LSTM")        
             [PrecisionT, RecallT, F_mT, errorT, PrecisionTR, RecallTR, F_mTR, errorTR] = lstm_main(dataTrainCross,dataTest); 
-            fprintf('Test LSTM Error  = %f\n', errorT);
-            fprintf('Train LSTM Error  = %f\n', errorTR);   
+            fprintf('Test %s Error  = %f\n', currentModel, errorT);
+            fprintf('Train %s Error  = %f\n', currentModel, errorTR);   
         end
-        RESULTMATRIX_TRAIN(use,index) = RESULTMATRIX_TRAIN(use,index) + errorTR;   
-        RESULTMATRIX_TEST(use,index) =  RESULTMATRIX_TEST(use,index) + errorT;
+        c(nameDataSetIndex, :) = { groupDATA{groupDATAId} , errorTR, errorT };        
+        %RESULTMATRIX_TRAIN(use,index) = RESULTMATRIX_TRAIN(use,index) + errorTR;   
+        %RESULTMATRIX_TEST(use,index) =  RESULTMATRIX_TEST(use,index) + errorT;
     end
-    RESULTMATRIX_TRAIN(use,index) =  RESULTMATRIX_TRAIN(use,index) / K_FOLD;
-    RESULTMATRIX_TEST(use,index) =  RESULTMATRIX_TEST(use,index) / K_FOLD;
-    fprintf('Test CrossValidation Error  = %f\n', RESULTMATRIX_TEST(use,index));  
-    fprintf('Train CrossValidation Error  = %f\n', RESULTMATRIX_TRAIN(use,index));
-    save('RESULTMATRIX_TRAIN.mat', 'RESULTMATRIX_TRAIN');
-    save('RESULTMATRIX_TEST.mat', 'RESULTMATRIX_TEST');
+    %RESULTMATRIX_TRAIN(use,index) =  RESULTMATRIX_TRAIN(use,index) / K_FOLD;
+    %RESULTMATRIX_TEST(use,index) =  RESULTMATRIX_TEST(use,index) / K_FOLD;
+    %fprintf('Test CrossValidation Error  = %f\n', RESULTMATRIX_TEST(use,index));  
+    %fprintf('Train CrossValidation Error  = %f\n', RESULTMATRIX_TRAIN(use,index));
+    %save('RESULTMATRIX_TRAIN.mat', 'RESULTMATRIX_TRAIN');
+    %save('RESULTMATRIX_TEST.mat', 'RESULTMATRIX_TEST');
+    
 end
 %%
 fprintf('..........STOP EXPERIMENT\n');
-
+end
+% Convert cell to a table and use first row as variable names
+T = cell2table(c);
+% Write the table to a CSV file
+writetable(T,append('Result-',currentModel, '-state-', int2str(N_STATES), '.csv'))
 %% PLOT
 %set(0,'DefaultAxesFontSize',14,'DefaultAxesFontName','Times New Roman');
 %set(0,'DefaultTextFontSize',14,'DefaultTextFontName','Times New Roman'); 
