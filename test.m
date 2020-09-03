@@ -11,7 +11,7 @@ fprintf('..........START EXPERIMENT\n');
 %%
 N_STATES = 9;
 N_MIX = 0;
-currentModel = "NPMPGM_SOM"; % 1-HMM 2-HCRF 3-NPMPGM_SOM 4-NPMPGM_KMEANS 5-KNN 6-DHMM+SOM 7-DHMM+KMEANS 8-NPMPGM_EM 9-LSTM
+%currentModel = "NPMPGM_KMEANS"; % 1-HMM 2-HCRF 3-NPMPGM_SOM 4-NPMPGM_KMEANS 5-KNN 6-DHMM+SOM 7-DHMM+KMEANS 8-NPMPGM_EM 9-LSTM
 
 %TRAINFOLDSIZE = [10, 20, 30, 40, 50, 60, 70, 80, 90, 100, 150, 200, 250, 300, 350, 400, 450, 500, 550, 600, 660];
 %TRAINFOLDSIZE = [ 20, 30, 40, 50, 60, 70, 80];
@@ -20,17 +20,24 @@ currentModel = "NPMPGM_SOM"; % 1-HMM 2-HCRF 3-NPMPGM_SOM 4-NPMPGM_KMEANS 5-KNN 6
 %TRAINFOLDSIZE = [20, 30, 40, 50, 60, 70, 80, 90, 100, 110, 120,130,140,150,160,170,180,190,200];
 %dataTrainUCI = getTrainData(1,UCIDATASET);
 %dataTest = getTestData(1,UCIDATASET);
-groupDATA = {'ArticularyWordRecognition' 'AtrialFibrillation' 'BasicMotions' ...
-    'CharacterTrajectories' 'Cricket' 'EigenWorms' 'Epilepsy' ...
-    'EthanolConcentration' 'ERing' 'FaceDetection' 'FingerMovements' ...
-    'HandMovementDirection' 'Handwriting' 'Heartbeat' 'InsectWingbeat' ...
-    'JapaneseVowels' 'Libras' 'LSST' 'MotorImagery' 'NATOPS' 'PenDigits' ...
-    'PEMS-SF' 'Phoneme' 'RacketSports' 'SelfRegulationSCP1' 'SelfRegulationSCP2' ...
-    'SpokenArabicDigits' 'StandWalkJump' 'UWaveGestureLibrary' };
+% groupDATA = {'ArticularyWordRecognition' 'AtrialFibrillation' 'BasicMotions' ...
+%     'CharacterTrajectories' 'Cricket' 'EigenWorms' 'Epilepsy' ...
+%     'EthanolConcentration' 'ERing' 'FaceDetection' 'FingerMovements' ...
+%     'HandMovementDirection' 'Handwriting' 'Heartbeat' 'InsectWingbeat' ...
+%     'JapaneseVowels' 'Libras' 'LSST' 'MotorImagery' 'NATOPS' 'PenDigits' ...
+%     'PEMS-SF' 'Phoneme' 'RacketSports' 'SelfRegulationSCP1' 'SelfRegulationSCP2' ...
+%     'SpokenArabicDigits' 'StandWalkJump' 'UWaveGestureLibrary' };
 
-%groupDATA = {'ArticularyWordRecognition' 'AtrialFibrillation' };
-c = cell(length(groupDATA), 3);
+groupDATA = {'ArticularyWordRecognition' 'AtrialFibrillation' };
+groupMODEL = {'NPMPGM_KMEANS' 'DHMM+KMEANS' };
+ResultCell = cell(length(groupDATA), 3);
+
+nameModelIndex = 0;
+for groupMODELId = 1:length(groupMODEL)
+nameModelIndex = nameModelIndex + 1;
+currentModel = groupMODEL{groupMODELId};
 nameDataSetIndex = 0;
+
 for groupDATAId = 1:length(groupDATA)
 nameDataSetTrain = append(groupDATA{groupDATAId}, '_TRAIN.mat') ;
 nameDataSetTest = append(groupDATA{groupDATAId}, '_TEST.mat') ;
@@ -143,7 +150,8 @@ for ii = 1: size(TRAINFOLDSIZE,2)
             fprintf('Test %s Error  = %f\n', currentModel, errorT);
             fprintf('Train %s Error  = %f\n', currentModel, errorTR);   
         end
-        c(nameDataSetIndex, :) = { groupDATA{groupDATAId} , errorTR, errorT };        
+        ResultCell(nameDataSetIndex, 1) = { groupDATA{groupDATAId}}; 
+        ResultCell(nameDataSetIndex, nameModelIndex + 1) = { errorT };        
         %RESULTMATRIX_TRAIN(use,index) = RESULTMATRIX_TRAIN(use,index) + errorTR;   
         %RESULTMATRIX_TEST(use,index) =  RESULTMATRIX_TEST(use,index) + errorT;
     end
@@ -156,12 +164,15 @@ for ii = 1: size(TRAINFOLDSIZE,2)
     
 end
 %%
-fprintf('..........STOP EXPERIMENT\n');
+fprintf('..........STOP EXPERIMENT - %s\n', groupDATA{groupDATAId});
+end
 end
 % Convert cell to a table and use first row as variable names
-T = cell2table(c);
+NameDataSetVar = {'NameDataSet'};
+TableHeader = [ NameDataSetVar groupMODEL];
+T = cell2table(ResultCell, 'VariableNames',TableHeader);
 % Write the table to a CSV file
-writetable(T,append('Result-',currentModel, '-state-', int2str(N_STATES), '.csv'))
+writetable(T,append('Result-state-', int2str(N_STATES), '.csv'))
 %% PLOT
 %set(0,'DefaultAxesFontSize',14,'DefaultAxesFontName','Times New Roman');
 %set(0,'DefaultTextFontSize',14,'DefaultTextFontName','Times New Roman'); 
