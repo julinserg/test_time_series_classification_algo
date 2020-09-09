@@ -9,7 +9,7 @@ clear;
 
 fprintf('..........START EXPERIMENT\n');
 %%
-N_STATES = 9;
+N_STATES = 7;
 N_MIX = 0;
 %currentModel = "NPMPGM_KMEANS"; % 1-HMM 2-HCRF 3-NPMPGM_SOM 4-NPMPGM_KMEANS 5-KNN 6-DHMM+SOM 7-DHMM+KMEANS 8-NPMPGM_EM 9-LSTM
 
@@ -28,7 +28,10 @@ N_MIX = 0;
 %     'PEMS-SF' 'Phoneme' 'RacketSports' 'SelfRegulationSCP1' 'SelfRegulationSCP2' ...
 %     'SpokenArabicDigits' 'StandWalkJump' 'UWaveGestureLibrary' };
 
-groupDATA = {'ArticularyWordRecognition' 'AtrialFibrillation' };
+groupDATA = {'ArticularyWordRecognition' 'AtrialFibrillation' 'BasicMotions' ...
+     'CharacterTrajectories' 'Cricket' 'Epilepsy' 'EthanolConcentration' ...
+     'FingerMovements' 'HandMovementDirection' 'Heartbeat' ...
+     'Libras'};
 groupMODEL = {'NPMPGM_KMEANS' 'DHMM+KMEANS' };
 ResultCell = cell(length(groupDATA), 3);
 
@@ -151,7 +154,7 @@ for ii = 1: size(TRAINFOLDSIZE,2)
             fprintf('Train %s Error  = %f\n', currentModel, errorTR);   
         end
         ResultCell(nameDataSetIndex, 1) = { groupDATA{groupDATAId}}; 
-        ResultCell(nameDataSetIndex, nameModelIndex + 1) = { errorT };        
+        ResultCell(nameDataSetIndex, nameModelIndex + 1) = { num2str(errorT, 4) };        
         %RESULTMATRIX_TRAIN(use,index) = RESULTMATRIX_TRAIN(use,index) + errorTR;   
         %RESULTMATRIX_TEST(use,index) =  RESULTMATRIX_TEST(use,index) + errorT;
     end
@@ -173,6 +176,8 @@ TableHeader = [ NameDataSetVar groupMODEL];
 T = cell2table(ResultCell, 'VariableNames',TableHeader);
 % Write the table to a CSV file
 writetable(T,append('Result-state-', int2str(N_STATES), '.csv'))
+
+fprintf('..........STOP EXPERIMENT\n');
 %% PLOT
 %set(0,'DefaultAxesFontSize',14,'DefaultAxesFontName','Times New Roman');
 %set(0,'DefaultTextFontSize',14,'DefaultTextFontName','Times New Roman'); 
