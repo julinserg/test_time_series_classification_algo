@@ -37,7 +37,7 @@ else
     parfor i=1:size(dataTrainForClass,1)
        i % вывод текущего номера класса в консоль
       F = dataTrainForClass{i};
-      [idx, net] = kmeans(F',row_map * col_map);
+      [idx, net] = kmeans(F',row_map * col_map, 'MaxIter',epohs_map);
       %[idx,net,sumd,D] = kmeans(F',row_map * col_map,'MaxIter',10000,...
        % 'Display','final','Replicates',10);
       cellNetKox{i} = net;
