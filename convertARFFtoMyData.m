@@ -2,7 +2,7 @@ clc;
 clear;
 
 javaaddpath('c:\Program Files\Weka-3-8-4\weka.jar');
-path = 'd:\\science\\phd_codesource\\Multivariate_arff\\';
+path = 'd:\\git\\phd_codesourse\\Multivariate_arff\\';
 %DuckDuckGeese
 groupDATA = {'ArticularyWordRecognition' 'AtrialFibrillation' 'BasicMotions' ...
     'CharacterTrajectories' 'Cricket' 'EigenWorms' 'Epilepsy' ...
@@ -11,6 +11,7 @@ groupDATA = {'ArticularyWordRecognition' 'AtrialFibrillation' 'BasicMotions' ...
     'JapaneseVowels' 'Libras' 'LSST' 'MotorImagery' 'NATOPS' 'PenDigits' ...
     'PEMS-SF' 'Phoneme' 'RacketSports' 'SelfRegulationSCP1' 'SelfRegulationSCP2' ...
     'SpokenArabicDigits' 'StandWalkJump' 'UWaveGestureLibrary' };
+%groupDATA = {'ERing'};
 for groupDATAId = 1:length(groupDATA)
 nameDataSet = groupDATA{groupDATAId};
 fprintf('..........BEGIN %s \n', nameDataSet);
@@ -27,19 +28,20 @@ while true
     if exist(str, 'file') == 0
         break;
     end
-    wekaOBJ = loadARFF(str);
+    wekaOBJ = loadARFF(str);    
     [mdata,featureNames,targetNDX,stringVals,relationName] = weka2matlab(wekaOBJ,[]);
+    mdataSort = sortrows(mdata,size(mdata,2));
     inst = 0;
     classOld = -1;
-    for i = 1: size(mdata,1) 
-        class = mdata(i, targetNDX);
+    for i = 1: size(mdataSort,1) 
+        class = mdataSort(i, targetNDX);
         if class ~= classOld
            inst = 1; 
         else
            inst = inst + 1;
         end
         classOld = class;
-        Array = mdata(i,1:end-1);
+        Array = mdataSort(i,1:end-1);
         %ArrayNotNAN = Array(~isnan(Array));
         result{class + 1,inst}(dim,:) = Array;
     end
@@ -72,7 +74,7 @@ end
 
 CellMinNotNanIndex = min(CellDimNotNan);
 result = result(:,1:CellMinNotNanIndex);
-resultFileName = ['d:\\science\\phd_codesource\\Multivariate_mat\\' nameDataSet '_' trainOrTest '.mat'];
+resultFileName = ['d:\\git\\phd_codesourse\\Multivariate_mat\\' nameDataSet '_' trainOrTest '.mat'];
 save( resultFileName, 'result','-v7.3');
 fprintf('..........END %s %s \n', trainOrTest, nameDataSet);
 end
