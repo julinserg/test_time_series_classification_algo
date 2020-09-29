@@ -9,7 +9,7 @@ clear;
 
 fprintf('..........START EXPERIMENT\n');
 %%
-N_STATES = 7;
+N_STATES = 12;
 N_MIX = 0;
 %currentModel = "NPMPGM_KMEANS"; % 1-HMM 2-HCRF 3-NPMPGM_SOM 4-NPMPGM_KMEANS 5-KNN 6-DHMM+SOM 7-DHMM+KMEANS 8-NPMPGM_EM 9-LSTM
 
@@ -38,7 +38,14 @@ groupDATA = {'ArticularyWordRecognition' 'AtrialFibrillation' 'BasicMotions' ...
      'StandWalkJump' 'UWaveGestureLibrary'};
 
 %groupDATA = {'Phoneme'};
-% myBestOn - ArticularyWordRecognition Cricket EigenWorms JapaneseVowels UWaveGestureLibrary
+% myBestOn 7 - ArticularyWordRecognition Cricket EigenWorms JapaneseVowels UWaveGestureLibrary
+% myBestOn 7 - ArticularyWordRecognition Cricket EigenWorms ERing
+% JapaneseVowels MotorImagery UWaveGestureLibrary
+% myBestOn 5 - ArticularyWordRecognition Cricket EigenWorms ERing
+% JapaneseVowels MotorImagery
+% myBestOn 3 - Cricket EigenWorms ERing JapaneseVowels MotorImagery NATOPS
+% myBestOn 9 - ArticularyWordRecognition Cricket EigenWorms ERing
+% JapaneseVowels MotorImagery UWaveGestureLibrary
 groupMODEL = {'NPMPGM_KMEANS' 'DHMM+KMEANS' };
 ResultCell = cell(length(groupDATA), 3);
 
