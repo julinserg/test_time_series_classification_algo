@@ -167,8 +167,9 @@ for ii = 1: size(TRAINFOLDSIZE,2)
             fprintf('Test %s Error  = %f\n', currentModel, errorT);
             fprintf('Train %s Error  = %f\n', currentModel, errorTR);   
         end
-        ResultCell(nameDataSetIndex, 1) = { groupDATA{groupDATAId}}; 
-        ResultCell(nameDataSetIndex, nameModelIndex + 1) = { num2str(errorT, 4) };        
+        ResultCell(nameDataSetIndex, 1) = { groupDATA{groupDATAId}};
+        resultStr = strcat("E-" ,  num2str(errorT, 4) , " O-" , num2str(errorT - errorTR, 4));
+        ResultCell(nameDataSetIndex, nameModelIndex + 1) = {resultStr};        
         %RESULTMATRIX_TRAIN(use,index) = RESULTMATRIX_TRAIN(use,index) + errorTR;   
         %RESULTMATRIX_TEST(use,index) =  RESULTMATRIX_TEST(use,index) + errorT;
     end
