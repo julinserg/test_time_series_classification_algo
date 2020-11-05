@@ -6,7 +6,8 @@ states_number   = 6;
 class_number = 5;
 dimension       = 15; 
 timeseries_length    = 50; 
-nsamples  = 600; 
+nsamples  = 600;
+noise = 0.5;
 dataTrain = cell(size(dimension,2),nsamples);
 dataTest = cell(size(dimension,2),nsamples);
 for i=1:class_number   
@@ -35,7 +36,7 @@ for i=1:size(dataTrain,1)
     for j=1:size(dataTrain,2)
          matrixT = dataTrain{i,j};
          for k=1:size(matrixT,1)
-            matrixT(k,:) = awgn( matrixT(k,:), 0.1, 'measured');
+            matrixT(k,:) = awgn( matrixT(k,:), noise, 'measured');
          end
          dataTrain{i,j} = matrixT;  
     end
@@ -70,5 +71,9 @@ end
 % figure
 % gplotmatrix(A',[],Y',[],[],[],false);
 
-save('dataTrainRndNoiseGaussHmm.mat', 'dataTrain','-v7.3');
-save('dataTestRndNoiseGaussHmm.mat', 'dataTest','-v7.3');
+result = dataTrain;
+strPrefix = append('-',num2str(states_number),'-',num2str(class_number),'-', ...
+num2str(dimension),'-',num2str(timeseries_length),'-',num2str(nsamples), '-',num2str(noise));
+save(append('Multivariate_mat\\MyRndNoiseGaussHmm', strPrefix, '_TRAIN', '.mat'), 'result','-v7.3');
+result = dataTest;
+save(append('Multivariate_mat\\MyRndNoiseGaussHmm', strPrefix, '_TEST', '.mat'), 'result','-v7.3');

@@ -1,6 +1,6 @@
 clc;
 clear;
-fprintf('..........START EXPERIMENT\n');
+fprintf('..........START COMPARE\n');
 
 % groupDATA = {'ArticularyWordRecognition' 'AtrialFibrillation' 'BasicMotions' ...
 %     'CharacterTrajectories' 'Cricket' 'EigenWorms' 'Epilepsy' ...
@@ -19,7 +19,7 @@ groupDATA = {'ArticularyWordRecognition' 'AtrialFibrillation' 'BasicMotions' ...
      'SelfRegulationSCP1' 'SelfRegulationSCP2' 'SpokenArabicDigits' ...
      'StandWalkJump' 'UWaveGestureLibrary'};
 
-%groupDATA = {'Phoneme'};
+%groupDATA = {'ArticularyWordRecognition' 'AtrialFibrillation'};
 % myBestOn 7 - ArticularyWordRecognition Cricket EigenWorms JapaneseVowels UWaveGestureLibrary
 % myBestOn 7 - ArticularyWordRecognition Cricket EigenWorms ERing
 % JapaneseVowels MotorImagery UWaveGestureLibrary
@@ -29,50 +29,47 @@ groupDATA = {'ArticularyWordRecognition' 'AtrialFibrillation' 'BasicMotions' ...
 % myBestOn 9 - ArticularyWordRecognition Cricket EigenWorms ERing
 % JapaneseVowels MotorImagery UWaveGestureLibrary
 
-nameDataSetIndex = 0;
-t = tiledlayout(4,7);
-for groupDATAId = 1:length(groupDATA)
-nexttile
-clear dataTrainForClass dataTrain labelTrain;
-nameDataSetTrain = append(groupDATA{groupDATAId}, '_TRAIN.mat') ;
-nameDataSetTest = append(groupDATA{groupDATAId}, '_TEST.mat') ;
-nameDataSetIndex = nameDataSetIndex + 1;
+ResultCell = cell(length(groupDATA), length(groupDATA));
+nameDataSetIndexX = 0;
+%t = tiledlayout(4,7);
+for groupDATAIdX = 1:length(groupDATA)
+%nexttile
+nameDataSetTrainX = append(groupDATA{groupDATAIdX}, '_TRAIN.mat') ;
+nameDataSetIndexX = nameDataSetIndexX + 1;
+dataTrainUCIX = getData2020(nameDataSetTrainX);
+dataX = getRawData(dataTrainUCIX, 1, 100);
 
-dataTrainUCI = getData2020(nameDataSetTrain);
-dataTest = getData2020(nameDataSetTest);
+ResultCell(nameDataSetIndexX, 1) = { groupDATA{groupDATAIdX}};
+nameDataSetIndexY = 1;
+for groupDATAIdY = 1:length(groupDATA)
+fprintf("--------------%s-%s \n", groupDATA{groupDATAIdX},groupDATA{groupDATAIdY});
 
-k = 1;
-for i=1:size(dataTrainUCI,1)
-    for j=1:size(dataTrainUCI,2)
-        dataTrain{k,1} = dataTrainUCI{i,j};
-        labelTrain(k,1) = i-1; 
-        k = k+1;
-    end
+nameDataSetTrainY = append(groupDATA{groupDATAIdY}, '_TRAIN.mat') ;
+nameDataSetIndexY = nameDataSetIndexY + 1;
+dataTrainUCIY = getData2020(nameDataSetTrainY);
+dataY = getRawData(dataTrainUCIY, 1, 100);
+
+DepTest2Class = DepTest2(dataX,dataY,'test','hsic');
+resultStr = num2str(DepTest2Class.h, 4);
+ResultCell(nameDataSetIndexX, nameDataSetIndexY) = {resultStr};
 end
-k_1 = 1;
-dataTrainForClass = cell(size(dataTrainUCI,1),1);
-for i=1:size(dataTrain,1)  
-    u = size(dataTrain{i},2);
-    a = dataTrain{i};
-    t = size(dataTrainForClass{labelTrain(i)+1},2) +1;        
-    dataTrainForClass{labelTrain(i)+1}(:,t:t+u-1) = a;       
-    k_1 = k_1+size(a,2);  
-end
-data = dataTrainForClass{1,1}';
-for i=1:size(data,2)
-   minV = min(data(:,i));
-   maxV = max(data(:,i));
-   data(:,i) = (data(:,i) - minV) / (maxV - minV); 
 end
 
-if size(data,1) > 2000
-    data = data(1:2000,:);
-end
-%Roystest(data);
-%HZmvntest(data);
+% Convert cell to a table and use first row as variable names
+NameDataSetVar = {'NameDataSet'};
+TableHeader = [ NameDataSetVar groupDATA ];
+T = cell2table(ResultCell, 'VariableNames',TableHeader);
+% Write the table to a CSV file
+writetable(T,append('CompareData-DepTest2', '.csv'))
+fprintf('..........STOP COMPARE\n');
+
+
 %figure
-fprintf("--------------%s", groupDATA{groupDATAId});
-Mskekur(data,1,0.05,groupDATA{groupDATAId});
+%Mskekur(data,1,0.05, groupDATA{groupDATAId});
+%p = anova1(data)
+%h = chi2gof(data)
+%HZmvntest(data);
+%Roystest(data);
 
 %clust = kmeans(data,7);
 %silhouette(data,clust, 'Euclidean')
@@ -80,5 +77,4 @@ Mskekur(data,1,0.05,groupDATA{groupDATAId});
 %net = selforgmap([10 10]);
 %net = train(net,data');
 %plotsompos(net,data')
-title(groupDATA{groupDATAId}) 
-end
+%title(groupDATA{groupDATAId}) 

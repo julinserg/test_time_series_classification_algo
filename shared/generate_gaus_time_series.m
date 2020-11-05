@@ -19,6 +19,7 @@ end
 
 A = cell2mat(Y);
 %Mskekur(A,1);
-
-save('dataTrainRndGaussHmm.mat', 'dataTrain','-v7.3');
-save('dataTestRndGaussHmm.mat', 'dataTest','-v7.3');
+result = dataTrain;
+save('Multivariate_mat\\MyRndGaussHmm_TRAIN.mat', 'result','-v7.3');
+result = dataTest;
+save('Multivariate_mat\\MyRndGaussHmm_TEST.mat', 'result','-v7.3');
