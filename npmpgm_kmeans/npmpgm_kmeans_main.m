@@ -1,4 +1,4 @@
-function [PrecisionT, RecallT, F_mT, errorT, PrecisionTR, RecallTR, F_mTR, errorTR] = npmpgm_kmeans_main(dataTrainRaw,dataTest,row_map,col_map,epohs_map,val_dirichlet)
+function [PrecisionT, RecallT, F_mT, errorT, PrecisionTR, RecallTR, F_mTR, errorTR] = npmpgm_kmeans_main(dataTrainRaw,dataTest,row_map,col_map,epohs_map,val_dirichlet, isNewModel)
 
 % чтение обучающих данных
 % подготовка обучающих данных для карты Кохонена
@@ -31,8 +31,8 @@ end;
 
 %% Обучение модели
 if USETRAIN == 1    
-   [Probability, cellNetKox] = npmpgm_kmeans_train(dataTrainRaw,dataTrainForClass, ...
-   row_map,col_map,epohs_map,val_dirichlet);
+   [Probability, cellNetKox, model] = npmpgm_kmeans_train(dataTrainRaw,dataTrainForClass, ...
+   row_map,col_map,epohs_map,val_dirichlet,isNewModel);
    % Сохранение матриц условных вероятностей в файл
    save('ProbabilityTransaction.mat','Probability');
    % Сохранение карт Кхонена в файл
@@ -51,11 +51,11 @@ load ProbabilityTransaction;
 %       , T - длина последовательности
 
 %% test on test data
-[PrecisionT, RecallT, F_mT, errorT] = npmpgm_kmeans_test_l(dataTest,Probability,cellNetKox);
+[PrecisionT, RecallT, F_mT, errorT] = npmpgm_kmeans_test_l(dataTest,Probability,cellNetKox,model);
 %% test on train data
-[PrecisionTR, RecallTR, F_mTR, errorTR] = npmpgm_kmeans_test_l(dataTrainRaw,Probability,cellNetKox);
+[PrecisionTR, RecallTR, F_mTR, errorTR] = npmpgm_kmeans_test_l(dataTrainRaw,Probability,cellNetKox,model);
 
-function [AveragePrecision, AverageRecall, F_measure, error] = npmpgm_kmeans_test_l(dataTest,Probability,cellNetKox)
+function [AveragePrecision, AverageRecall, F_measure, error] = npmpgm_kmeans_test_l(dataTest,Probability,cellNetKox,model)
 k = 1;
 for i=1:size(dataTest,1)
     for j=1:size(dataTest,2)       
@@ -64,7 +64,7 @@ for i=1:size(dataTest,1)
     end;
 end;
 dataTest = dataTest(:);
-[arrayLL] = npmpgm_kmeans_test(Probability,cellNetKox,dataTest);
+[arrayLL] = npmpgm_kmeans_test(Probability,cellNetKox,model,dataTest);
 % arrayLabelDetect - массив меток классов выданных классификатором  
 for i=1:size(arrayLL,2)
     [c index] = max(arrayLL(:,i));

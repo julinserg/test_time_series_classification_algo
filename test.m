@@ -30,16 +30,15 @@ N_MIX = 0;
 
 % fail - 'FaceDetection' 'InsectWingbeat' 'Phoneme'
 
-% groupDATA = {'ArticularyWordRecognition' 'AtrialFibrillation' 'BasicMotions' ...
-%      'CharacterTrajectories' 'Cricket' 'EigenWorms' 'Epilepsy' 'EthanolConcentration' ...
-%      'ERing' 'FingerMovements' 'HandMovementDirection' 'Handwriting' 'Heartbeat' 'JapaneseVowels' ...
-%      'Libras' 'LSST' 'MotorImagery' 'NATOPS' 'PenDigits' 'PEMS-SF' 'RacketSports' ...
-%      'SelfRegulationSCP1' 'SelfRegulationSCP2' 'SpokenArabicDigits' ...
-%      'StandWalkJump' 'UWaveGestureLibrary'};
+groupDATA = {'ArticularyWordRecognition' 'AtrialFibrillation' 'BasicMotions' ...
+     'CharacterTrajectories' 'Cricket' 'EigenWorms' 'Epilepsy' 'EthanolConcentration' ...
+     'ERing' 'FingerMovements' 'HandMovementDirection' 'Handwriting' 'Heartbeat' 'JapaneseVowels' ...
+     'Libras' 'LSST' 'MotorImagery' 'NATOPS' 'PenDigits' 'PEMS-SF' 'RacketSports' ...
+     'SelfRegulationSCP1' 'SelfRegulationSCP2' 'SpokenArabicDigits' ...
+     'StandWalkJump' 'UWaveGestureLibrary'};
 
-groupDATA = {'MyRndGaussHmm' 'MyRndNoiseGaussHmm-6-5-15-50-600-0.1' ...
-    'MyRndNoiseGaussHmm-6-5-5-50-600-0.1' 'MyRndNoiseGaussHmm-6-5-30-50-600-0.1' ...
-    'MyRndNoiseGaussHmm-6-5-15-50-600-0.5'};
+%   groupDATA = { 'ArticularyWordRecognition' 'AtrialFibrillation' 'BasicMotions' ...
+%       'CharacterTrajectories' 'Cricket' };
 % myBestOn 7 - ArticularyWordRecognition Cricket EigenWorms JapaneseVowels UWaveGestureLibrary
 % myBestOn 7 - ArticularyWordRecognition Cricket EigenWorms ERing
 % JapaneseVowels MotorImagery UWaveGestureLibrary
@@ -48,9 +47,9 @@ groupDATA = {'MyRndGaussHmm' 'MyRndNoiseGaussHmm-6-5-15-50-600-0.1' ...
 % myBestOn 3 - Cricket EigenWorms ERing JapaneseVowels MotorImagery NATOPS
 % myBestOn 9 - ArticularyWordRecognition Cricket EigenWorms ERing
 % JapaneseVowels MotorImagery UWaveGestureLibrary
-groupMODEL = {'NPMPGM_KMEANS' 'DHMM+KMEANS' 'HMM' };
-ResultCellError = cell(length(groupDATA), 3);
-ResultCellOverfit = cell(length(groupDATA), 3);
+groupMODEL = {'NPMPGM_KMEANS-S0' 'NPMPGM_KMEANS-S1' 'DHMM+KMEANS' };
+ResultCellError = cell(length(groupDATA), length(groupMODEL)+1);
+ResultCellOverfit = cell(length(groupDATA), length(groupMODEL)+1);
 
 nameModelIndex = 0;
 for groupMODELId = 1:length(groupMODEL)
@@ -119,17 +118,31 @@ for ii = 1: size(TRAINFOLDSIZE,2)
             [PrecisionT, RecallT, F_mT, errorT, PrecisionTR, RecallTR, F_mTR, errorTR] = npmpgm_main(dataTrainCross,dataTest,row_map,col_map,epohs_map,val_dirichlet);            
             fprintf('Test %s Error  = %f\n', currentModel, errorT);  
             fprintf('Train %s Error  = %f\n', currentModel, errorTR);            
-        end
-         if (currentModel == "NPMPGM_KMEANS")        
+        end      
+         if (currentModel == "NPMPGM_KMEANS-S0")        
             %% Инициализация параметров классификатора    
             row_map = 1; % колличество строк карты Кохонена
             col_map = N_STATES; % колличество столбцов карты Кохонена
             epohs_map = 1000; % колличество эпох обучения карты Кохонена
-            val_dirichlet = 0; % параметр распределения Дирихле
-            [PrecisionT, RecallT, F_mT, errorT, PrecisionTR, RecallTR, F_mTR, errorTR] = npmpgm_kmeans_main(dataTrainCross,dataTest,row_map,col_map,epohs_map,val_dirichlet);            
+            val_dirichlet = 0; % параметр распределения Дирихле 
+            isNewModel = 0;
+            [PrecisionT, RecallT, F_mT, errorT, PrecisionTR, RecallTR, F_mTR, errorTR] = ...
+            npmpgm_kmeans_main(dataTrainCross,dataTest,row_map,col_map,epohs_map,val_dirichlet, isNewModel);            
             fprintf('Test %s Error  = %f\n', currentModel, errorT);  
             fprintf('Train %s Error  = %f\n', currentModel, errorTR);            
-         end        
+         end 
+         if (currentModel == "NPMPGM_KMEANS-S1")        
+            %% Инициализация параметров классификатора    
+            row_map = 1; % колличество строк карты Кохонена
+            col_map = N_STATES; % колличество столбцов карты Кохонена
+            epohs_map = 1000; % колличество эпох обучения карты Кохонена
+            val_dirichlet = 0; % параметр распределения Дирихле 
+            isNewModel = 1;
+            [PrecisionT, RecallT, F_mT, errorT, PrecisionTR, RecallTR, F_mTR, errorTR] = ...
+            npmpgm_kmeans_main(dataTrainCross,dataTest,row_map,col_map,epohs_map,val_dirichlet, isNewModel);            
+            fprintf('Test %s Error  = %f\n', currentModel, errorT);  
+            fprintf('Train %s Error  = %f\n', currentModel, errorTR);            
+         end 
         if (currentModel == "KNN")        
             [PrecisionT, RecallT, F_mT, errorT, PrecisionTR, RecallTR, F_mTR, errorTR] = knn_main(dataTrainCross,dataTest); 
             fprintf('Test KNN Error  = %f\n', currentModel, errorT);

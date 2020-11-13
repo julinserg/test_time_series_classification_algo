@@ -1,4 +1,4 @@
-function [Probability, cellNetKox] = npmpgm_kmeans_train(dataTrainRaw,dataTrainForClass, row_map, col_map, epohs_map, val_dirichlet)
+function [Probability, cellNetKox, model] = npmpgm_kmeans_train(dataTrainRaw,dataTrainForClass, row_map, col_map, epohs_map, val_dirichlet, isNewModel)
 %% Функция обучения модели 
 % Входняе данные:
 %       dataTrainRaw - массив ячеек (cell) содежащий обучающие данные,
@@ -21,15 +21,28 @@ function [Probability, cellNetKox] = npmpgm_kmeans_train(dataTrainRaw,dataTrainF
 % обучение карты Кохонена для каждого класса 
 %%
 cellNetKox = cell(size(dataTrainRaw,1),1);
+Sigma = cell(size(dataTrainRaw,1),1);
+
 % обучение карт Кохонена
 % !!!! обучение карты внутри parfor возможно только наиная с версии R2013a 
 for i=1:size(dataTrainForClass,1)
    i % вывод текущего номера класса в консоль
   F = dataTrainForClass{i};
-  [idx, net] = kmeans(F',row_map * col_map,'MaxIter',epohs_map);
+  options = statset('UseParallel',1);
+  [idx, net] = kmeans(F',row_map * col_map, ...
+  'MaxIter',epohs_map,'Replicates',10,'Options',options);
   %[idx,net,sumd,D] = kmeans(F',row_map * col_map,'MaxIter',10000,...
    % 'Display','final','Replicates',10);
   cellNetKox{i} = net;
+  
+    for k=1:row_map * col_map
+       %s = std(F');
+       s = ones(1, size(F,1));
+        D = diag(s);
+        DD(:,:,k) = D;
+    end
+    Sigma{i} = DD;
+  
 end;
 % вычисляем распределение вероятностей переходов между узлами карты для каждого класса
 Probability = cell(size(cellNetKox,1),1);
@@ -53,6 +66,9 @@ for i=1:size(dataTrainRaw,1)
           z(ii,:) = sum((w(:,ii+copies)-p).^2,1);
         end
         n = -z.^0.5;
+       % if isCalcSigma == 1
+       %     n = n ./Sigma{i};
+       % end
         [maxn,array] = max(n,[],1);
        for k=1:size(array,2)-1
            pp = array(1,k);
@@ -75,3 +91,40 @@ for i=1:size(Probability,1)
         end  
    end
 end
+
+model.isNewModel = isNewModel;
+model.modelType = 'generativeClassifier';
+model.nclasses = size(cellNetKox, 1);
+nclasses = model.nclasses;
+classConditionals = cell(nclasses, 1);
+for c=1:nclasses
+    modelP.nstates = size(cellNetKox{c},1);
+    modelP.type = 'gauss';
+
+    modelP.pi = repmat(5, 1, size(Probability{c}.A,2));
+    modelP.pi(1,1) = 10;
+    modelP.pi = normalizeLogspace(modelP.pi);
+    modelP.pi = exp(modelP.pi);
+    modelP.A = Probability{c}.A;
+    modelPP.mu = cellNetKox{c}';
+    modelPP.Sigma = Sigma{c};
+    modelPP.nstates = size(cellNetKox{c},1);
+    modelPP.d = size(dataTrainRaw{1,1},1);
+    modelPP.cpdType = 'condgauss';
+    modelP.emission = modelPP;
+    classConditionals{c} = modelP;
+end
+model.classConditionals = classConditionals;
+
+k = 1;
+for i=1:size(dataTrainRaw,1)
+    for j=1:size(dataTrainRaw,2)
+        dataTrain{k,1} = dataTrainRaw{i,j};
+        labelTrain(k,1) = i-1; 
+        k = k+1;
+    end
+end
+
+SetDefaultValue(4, 'pseudoCount', ones(1, model.nclasses)); 
+prior = discreteFit(labelTrain, pseudoCount);
+model.prior = prior;

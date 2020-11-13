@@ -2,16 +2,29 @@ clc;
 clear;
 setSeed(2);
 %% sample data
+fprintf('..........START GENERATE\n');
 states_number   = 6;
 class_number = 5;
 dimension       = 15; 
 timeseries_length    = 50; 
 nsamples  = 600;
-noise = 0.5;
+noise = 0.1;
+isOnesSigma = 1; 
+Sigma = zeros(dimension, dimension, states_number);
+if (isOnesSigma == 1)    
+    for k=1:states_number
+        Sigma(:, :, k) = diag(ones(dimension,1) + 9);
+    end
+else
+    for k=1:states_number
+        Sigma(:, :, k) = randpd(dimension) + 2*eye(dimension);
+    end
+end
+
 dataTrain = cell(size(dimension,2),nsamples);
 dataTest = cell(size(dimension,2),nsamples);
 for i=1:class_number   
-   hmmSource = mkRndGaussHmm(states_number, dimension); 
+   hmmSource = mkRndGaussHmmMy(states_number, dimension, Sigma); 
    [Y, Z]    = hmmSample(hmmSource, timeseries_length, nsamples);    
    [Y1, Z1]  = hmmSample(hmmSource, timeseries_length, nsamples); 
    Y         = cellwrap(Y');
@@ -72,8 +85,13 @@ end
 % gplotmatrix(A',[],Y',[],[],[],false);
 
 result = dataTrain;
+sigmaVal = 0;
+if(isOnesSigma == 1)
+    sigmaVal = Sigma(1,1,1);
+end
 strPrefix = append('-',num2str(states_number),'-',num2str(class_number),'-', ...
-num2str(dimension),'-',num2str(timeseries_length),'-',num2str(nsamples), '-',num2str(noise));
+num2str(dimension),'-',num2str(timeseries_length),'-',num2str(nsamples), '-',num2str(noise), '-',num2str(sigmaVal));
 save(append('Multivariate_mat\\MyRndNoiseGaussHmm', strPrefix, '_TRAIN', '.mat'), 'result','-v7.3');
 result = dataTest;
 save(append('Multivariate_mat\\MyRndNoiseGaussHmm', strPrefix, '_TEST', '.mat'), 'result','-v7.3');
+fprintf('..........STOP GENERATE\n');
