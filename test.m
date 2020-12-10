@@ -47,8 +47,7 @@ N_MIX = 0;
 % myBestOn 3 - Cricket EigenWorms ERing JapaneseVowels MotorImagery NATOPS
 % myBestOn 9 - ArticularyWordRecognition Cricket EigenWorms ERing
 % JapaneseVowels MotorImagery UWaveGestureLibrary
-%groupMODEL = {'NPMPGM_KMEANS-S0' 'NPMPGM_KMEANS-S1' 'DHMM+KMEANS' };
-groupMODEL = { 'NPMPGM_KMEANS-S1' };
+groupMODEL = {'NPMPGM_KMEANS-S0' 'NPMPGM_KMEANS-S1' 'DHMM+KMEANS' };
 ResultCellError = cell(length(groupDATA), length(groupMODEL)+1);
 ResultCellOverfit = cell(length(groupDATA), length(groupMODEL)+1);
 

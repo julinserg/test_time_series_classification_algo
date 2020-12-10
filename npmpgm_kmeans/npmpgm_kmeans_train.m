@@ -106,19 +106,17 @@ for c=1:nclasses
     modelP.pi = normalizeLogspace(modelP.pi);
     modelP.pi = exp(modelP.pi);
     modelP.A = Probability{c}.A;
+    modelPP.nstates = size(cellNetKox{c},1);
+    modelPP.d = size(dataTrainRaw{1,1},1);
+    modelPP.N = size(dataTrainRaw{1,1},2);
     modelPP.mu = cellNetKox{c}';
-    d = size(dataTrainRaw{1,1},1);
-    N = size(dataTrainRaw{1,1},2);
+    modelPP.Sigma = Sigma{c};
+    d = modelPP.d;
     prior.mu    = zeros(1, d);
     prior.Sigma = 0.1*eye(d);
     prior.k     = 0.01;  
     prior.dof   = d + 1; 
-    modelPP.mu     = (N*modelPP.mu + prior.k*prior.mu(:))./(N + prior.k);
-    modelPP.Sigma = Sigma{c};
-    %SN = S0 + X'*X + kappa0*m0*m0' - kappaN*muN*muN'; % Murphy eqn 4.214
-    %Sigma = SN/(nuN - D - 1); % posterior mean estimate
-    modelPP.nstates = size(cellNetKox{c},1);
-    modelPP.d = size(dataTrainRaw{1,1},1);
+    %modelPP = addPrior(modelPP, prior);    
     modelPP.cpdType = 'condgauss';
     modelP.emission = modelPP;
     classConditionals{c} = modelP;
@@ -137,3 +135,32 @@ end
 SetDefaultValue(4, 'pseudoCount', ones(1, model.nclasses)); 
 prior = discreteFit(labelTrain, pseudoCount);
 model.prior = prior;
+end
+
+function model = addPrior(model, prior)
+N    = model.N;
+XX      = model.Sigma;
+xbar    = model.mu;
+d       = model.d;
+nstates = model.nstates;
+
+kappa0 = prior.k;
+m0     = prior.mu(:);
+nu0    = prior.dof;
+S0     = prior.Sigma;
+mu     = zeros(d, nstates);
+SigmaL  = zeros(d, d, nstates);
+for k = 1:nstates
+    xbark          = xbar(:, k);
+    XXk            = XX(:, :, k);
+    wk             = N;
+    mn             = (wk*xbark + kappa0*m0)./(wk + kappa0);
+    a              = (kappa0*wk)./(kappa0 + wk);
+    b              = nu0 + wk + d + 2;
+    Sprior         = (xbark-m0)*(xbark-m0)';
+    SigmaL(:, :, k) = (S0 + XXk + a*Sprior)./b;
+    mu(:, k)       = mn;
+end
+model.mu    = mu;
+model.Sigma = SigmaL;
+end
