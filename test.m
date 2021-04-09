@@ -6,7 +6,6 @@ clear;
 %if ~isOpen
 %   parpool open 4;
 %end;
-
 fprintf('..........START EXPERIMENT\n');
 %%
 N_STATES = 5;
@@ -37,8 +36,9 @@ N_MIX = 0;
 %      'SelfRegulationSCP1' 'SelfRegulationSCP2' 'SpokenArabicDigits' ...
 %      'StandWalkJump' 'UWaveGestureLibrary'};
 
-   groupDATA = { 'ArticularyWordRecognition' 'AtrialFibrillation' 'BasicMotions' ...
-       'CharacterTrajectories' 'Cricket' };
+%   groupDATA = { 'SpokenArabicDigits' 'CharacterTrajectories' 'JapaneseVowels' ...
+%       'Libras' 'PenDigits' 'UWaveGestureLibrary' };
+   groupDATA = { 'JapaneseVowels'};
 % myBestOn 7 - ArticularyWordRecognition Cricket EigenWorms JapaneseVowels UWaveGestureLibrary
 % myBestOn 7 - ArticularyWordRecognition Cricket EigenWorms ERing
 % JapaneseVowels MotorImagery UWaveGestureLibrary
@@ -47,7 +47,7 @@ N_MIX = 0;
 % myBestOn 3 - Cricket EigenWorms ERing JapaneseVowels MotorImagery NATOPS
 % myBestOn 9 - ArticularyWordRecognition Cricket EigenWorms ERing
 % JapaneseVowels MotorImagery UWaveGestureLibrary
-groupMODEL = {'NPMPGM_KMEANS-S0' 'NPMPGM_KMEANS-S1' 'DHMM+KMEANS' };
+groupMODEL = { 'NPMPGM_KMEANS-S0', 'DHMM+KMEANS' };
 ResultCellError = cell(length(groupDATA), length(groupMODEL)+1);
 ResultCellOverfit = cell(length(groupDATA), length(groupMODEL)+1);
 
@@ -64,7 +64,12 @@ nameDataSetIndex = nameDataSetIndex + 1;
 
 dataTrainUCI = getData2020(nameDataSetTrain);
 dataTest = getData2020(nameDataSetTest);
-TRAINFOLDSIZE = [size(dataTrainUCI,2)];
+%TRAINFOLDSIZE = [size(dataTrainUCI,2)];
+TRAINFOLDSIZE = [5];
+if size(dataTrainUCI,2) < 20
+    TRAINFOLDSIZE = [size(dataTrainUCI,2)];
+end
+
 %%
 endD = 0;
 index = 0;
