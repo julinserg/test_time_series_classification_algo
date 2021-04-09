@@ -6,7 +6,7 @@ clear;
 %if ~isOpen
 %   parpool open 4;
 %end;
-fprintf('..........START EXPERIMENT\n');
+fprintf('..........START EXPERIMENT - MAIN\n');
 %%
 N_STATES = 5;
 N_MIX = 0;
@@ -38,7 +38,7 @@ N_MIX = 0;
 
 %   groupDATA = { 'SpokenArabicDigits' 'CharacterTrajectories' 'JapaneseVowels' ...
 %       'Libras' 'PenDigits' 'UWaveGestureLibrary' };
-   groupDATA = { 'JapaneseVowels'};
+   groupDATA = { 'JapaneseVowels', 'SpokenArabicDigits'};
 % myBestOn 7 - ArticularyWordRecognition Cricket EigenWorms JapaneseVowels UWaveGestureLibrary
 % myBestOn 7 - ArticularyWordRecognition Cricket EigenWorms ERing
 % JapaneseVowels MotorImagery UWaveGestureLibrary
@@ -47,9 +47,16 @@ N_MIX = 0;
 % myBestOn 3 - Cricket EigenWorms ERing JapaneseVowels MotorImagery NATOPS
 % myBestOn 9 - ArticularyWordRecognition Cricket EigenWorms ERing
 % JapaneseVowels MotorImagery UWaveGestureLibrary
-groupMODEL = { 'NPMPGM_KMEANS-S0', 'DHMM+KMEANS' };
+groupMODEL = { 'NPMPGM_KMEANS-S0' };
 ResultCellAccuracy = cell(length(groupDATA), length(groupMODEL)+1);
 ResultCellOverfit = cell(length(groupDATA), length(groupMODEL)+1);
+
+TRAINFOLDSIZE  = [ 10, 20];
+% TRAINFOLDSIZE_ONE = 10;
+% TRAINFOLDSIZE = [TRAINFOLDSIZE_ONE];
+% if size(dataTrainUCI,2) < TRAINFOLDSIZE_ONE
+%     TRAINFOLDSIZE = [size(dataTrainUCI,2)];
+% end
 
 nameModelIndex = 0;
 for groupMODELId = 1:length(groupMODEL)
@@ -57,33 +64,28 @@ nameModelIndex = nameModelIndex + 1;
 currentModel = groupMODEL{groupMODELId};
 nameDataSetIndex = 0;
 
+RESULTMATRIX_TRAIN = cell(length(groupDATA), size(TRAINFOLDSIZE,2) + 1);
+RESULTMATRIX_TEST = cell(length(groupDATA), size(TRAINFOLDSIZE,2) + 1);
 for groupDATAId = 1:length(groupDATA)
+fprintf('..........START EXPERIMENT - %s - %s\n', currentModel, groupDATA{groupDATAId});
+
 nameDataSetTrain = append(groupDATA{groupDATAId}, '_TRAIN.mat') ;
 nameDataSetTest = append(groupDATA{groupDATAId}, '_TEST.mat') ;
 nameDataSetIndex = nameDataSetIndex + 1;
 
 dataTrainUCI = getData2020(nameDataSetTrain);
 dataTest = getData2020(nameDataSetTest);
-%TRAINFOLDSIZE = [size(dataTrainUCI,2)];
-TRAINFOLDSIZE_ONE = 10;
-TRAINFOLDSIZE = [TRAINFOLDSIZE_ONE];
-if size(dataTrainUCI,2) < TRAINFOLDSIZE_ONE
-    TRAINFOLDSIZE = [size(dataTrainUCI,2)];
-end
+
 
 %%
 endD = 0;
 index = 0;
-RESUTMATRIX_TRAIN = zeros(9, size(TRAINFOLDSIZE,2));
-RESULTMATRIX_TEST = zeros(9, size(TRAINFOLDSIZE,2));
+
 
 for ii = 1: size(TRAINFOLDSIZE,2) 
     endD = TRAINFOLDSIZE(ii);
     dataTrain = dataTrainUCI(:,1:endD);  
     index = index + 1;
-    %RESULTMATRIX_X(use,index) = endD;
-    %RESULTMATRIX_X(use,index) = endD;
-    %RESULTMATRIX_X(use,index) = endD;
     K_FOLD = size(dataTrainUCI,2)/endD;    
     Indices = mycrosvalid( size(dataTrainUCI,2), K_FOLD );
     K_FOLD = 1;
@@ -193,19 +195,15 @@ for ii = 1: size(TRAINFOLDSIZE,2)
         ResultCellOverfit(nameDataSetIndex, 1) = { groupDATA{groupDATAId}};       
         ResultCellAccuracy(nameDataSetIndex, nameModelIndex + 1) = {num2str(1 - errorT, 4)};       
         ResultCellOverfit(nameDataSetIndex, nameModelIndex + 1) = {num2str(errorT - errorTR, 4)};  
-        %RESULTMATRIX_TRAIN(use,index) = RESULTMATRIX_TRAIN(use,index) + errorTR;   
-        %RESULTMATRIX_TEST(use,index) =  RESULTMATRIX_TEST(use,index) + errorT;
-    end
-    %RESULTMATRIX_TRAIN(use,index) =  RESULTMATRIX_TRAIN(use,index) / K_FOLD;
-    %RESULTMATRIX_TEST(use,index) =  RESULTMATRIX_TEST(use,index) / K_FOLD;
-    %fprintf('Test CrossValidation Error  = %f\n', RESULTMATRIX_TEST(use,index));  
-    %fprintf('Train CrossValidation Error  = %f\n', RESULTMATRIX_TRAIN(use,index));
-    %save('RESULTMATRIX_TRAIN.mat', 'RESULTMATRIX_TRAIN');
-    %save('RESULTMATRIX_TEST.mat', 'RESULTMATRIX_TEST');
-    
+        
+        RESULTMATRIX_TRAIN(nameDataSetIndex,1) = { groupDATA{groupDATAId}}; 
+        RESULTMATRIX_TEST(nameDataSetIndex, 1) = { groupDATA{groupDATAId}};  
+        RESULTMATRIX_TRAIN(nameDataSetIndex,index + 1) = {1 - errorTR};   
+        RESULTMATRIX_TEST(nameDataSetIndex,index + 1) = {1 - errorT};
+    end    
 end
 %%
-fprintf('..........STOP EXPERIMENT - %s\n', groupDATA{groupDATAId});
+fprintf('..........STOP EXPERIMENT - %s - %s\n', currentModel, groupDATA{groupDATAId});
 end
 end
 % Convert cell to a table and use first row as variable names
@@ -214,20 +212,19 @@ TableHeader = [ NameDataSetVar groupMODEL];
 TableAccuracy = cell2table(ResultCellAccuracy, 'VariableNames',TableHeader);
 TableOverfit= cell2table(ResultCellOverfit, 'VariableNames',TableHeader);
 % Write the table to a CSV file
-writetable(TableAccuracy,append('Result-state-', int2str(N_STATES), '-accuracy.csv'))
-writetable(TableOverfit,append('Result-state-', int2str(N_STATES), '-overfit.csv'))
+writetable(TableAccuracy,append('Accuracy(state-', int2str(N_STATES), ', size -', ...
+int2str(TRAINFOLDSIZE(end)), ').csv'))
+writetable(TableOverfit,append('Overfit(state-', int2str(N_STATES), ', size -', ...
+int2str(TRAINFOLDSIZE(end)), ').csv'))
 
-fprintf('..........STOP EXPERIMENT\n');
-%% PLOT
-%set(0,'DefaultAxesFontSize',14,'DefaultAxesFontName','Times New Roman');
-%set(0,'DefaultTextFontSize',14,'DefaultTextFontName','Times New Roman'); 
-%figure('Units', 'normalized', 'OuterPosition', [0 0 1 1]);
-%hold on;
-%plot(RESULTMATRIX_X(use,:), RESULTMATRIX_TRAIN(use,:),'r','LineWidth',3);
-%plot(RESULTMATRIX_X(use,:), RESULTMATRIX_TEST(use,:),'--','Color',[.1 .4 .1],'LineWidth',3);
-%axis([-inf,inf,0,1])
-%legend('ERROR TRAIN','ERROR TEST', 2);
-%BX=get(gca,'XTick');
-%BY=get(gca,'YTick');
-%xlabel('Sample Size');
-%ylabel('Error');
+NameArraySizeDataSet = string(TRAINFOLDSIZE);
+TableHeader2 = [ NameDataSetVar NameArraySizeDataSet];
+TableAccuracyTraint = cell2table(RESULTMATRIX_TRAIN, 'VariableNames',TableHeader2);
+TableAccuracyTest= cell2table(RESULTMATRIX_TEST, 'VariableNames',TableHeader2);
+strModelName = groupMODEL{size(groupMODEL)};
+writetable(TableAccuracyTraint,append('AccuracyTaintSeq(model - ', ...
+strModelName ,', state-', int2str(N_STATES), ').csv'))
+writetable(TableAccuracyTest,append('AccuracyTestSeq(model - ', ...
+strModelName ,', state-', int2str(N_STATES), ').csv'))
+
+fprintf('..........STOP EXPERIMENT - MAIN\n');
