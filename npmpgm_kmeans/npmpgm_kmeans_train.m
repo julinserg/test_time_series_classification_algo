@@ -26,7 +26,7 @@ Sigma = cell(size(dataTrainRaw,1),1);
 % обучение карт Кохонена
 % !!!! обучение карты внутри parfor возможно только наиная с версии R2013a 
 for i=1:size(dataTrainForClass,1)
-   i % вывод текущего номера класса в консоль
+  i % вывод текущего номера класса в консоль
   F = dataTrainForClass{i};
   options = statset('UseParallel',1);
   [idx, net] = kmeans(F',row_map * col_map, ...
