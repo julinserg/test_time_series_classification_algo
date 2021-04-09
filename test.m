@@ -47,8 +47,8 @@ N_MIX = 0;
 % myBestOn 3 - Cricket EigenWorms ERing JapaneseVowels MotorImagery NATOPS
 % myBestOn 9 - ArticularyWordRecognition Cricket EigenWorms ERing
 % JapaneseVowels MotorImagery UWaveGestureLibrary
-groupMODEL = { 'NPMPGM_KMEANS-S0', 'DHMM+KMEANS' };
-ResultCellError = cell(length(groupDATA), length(groupMODEL)+1);
+groupMODEL = { 'NPMPGM_KMEANS-S0', 'NPMPGM_KMEANS-S0', 'DHMM+KMEANS' };
+ResultCellAccuracy = cell(length(groupDATA), length(groupMODEL)+1);
 ResultCellOverfit = cell(length(groupDATA), length(groupMODEL)+1);
 
 nameModelIndex = 0;
@@ -65,8 +65,9 @@ nameDataSetIndex = nameDataSetIndex + 1;
 dataTrainUCI = getData2020(nameDataSetTrain);
 dataTest = getData2020(nameDataSetTest);
 %TRAINFOLDSIZE = [size(dataTrainUCI,2)];
-TRAINFOLDSIZE = [5];
-if size(dataTrainUCI,2) < 20
+TRAINFOLDSIZE_ONE = 10;
+TRAINFOLDSIZE = [TRAINFOLDSIZE_ONE];
+if size(dataTrainUCI,2) < TRAINFOLDSIZE_ONE
     TRAINFOLDSIZE = [size(dataTrainUCI,2)];
 end
 
@@ -111,8 +112,8 @@ for ii = 1: size(TRAINFOLDSIZE,2)
             R{2}.params.regFactorL1 = 0;
             % R{2}.params.initWeights = initDataTransHMMtoHCRF;
             [PrecisionT, RecallT, F_mT, errorT, PrecisionTR, RecallTR, F_mTR, errorTR] = hcrf_main(dataTrainCross,dataTest,R);
-            fprintf('Test %s Error  = %f\n', currentModel, errorT); 
-            fprintf('Train %s Error  = %f\n', currentModel, errorTR);     
+            fprintf('Test %s Accuracy  = %f\n', currentModel, 1 - errorT); 
+            fprintf('Train %s Accuracy  = %f\n', currentModel, 1 - errorTR);     
         end
         if (currentModel == "NPMPGM_SOM")        
             %% Инициализация параметров классификатора    
@@ -121,8 +122,8 @@ for ii = 1: size(TRAINFOLDSIZE,2)
             epohs_map = 1000; % колличество эпох обучения карты Кохонена
             val_dirichlet = 0; % параметр распределения Дирихле
             [PrecisionT, RecallT, F_mT, errorT, PrecisionTR, RecallTR, F_mTR, errorTR] = npmpgm_main(dataTrainCross,dataTest,row_map,col_map,epohs_map,val_dirichlet);            
-            fprintf('Test %s Error  = %f\n', currentModel, errorT);  
-            fprintf('Train %s Error  = %f\n', currentModel, errorTR);            
+            fprintf('Test %s Accuracy  = %f\n', currentModel, 1- errorT);  
+            fprintf('Train %s Accuracy  = %f\n', currentModel, 1 - errorTR);            
         end      
          if (currentModel == "NPMPGM_KMEANS-S0")        
             %% Инициализация параметров классификатора    
@@ -133,8 +134,8 @@ for ii = 1: size(TRAINFOLDSIZE,2)
             isNewModel = 0;
             [PrecisionT, RecallT, F_mT, errorT, PrecisionTR, RecallTR, F_mTR, errorTR] = ...
             npmpgm_kmeans_main(dataTrainCross,dataTest,row_map,col_map,epohs_map,val_dirichlet, isNewModel);            
-            fprintf('Test %s Error  = %f\n', currentModel, errorT);  
-            fprintf('Train %s Error  = %f\n', currentModel, errorTR);            
+            fprintf('Test %s Accuracy  = %f\n', currentModel, 1 - errorT);  
+            fprintf('Train %s Accuracy  = %f\n', currentModel, 1 - errorTR);            
          end 
          if (currentModel == "NPMPGM_KMEANS-S1")        
             %% Инициализация параметров классификатора    
@@ -145,13 +146,13 @@ for ii = 1: size(TRAINFOLDSIZE,2)
             isNewModel = 1;
             [PrecisionT, RecallT, F_mT, errorT, PrecisionTR, RecallTR, F_mTR, errorTR] = ...
             npmpgm_kmeans_main(dataTrainCross,dataTest,row_map,col_map,epohs_map,val_dirichlet, isNewModel);            
-            fprintf('Test %s Error  = %f\n', currentModel, errorT);  
-            fprintf('Train %s Error  = %f\n', currentModel, errorTR);            
+            fprintf('Test %s Accuracy  = %f\n', currentModel, 1 - errorT);  
+            fprintf('Train %s Accuracy  = %f\n', currentModel, 1 - errorTR);            
          end 
         if (currentModel == "KNN")        
             [PrecisionT, RecallT, F_mT, errorT, PrecisionTR, RecallTR, F_mTR, errorTR] = knn_main(dataTrainCross,dataTest); 
-            fprintf('Test KNN Error  = %f\n', currentModel, errorT);
-            fprintf('Train KNN Error  = %f\n', currentModel, errorTR);   
+            fprintf('Test KNN Accuracy  = %f\n', currentModel, 1 - errorT);
+            fprintf('Train KNN Accuracy  = %f\n', currentModel, 1 - errorTR);   
         end
         if (currentModel == "DHMM+SOM")        
             %% Инициализация параметров классификатора    
@@ -159,8 +160,8 @@ for ii = 1: size(TRAINFOLDSIZE,2)
             col_map = 10; % колличество столбцов карты Кохонена
             epohs_map = 1000; % колличество эпох обучения карты Кохонена           
             [PrecisionT, RecallT, F_mT, errorT, PrecisionTR, RecallTR, F_mTR, errorTR] = hmmsom_main(dataTrainCross,dataTest,row_map,col_map,epohs_map,N_STATES,0);            
-            fprintf('Test %s Error  = %f\n', currentModel, errorT);  
-            fprintf('Train %s Error  = %f\n', currentModel, errorTR);
+            fprintf('Test %s Accuracy  = %f\n', currentModel, 1 - errorT);  
+            fprintf('Train %s Accuracy  = %f\n', currentModel, 1 - errorTR);
             
         end
         if (currentModel == "DHMM+KMEANS")        
@@ -169,8 +170,8 @@ for ii = 1: size(TRAINFOLDSIZE,2)
             col_map = 10; % колличество столбцов карты Кохонена
             epohs_map = 1000; % колличество эпох обучения карты Кохонена           
             [PrecisionT, RecallT, F_mT, errorT, PrecisionTR, RecallTR, F_mTR, errorTR] = hmmsom_main(dataTrainCross,dataTest,row_map,col_map,epohs_map,N_STATES,1);            
-            fprintf('Test %s Error  = %f\n', currentModel, errorT);  
-            fprintf('Train %s Error  = %f\n', currentModel, errorTR);
+            fprintf('Test %s Accuracy  = %f\n', currentModel, 1 - errorT);  
+            fprintf('Train %s Accuracy  = %f\n', currentModel, 1 - errorTR);
             
         end       
         if (currentModel == "NPMPGM_EM")        
@@ -180,17 +181,17 @@ for ii = 1: size(TRAINFOLDSIZE,2)
             epohs_map = 1000; % колличество эпох обучения карты Кохонена
             val_dirichlet = 0; % параметр распределения Дирихле
             [PrecisionT, RecallT, F_mT, errorT, PrecisionTR, RecallTR, F_mTR, errorTR] = npmpgm_em_main(dataTrainCross,dataTest,row_map,col_map,epohs_map,val_dirichlet);            
-            fprintf('Test %s Error  = %f\n', currentModel, errorT);  
-            fprintf('Train %s Error  = %f\n', currentModel, errorTR);            
+            fprintf('Test %s Accuracy  = %f\n', currentModel, 1 - errorT);  
+            fprintf('Train %s Accuracy  = %f\n', currentModel, 1 - errorTR);            
         end
         if (currentModel == "LSTM")        
             [PrecisionT, RecallT, F_mT, errorT, PrecisionTR, RecallTR, F_mTR, errorTR] = lstm_main(dataTrainCross,dataTest); 
-            fprintf('Test %s Error  = %f\n', currentModel, errorT);
-            fprintf('Train %s Error  = %f\n', currentModel, errorTR);   
+            fprintf('Test %s Accuracy  = %f\n', currentModel, 1 - errorT);
+            fprintf('Train %s Accuracy  = %f\n', currentModel, 1 - errorTR);   
         end
-        ResultCellError(nameDataSetIndex, 1) = { groupDATA{groupDATAId}};
+        ResultCellAccuracy(nameDataSetIndex, 1) = { groupDATA{groupDATAId}};
         ResultCellOverfit(nameDataSetIndex, 1) = { groupDATA{groupDATAId}};       
-        ResultCellError(nameDataSetIndex, nameModelIndex + 1) = {num2str(errorT, 4)};       
+        ResultCellAccuracy(nameDataSetIndex, nameModelIndex + 1) = {num2str(1 - errorT, 4)};       
         ResultCellOverfit(nameDataSetIndex, nameModelIndex + 1) = {num2str(errorT - errorTR, 4)};  
         %RESULTMATRIX_TRAIN(use,index) = RESULTMATRIX_TRAIN(use,index) + errorTR;   
         %RESULTMATRIX_TEST(use,index) =  RESULTMATRIX_TEST(use,index) + errorT;
@@ -210,10 +211,10 @@ end
 % Convert cell to a table and use first row as variable names
 NameDataSetVar = {'NameDataSet'};
 TableHeader = [ NameDataSetVar groupMODEL];
-TableError = cell2table(ResultCellError, 'VariableNames',TableHeader);
+TableAccuracy = cell2table(ResultCellAccuracy, 'VariableNames',TableHeader);
 TableOverfit= cell2table(ResultCellOverfit, 'VariableNames',TableHeader);
 % Write the table to a CSV file
-writetable(TableError,append('Result-state-', int2str(N_STATES), '-error.csv'))
+writetable(TableAccuracy,append('Result-state-', int2str(N_STATES), '-accuracy.csv'))
 writetable(TableOverfit,append('Result-state-', int2str(N_STATES), '-overfit.csv'))
 
 fprintf('..........STOP EXPERIMENT\n');
