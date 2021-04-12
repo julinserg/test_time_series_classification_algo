@@ -38,7 +38,7 @@ N_MIX = 0;
 
 %   groupDATA = { 'SpokenArabicDigits' 'CharacterTrajectories' 'JapaneseVowels' ...
 %       'Libras' 'PenDigits' 'UWaveGestureLibrary' };
- %  groupDATA = { 'AtrialFibrillation', 'SpokenArabicDigits'};
+   %groupDATA = { 'AtrialFibrillation', 'SpokenArabicDigits'};
 % myBestOn 7 - ArticularyWordRecognition Cricket EigenWorms JapaneseVowels UWaveGestureLibrary
 % myBestOn 7 - ArticularyWordRecognition Cricket EigenWorms ERing
 % JapaneseVowels MotorImagery UWaveGestureLibrary
@@ -52,6 +52,7 @@ ResultCellAccuracy = cell(length(groupDATA), length(groupMODEL)+1);
 ResultCellOverfit = cell(length(groupDATA), length(groupMODEL)+1);
 
 TRAINFOLDSIZE  = [ 10, 20, 30, 40, 50, 60, 70, 80, 90, 100];
+
 % TRAINFOLDSIZE_ONE = 10;
 % TRAINFOLDSIZE = [TRAINFOLDSIZE_ONE];
 % if size(dataTrainUCI,2) < TRAINFOLDSIZE_ONE
@@ -65,7 +66,7 @@ currentModel = groupMODEL{groupMODELId};
 nameDataSetIndex = 0;
 
 RESULTMATRIX_TRAIN = cell(length(groupDATA), size(TRAINFOLDSIZE,2) + 1);
-RESULTMATRIX_TEST = cell(length(groupDATA), size(TRAINFOLDSIZE,2) + 1);
+RESULTMATRIX_OVERFIT = cell(length(groupDATA), size(TRAINFOLDSIZE,2) + 1);
 for groupDATAId = 1:length(groupDATA)
 fprintf('..........START EXPERIMENT - %s - %s\n', currentModel, groupDATA{groupDATAId});
 
@@ -86,7 +87,7 @@ for ii = 1: size(TRAINFOLDSIZE,2)
     endD = TRAINFOLDSIZE(ii);
     if endD > size(dataTrainUCI,2)
         RESULTMATRIX_TRAIN(nameDataSetIndex,1) = { groupDATA{groupDATAId}}; 
-        RESULTMATRIX_TEST(nameDataSetIndex, 1) = { groupDATA{groupDATAId}};
+        RESULTMATRIX_OVERFIT(nameDataSetIndex, 1) = { groupDATA{groupDATAId}};
         continue
     end
     dataTrain = dataTrainUCI(:,1:endD);  
@@ -202,9 +203,9 @@ for ii = 1: size(TRAINFOLDSIZE,2)
         ResultCellOverfit(nameDataSetIndex, nameModelIndex + 1) = {num2str(errorT - errorTR, 4)};  
         
         RESULTMATRIX_TRAIN(nameDataSetIndex,1) = { groupDATA{groupDATAId}}; 
-        RESULTMATRIX_TEST(nameDataSetIndex, 1) = { groupDATA{groupDATAId}};  
+        RESULTMATRIX_OVERFIT(nameDataSetIndex, 1) = { groupDATA{groupDATAId}};  
         RESULTMATRIX_TRAIN(nameDataSetIndex,index + 1) = {1 - errorTR};   
-        RESULTMATRIX_TEST(nameDataSetIndex,index + 1) = {1 - errorT};
+        RESULTMATRIX_OVERFIT(nameDataSetIndex,index + 1) = {errorT - errorTR};
     end    
 end
 %%
@@ -224,12 +225,12 @@ int2str(TRAINFOLDSIZE(end)), ').csv'))
 
 NameArraySizeDataSet = string(TRAINFOLDSIZE);
 TableHeader2 = [ NameDataSetVar NameArraySizeDataSet];
-TableAccuracyTraint = cell2table(RESULTMATRIX_TRAIN, 'VariableNames',TableHeader2);
-TableAccuracyTest= cell2table(RESULTMATRIX_TEST, 'VariableNames',TableHeader2);
+TableAccuracyTrain = cell2table(RESULTMATRIX_TRAIN, 'VariableNames',TableHeader2);
+TableAccuracyOverfit= cell2table(RESULTMATRIX_OVERFIT, 'VariableNames',TableHeader2);
 strModelName = groupMODEL{size(groupMODEL)};
-writetable(TableAccuracyTraint,append('AccuracyTaintSeq(model - ', ...
+writetable(TableAccuracyTrain,append('AccuracySeqTrain(model - ', ...
 strModelName ,', state-', int2str(N_STATES), ').csv'))
-writetable(TableAccuracyTest,append('AccuracyTestSeq(model - ', ...
+writetable(TableAccuracyOverfit,append('AccuracySeqOverfit(model - ', ...
 strModelName ,', state-', int2str(N_STATES), ').csv'))
 
 fprintf('..........STOP EXPERIMENT - MAIN\n');
