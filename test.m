@@ -29,16 +29,16 @@ N_MIX = 0;
 
 % fail - 'FaceDetection' 'InsectWingbeat' 'Phoneme' 'MotorImagery'
 
-% groupDATA = {'ArticularyWordRecognition' 'AtrialFibrillation' 'BasicMotions' ...
-%      'CharacterTrajectories' 'Cricket' 'EigenWorms' 'Epilepsy' 'EthanolConcentration' ...
-%      'ERing' 'FingerMovements' 'HandMovementDirection' 'Handwriting' 'Heartbeat' 'JapaneseVowels' ...
-%      'Libras' 'LSST' 'NATOPS' 'PenDigits' 'PEMS-SF' 'RacketSports' ...
-%      'SelfRegulationSCP1' 'SelfRegulationSCP2' 'SpokenArabicDigits' ...
-%      'StandWalkJump' 'UWaveGestureLibrary'};
+ groupDATA = {'ArticularyWordRecognition' 'AtrialFibrillation' 'BasicMotions' ...
+      'CharacterTrajectories' 'Cricket' 'EigenWorms' 'Epilepsy' 'EthanolConcentration' ...
+      'ERing' 'FingerMovements' 'HandMovementDirection' 'Handwriting' 'Heartbeat' 'JapaneseVowels' ...
+      'Libras' 'LSST' 'NATOPS' 'PenDigits' 'PEMS-SF' 'RacketSports' ...
+      'SelfRegulationSCP1' 'SelfRegulationSCP2' 'SpokenArabicDigits' ...
+      'StandWalkJump' 'UWaveGestureLibrary'};
 
 %   groupDATA = { 'SpokenArabicDigits' 'CharacterTrajectories' 'JapaneseVowels' ...
 %       'Libras' 'PenDigits' 'UWaveGestureLibrary' };
-   groupDATA = { 'JapaneseVowels', 'SpokenArabicDigits'};
+ %  groupDATA = { 'AtrialFibrillation', 'SpokenArabicDigits'};
 % myBestOn 7 - ArticularyWordRecognition Cricket EigenWorms JapaneseVowels UWaveGestureLibrary
 % myBestOn 7 - ArticularyWordRecognition Cricket EigenWorms ERing
 % JapaneseVowels MotorImagery UWaveGestureLibrary
@@ -51,7 +51,7 @@ groupMODEL = { 'NPMPGM_KMEANS-S0' };
 ResultCellAccuracy = cell(length(groupDATA), length(groupMODEL)+1);
 ResultCellOverfit = cell(length(groupDATA), length(groupMODEL)+1);
 
-TRAINFOLDSIZE  = [ 10, 20];
+TRAINFOLDSIZE  = [ 10, 20, 30, 40, 50, 60, 70, 80, 90, 100];
 % TRAINFOLDSIZE_ONE = 10;
 % TRAINFOLDSIZE = [TRAINFOLDSIZE_ONE];
 % if size(dataTrainUCI,2) < TRAINFOLDSIZE_ONE
@@ -84,6 +84,11 @@ index = 0;
 
 for ii = 1: size(TRAINFOLDSIZE,2) 
     endD = TRAINFOLDSIZE(ii);
+    if endD > size(dataTrainUCI,2)
+        RESULTMATRIX_TRAIN(nameDataSetIndex,1) = { groupDATA{groupDATAId}}; 
+        RESULTMATRIX_TEST(nameDataSetIndex, 1) = { groupDATA{groupDATAId}};
+        continue
+    end
     dataTrain = dataTrainUCI(:,1:endD);  
     index = index + 1;
     K_FOLD = size(dataTrainUCI,2)/endD;    
