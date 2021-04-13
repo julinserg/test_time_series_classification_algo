@@ -38,7 +38,7 @@ N_MIX = 0;
 
 %   groupDATA = { 'SpokenArabicDigits' 'CharacterTrajectories' 'JapaneseVowels' ...
 %       'Libras' 'PenDigits' 'UWaveGestureLibrary' };
-   %groupDATA = { 'Cricket'};
+  % groupDATA = { 'HandMovementDirection'};
 % myBestOn 7 - ArticularyWordRecognition Cricket EigenWorms JapaneseVowels UWaveGestureLibrary
 % myBestOn 7 - ArticularyWordRecognition Cricket EigenWorms ERing
 % JapaneseVowels MotorImagery UWaveGestureLibrary
@@ -47,12 +47,11 @@ N_MIX = 0;
 % myBestOn 3 - Cricket EigenWorms ERing JapaneseVowels MotorImagery NATOPS
 % myBestOn 9 - ArticularyWordRecognition Cricket EigenWorms ERing
 % JapaneseVowels MotorImagery UWaveGestureLibrary
-groupMODEL = { 'NPMPGM_KMEANS-S0' };
+groupMODEL = { 'HMM' };
 ResultCellAccuracy = cell(length(groupDATA), length(groupMODEL)+1);
 ResultCellOverfit = cell(length(groupDATA), length(groupMODEL)+1);
 
 TRAINFOLDSIZE  = [ 5, 10, 15, 20, 25, 30, 35, 40, 45, 50, 60, 70, 80, 90, 100];
-
 % TRAINFOLDSIZE_ONE = 10;
 % TRAINFOLDSIZE = [TRAINFOLDSIZE_ONE];
 % if size(dataTrainUCI,2) < TRAINFOLDSIZE_ONE
@@ -65,7 +64,7 @@ nameModelIndex = nameModelIndex + 1;
 currentModel = groupMODEL{groupMODELId};
 nameDataSetIndex = 0;
 
-RESULTMATRIX_TRAIN = cell(length(groupDATA), size(TRAINFOLDSIZE,2) + 1);
+RESULTMATRIX_ACCURACY = cell(length(groupDATA), size(TRAINFOLDSIZE,2) + 1);
 RESULTMATRIX_OVERFIT = cell(length(groupDATA), size(TRAINFOLDSIZE,2) + 1);
 for groupDATAId = 1:length(groupDATA)
 fprintf('..........START EXPERIMENT - %s - %s\n', currentModel, groupDATA{groupDATAId});
@@ -92,10 +91,8 @@ for ii = 1: size(TRAINFOLDSIZE,2)
             isSmallData = 1;
         end
     else
-        RESULTMATRIX_TRAIN(nameDataSetIndex,1) = { groupDATA{groupDATAId}}; 
-        RESULTMATRIX_OVERFIT(nameDataSetIndex, 1) = { groupDATA{groupDATAId}};
-        RESULTMATRIX_TRAIN(nameDataSetIndex,index + 1) = {0};   
-        RESULTMATRIX_OVERFIT(nameDataSetIndex,index + 1) = {0};
+        [RESULTMATRIX_ACCURACY, RESULTMATRIX_OVERFIT] = setNullToResultMatrix(RESULTMATRIX_ACCURACY, RESULTMATRIX_OVERFIT, groupDATA, ...
+                    groupDATAId, nameDataSetIndex, index);
         continue;
     end
     
@@ -107,7 +104,13 @@ for ii = 1: size(TRAINFOLDSIZE,2)
         dataTrainCross = dataTrainUCI(:,Indices == cros_iter );        
         if (currentModel == "HMM")
             diag = 0;
-            [PrecisionT, RecallT, F_mT, errorT, PrecisionTR, RecallTR, F_mTR, errorTR] = hmm_main(dataTrainCross,dataTest,N_STATES,N_MIX,diag); 
+            try
+                [PrecisionT, RecallT, F_mT, errorT, PrecisionTR, RecallTR, F_mTR, errorTR] = hmm_main(dataTrainCross,dataTest,N_STATES,N_MIX,diag); 
+            catch
+                [RESULTMATRIX_ACCURACY, RESULTMATRIX_OVERFIT] = setNullToResultMatrix(RESULTMATRIX_ACCURACY, RESULTMATRIX_OVERFIT, groupDATA, ...
+                    groupDATAId, nameDataSetIndex, index);
+                continue;
+            end
             fprintf('Test %s Error  = %f\n', currentModel, errorT);
             fprintf('Train %s Error  = %f\n', currentModel, errorTR);   
         end
@@ -174,8 +177,14 @@ for ii = 1: size(TRAINFOLDSIZE,2)
             %% Инициализация параметров классификатора    
             row_map = 10; % колличество строк карты Кохонена
             col_map = 10; % колличество столбцов карты Кохонена
-            epohs_map = 1000; % колличество эпох обучения карты Кохонена           
-            [PrecisionT, RecallT, F_mT, errorT, PrecisionTR, RecallTR, F_mTR, errorTR] = hmmsom_main(dataTrainCross,dataTest,row_map,col_map,epohs_map,N_STATES,0);            
+            epohs_map = 1000; % колличество эпох обучения карты Кохонена   
+            try
+                [PrecisionT, RecallT, F_mT, errorT, PrecisionTR, RecallTR, F_mTR, errorTR] = hmmsom_main(dataTrainCross,dataTest,row_map,col_map,epohs_map,N_STATES,0);  
+            catch
+                [RESULTMATRIX_ACCURACY, RESULTMATRIX_OVERFIT] = setNullToResultMatrix(RESULTMATRIX_ACCURACY, RESULTMATRIX_OVERFIT, groupDATA, ...
+                    groupDATAId, nameDataSetIndex, index);
+                continue;
+            end
             fprintf('Test %s Accuracy  = %f\n', currentModel, 1 - errorT);  
             fprintf('Train %s Accuracy  = %f\n', currentModel, 1 - errorTR);
             
@@ -184,8 +193,14 @@ for ii = 1: size(TRAINFOLDSIZE,2)
             %% Инициализация параметров классификатора    
             row_map = 10; % колличество строк карты Кохонена
             col_map = 10; % колличество столбцов карты Кохонена
-            epohs_map = 1000; % колличество эпох обучения карты Кохонена           
-            [PrecisionT, RecallT, F_mT, errorT, PrecisionTR, RecallTR, F_mTR, errorTR] = hmmsom_main(dataTrainCross,dataTest,row_map,col_map,epohs_map,N_STATES,1);            
+            epohs_map = 1000; % колличество эпох обучения карты Кохонена 
+            try
+                [PrecisionT, RecallT, F_mT, errorT, PrecisionTR, RecallTR, F_mTR, errorTR] = hmmsom_main(dataTrainCross,dataTest,row_map,col_map,epohs_map,N_STATES,1);
+            catch
+                [RESULTMATRIX_ACCURACY, RESULTMATRIX_OVERFIT] = setNullToResultMatrix(RESULTMATRIX_ACCURACY, RESULTMATRIX_OVERFIT, groupDATA, ...
+                    groupDATAId, nameDataSetIndex, index);
+                continue;
+            end
             fprintf('Test %s Accuracy  = %f\n', currentModel, 1 - errorT);  
             fprintf('Train %s Accuracy  = %f\n', currentModel, 1 - errorTR);
             
@@ -196,7 +211,13 @@ for ii = 1: size(TRAINFOLDSIZE,2)
             col_map = N_STATES; % колличество столбцов карты Кохонена
             epohs_map = 1000; % колличество эпох обучения карты Кохонена
             val_dirichlet = 0; % параметр распределения Дирихле
-            [PrecisionT, RecallT, F_mT, errorT, PrecisionTR, RecallTR, F_mTR, errorTR] = npmpgm_em_main(dataTrainCross,dataTest,row_map,col_map,epohs_map,val_dirichlet);            
+            try
+                [PrecisionT, RecallT, F_mT, errorT, PrecisionTR, RecallTR, F_mTR, errorTR] = npmpgm_em_main(dataTrainCross,dataTest,row_map,col_map,epohs_map,val_dirichlet);
+            catch
+                [RESULTMATRIX_ACCURACY, RESULTMATRIX_OVERFIT] = setNullToResultMatrix(RESULTMATRIX_ACCURACY, RESULTMATRIX_OVERFIT, groupDATA, ...
+                    groupDATAId, nameDataSetIndex, index);
+                continue;
+            end
             fprintf('Test %s Accuracy  = %f\n', currentModel, 1 - errorT);  
             fprintf('Train %s Accuracy  = %f\n', currentModel, 1 - errorTR);            
         end
@@ -210,9 +231,9 @@ for ii = 1: size(TRAINFOLDSIZE,2)
         ResultCellAccuracy(nameDataSetIndex, nameModelIndex + 1) = {num2str(1 - errorT, 4)};       
         ResultCellOverfit(nameDataSetIndex, nameModelIndex + 1) = {num2str(errorT - errorTR, 4)};  
         
-        RESULTMATRIX_TRAIN(nameDataSetIndex,1) = { groupDATA{groupDATAId}}; 
+        RESULTMATRIX_ACCURACY(nameDataSetIndex,1) = { groupDATA{groupDATAId}}; 
         RESULTMATRIX_OVERFIT(nameDataSetIndex, 1) = { groupDATA{groupDATAId}};  
-        RESULTMATRIX_TRAIN(nameDataSetIndex,index + 1) = {1 - errorTR};   
+        RESULTMATRIX_ACCURACY(nameDataSetIndex,index + 1) = {1 - errorT};   
         RESULTMATRIX_OVERFIT(nameDataSetIndex,index + 1) = {errorT - errorTR};
     end    
 end
@@ -233,12 +254,20 @@ int2str(TRAINFOLDSIZE(end)), ').csv'))
 
 NameArraySizeDataSet = string(TRAINFOLDSIZE);
 TableHeader2 = [ NameDataSetVar NameArraySizeDataSet];
-TableAccuracyTrain = cell2table(RESULTMATRIX_TRAIN, 'VariableNames',TableHeader2);
-TableAccuracyOverfit= cell2table(RESULTMATRIX_OVERFIT, 'VariableNames',TableHeader2);
+TableAccuracySeq = cell2table(RESULTMATRIX_ACCURACY, 'VariableNames',TableHeader2);
+TableOverfitSeq= cell2table(RESULTMATRIX_OVERFIT, 'VariableNames',TableHeader2);
 strModelName = groupMODEL{size(groupMODEL)};
-writetable(TableAccuracyTrain,append('AccuracySeqTrain(model - ', ...
+writetable(TableAccuracySeq,append('AccuracySeq(model - ', ...
 strModelName ,', state-', int2str(N_STATES), ').csv'))
-writetable(TableAccuracyOverfit,append('AccuracySeqOverfit(model - ', ...
+writetable(TableOverfitSeq,append('OverfitSeq(model - ', ...
 strModelName ,', state-', int2str(N_STATES), ').csv'))
 
 fprintf('..........STOP EXPERIMENT - MAIN\n');
+
+function [RESULTMATRIX_ACCURACY, RESULTMATRIX_OVERFIT] = setNullToResultMatrix(RESULTMATRIX_ACCURACY, RESULTMATRIX_OVERFIT, groupDATA, ...
+groupDATAId, nameDataSetIndex, index)
+    RESULTMATRIX_ACCURACY(nameDataSetIndex,1) = { groupDATA{groupDATAId}}; 
+    RESULTMATRIX_OVERFIT(nameDataSetIndex, 1) = { groupDATA{groupDATAId}};
+    RESULTMATRIX_ACCURACY(nameDataSetIndex,index + 1) = {0};   
+    RESULTMATRIX_OVERFIT(nameDataSetIndex,index + 1) = {0};
+end
