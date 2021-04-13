@@ -38,7 +38,7 @@ N_MIX = 0;
 
 %   groupDATA = { 'SpokenArabicDigits' 'CharacterTrajectories' 'JapaneseVowels' ...
 %       'Libras' 'PenDigits' 'UWaveGestureLibrary' };
-   %groupDATA = { 'AtrialFibrillation', 'SpokenArabicDigits'};
+   %groupDATA = { 'Cricket'};
 % myBestOn 7 - ArticularyWordRecognition Cricket EigenWorms JapaneseVowels UWaveGestureLibrary
 % myBestOn 7 - ArticularyWordRecognition Cricket EigenWorms ERing
 % JapaneseVowels MotorImagery UWaveGestureLibrary
@@ -51,7 +51,7 @@ groupMODEL = { 'NPMPGM_KMEANS-S0' };
 ResultCellAccuracy = cell(length(groupDATA), length(groupMODEL)+1);
 ResultCellOverfit = cell(length(groupDATA), length(groupMODEL)+1);
 
-TRAINFOLDSIZE  = [ 10, 20, 30, 40, 50, 60, 70, 80, 90, 100];
+TRAINFOLDSIZE  = [ 5, 10, 15, 20, 25, 30, 35, 40, 45, 50, 60, 70, 80, 90, 100];
 
 % TRAINFOLDSIZE_ONE = 10;
 % TRAINFOLDSIZE = [TRAINFOLDSIZE_ONE];
@@ -82,16 +82,24 @@ dataTest = getData2020(nameDataSetTest);
 endD = 0;
 index = 0;
 
-
-for ii = 1: size(TRAINFOLDSIZE,2) 
-    endD = TRAINFOLDSIZE(ii);
-    if endD > size(dataTrainUCI,2)
+isSmallData = 0;
+for ii = 1: size(TRAINFOLDSIZE,2)
+    index = index + 1;
+    endD = TRAINFOLDSIZE(ii);     
+    if isSmallData == 0
+        if endD > size(dataTrainUCI,2)
+            endD = size(dataTrainUCI,2);
+            isSmallData = 1;
+        end
+    else
         RESULTMATRIX_TRAIN(nameDataSetIndex,1) = { groupDATA{groupDATAId}}; 
         RESULTMATRIX_OVERFIT(nameDataSetIndex, 1) = { groupDATA{groupDATAId}};
-        continue
+        RESULTMATRIX_TRAIN(nameDataSetIndex,index + 1) = {0};   
+        RESULTMATRIX_OVERFIT(nameDataSetIndex,index + 1) = {0};
+        continue;
     end
-    dataTrain = dataTrainUCI(:,1:endD);  
-    index = index + 1;
+    
+    dataTrain = dataTrainUCI(:,1:endD);    
     K_FOLD = size(dataTrainUCI,2)/endD;    
     Indices = mycrosvalid( size(dataTrainUCI,2), K_FOLD );
     K_FOLD = 1;
