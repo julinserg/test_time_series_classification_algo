@@ -12,8 +12,8 @@ hstate = 5
 dictModel = {}
 dictModel['DHMM+KMEANS({st})'.format(st = hstate)] = ModelStruct('AccuracySeq(model - DHMM+KMEANS, state-5).csv', 'blue', 's' )
 dictModel['HMM({st})'.format(st = hstate)] = ModelStruct('AccuracySeq(model - HMM, state-5).csv', 'green', '+')
+dictModel['NPMPGM_SOM({st})'.format(st = hstate)] = ModelStruct('AccuracySeq(model - NPMPGM_SOM, state-5).csv', 'orange', 'h')
 dictModel['NPMPGM_KMEANS-S0({st})'.format(st = hstate)] = ModelStruct('AccuracySeq(model - NPMPGM_KMEANS-S0, state-5).csv', 'red', 'o')
-dictModel['NPMPGM_SOM({st})'.format(st = hstate)] = ModelStruct('AccuracySeq(model - NPMPGM_SOM, state-5).csv', 'black', 'v')
 
 dataSetName = set()
 dictAccuracySeqByModel = {}
