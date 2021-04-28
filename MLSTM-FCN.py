@@ -91,7 +91,7 @@ def squeeze_excite_block(input):
 if not os.path.exists('weights'):
     os.makedirs('weights')
 
-DATA = ('UWaveGestureLibrary' , 24)
+DATA = ('Cricket' , 4)
 TRAINFOLDSIZE  = [ 5, 10, 15, 20, 25, 30, 35, 40, 45, 50, 60, 70, 80, 90, 100]
 
 dataIndex = 0
@@ -113,7 +113,7 @@ for dataSizePerClass in TRAINFOLDSIZE:
     TRAINABLE = True
     model = generate_model_2()
 
-    train_model(model, DATASET_INDEX, dataset_prefix=DATASET_NAME, epochs=10, batch_size=128)
+    train_model(model, DATASET_INDEX, dataset_prefix=DATASET_NAME, epochs=1000, batch_size=128)
 
     accuracy, loss = evaluate_model(model, DATASET_INDEX, dataset_prefix=DATASET_NAME, batch_size=128)
     RESULT_ACCURACY.append(accuracy)
