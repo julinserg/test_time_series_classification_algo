@@ -9,3 +9,6 @@
 *.pdf
 *.png
 *.db
+*.npy
+*.pyc
+*.h5
