@@ -98,12 +98,13 @@ dataIndex = 0
 RESULT_ACCURACY = []
 DATASET_NAME= DATA[0]
 DATASET_INDEX = DATA[1]
+stopFlag = False
 for dataSizePerClass in TRAINFOLDSIZE:
-    resultGenerate = generate_dataset.generate_dataset(dataSizePerClass,'./Multivariate_mat_for_mlstm/{dataName}_MLSTM.mat'.format(dataName = DATASET_NAME),
-                                      './numPyData/{dataName}/'.format(dataName = DATASET_NAME))
-    if resultGenerate == False:
+    if stopFlag == True:
         RESULT_ACCURACY.append(0)
         continue
+    stopFlag = generate_dataset.generate_dataset(dataSizePerClass,'./Multivariate_mat_for_mlstm/{dataName}_MLSTM.mat'.format(dataName = DATASET_NAME),
+                                      './numPyData/{dataName}/'.format(dataName = DATASET_NAME))
 
     MAX_TIMESTEPS = MAX_TIMESTEPS_LIST[DATASET_INDEX]
     MAX_NB_VARIABLE = MAX_NB_VARIABLES[DATASET_INDEX]
@@ -112,7 +113,7 @@ for dataSizePerClass in TRAINFOLDSIZE:
     TRAINABLE = True
     model = generate_model_2()
 
-    train_model(model, DATASET_INDEX, dataset_prefix=DATASET_NAME, epochs=1000, batch_size=128)
+    train_model(model, DATASET_INDEX, dataset_prefix=DATASET_NAME, epochs=10, batch_size=128)
 
     accuracy, loss = evaluate_model(model, DATASET_INDEX, dataset_prefix=DATASET_NAME, batch_size=128)
     RESULT_ACCURACY.append(accuracy)

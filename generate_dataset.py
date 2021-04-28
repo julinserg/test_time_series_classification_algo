@@ -49,11 +49,13 @@ def generate_dataset(dataSizePerClass, srcPath, dstFolder):
         var_count = X_test_mat[i].shape[-1]
         X_test[i, :, :var_count] = X_test_mat[i][:, :max_nb_timesteps]
 
+    is_small_data = False
     numClass = len(np.unique(y_train))
-    if dataSizePerClass*numClass <= np.size(X_train,0):
-        X_train, y_train  = trancate_dataset.trancate_dataset(dataSizePerClass, X_train, y_train)
-    else:
-        return False
+    if dataSizePerClass*numClass > np.size(X_train,0):
+        is_small_data = True
+        dataSizePerClass = int(np.size(X_train,0) / numClass)
+
+    X_train, y_train = trancate_dataset.trancate_dataset(dataSizePerClass, X_train, y_train)
 
     # ''' Save the datasets '''
     print("Train dataset : ", X_train.shape, y_train.shape)
@@ -69,4 +71,4 @@ def generate_dataset(dataSizePerClass, srcPath, dstFolder):
     np.save(dstFolder + 'y_train.npy', y_train)
     np.save(dstFolder + 'X_test.npy', X_test)
     np.save(dstFolder + 'y_test.npy', y_test)
-    return True
+    return is_small_data
