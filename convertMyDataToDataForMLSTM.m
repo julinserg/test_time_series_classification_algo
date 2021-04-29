@@ -1,7 +1,7 @@
 clc;
 clear;
 
-path = 'D:\\science\\phd_codesource\\Multivariate_mat\\';
+path = './Multivariate_mat/';
 %DuckDuckGeese
 groupDATA = {'ArticularyWordRecognition' 'AtrialFibrillation' 'BasicMotions' ...
     'CharacterTrajectories' 'Cricket' 'EigenWorms' 'Epilepsy' ...
@@ -12,6 +12,9 @@ groupDATA = {'ArticularyWordRecognition' 'AtrialFibrillation' 'BasicMotions' ...
     'SpokenArabicDigits' 'StandWalkJump' 'UWaveGestureLibrary' };
 %groupDATA = {'SpokenArabicDigits'};
 fprintf('..........BEGIN \n');
+if ~exist('./Multivariate_mat_for_mlstm/', 'dir')
+       mkdir('./Multivariate_mat_for_mlstm/')
+end
 for groupDATAId = 1:length(groupDATA)
     nameDataSet = groupDATA{groupDATAId};
     fprintf('..........BEGIN %s \n', nameDataSet);
@@ -20,9 +23,9 @@ for groupDATAId = 1:length(groupDATA)
     Y_train = Y';
     [X, Y] = loadMyMatData(path, nameDataSet, '_TEST.mat');
     X_test = X';
-    Y_test = Y';
+    Y_test = Y';      
     
-    resultFileName = ['d:\\science\\phd_codesource\\Multivariate_mat_for_mlstm\\' nameDataSet '_MLSTM.mat'];
+    resultFileName = ['./Multivariate_mat_for_mlstm/' nameDataSet '_MLSTM.mat'];
     save( resultFileName, 'X_train', 'Y_train', 'X_test', 'Y_test');
     fprintf('..........END %s \n', nameDataSet);
 end
