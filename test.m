@@ -29,15 +29,22 @@ N_MIX = 0;
 
 % fail - 'FaceDetection' 'InsectWingbeat' 'Phoneme' 'MotorImagery'
 
- groupDATA = {'ArticularyWordRecognition' 'AtrialFibrillation' 'BasicMotions' ...
-      'CharacterTrajectories' 'Cricket' 'EigenWorms' 'Epilepsy' 'EthanolConcentration' ...
-      'ERing' 'FingerMovements' 'HandMovementDirection' 'Handwriting' 'Heartbeat' 'JapaneseVowels' ...
-      'Libras' 'LSST' 'NATOPS' 'PenDigits' 'PEMS-SF' 'RacketSports' ...
-      'SelfRegulationSCP1' 'SelfRegulationSCP2' 'SpokenArabicDigits' ...
-      'StandWalkJump' 'UWaveGestureLibrary'};
+INDEX_DATASET = 1;
+groupDATA = {'ArticularyWordRecognition' 'AtrialFibrillation' 'BasicMotions' ...
+  'CharacterTrajectories' 'Cricket' 'EigenWorms' 'Epilepsy' 'EthanolConcentration' ...
+  'ERing' 'FingerMovements' 'HandMovementDirection' 'Handwriting' 'Heartbeat' 'JapaneseVowels' ...
+  'Libras' 'LSST' 'NATOPS' 'PenDigits' 'PEMS-SF' 'RacketSports' ...
+  'SelfRegulationSCP1' 'SelfRegulationSCP2' 'SpokenArabicDigits' ...
+  'StandWalkJump' 'UWaveGestureLibrary'};
 
-%   groupDATA = { 'SpokenArabicDigits' 'CharacterTrajectories' 'JapaneseVowels' ...
-%       'Libras' 'PenDigits' 'UWaveGestureLibrary' };
+groupDATATEST = groupDATA;
+
+for groupDATAId = 1:length(groupDATA)
+    groupDATA{groupDATAId} = append(groupDATA{groupDATAId} , '-' , num2str(INDEX_DATASET));
+end
+
+%    groupDATA = { 'SpokenArabicDigits-1'};
+%    groupDATATEST = { 'SpokenArabicDigits'};
   % groupDATA = { 'HandMovementDirection'};
 % myBestOn 7 - ArticularyWordRecognition Cricket EigenWorms JapaneseVowels UWaveGestureLibrary
 % myBestOn 7 - ArticularyWordRecognition Cricket EigenWorms ERing
@@ -51,7 +58,8 @@ groupMODEL = { 'HMM' };
 ResultCellAccuracy = cell(length(groupDATA), length(groupMODEL)+1);
 ResultCellOverfit = cell(length(groupDATA), length(groupMODEL)+1);
 
-TRAINFOLDSIZE  = [ 5, 10, 15, 20, 25, 30, 35, 40, 45, 50, 60, 70, 80, 90, 100];
+TRAINFOLDSIZE  = [ 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, ...
+    17, 18, 19, 20, 25, 30, 35, 40, 45, 50];
 % TRAINFOLDSIZE_ONE = 10;
 % TRAINFOLDSIZE = [TRAINFOLDSIZE_ONE];
 % if size(dataTrainUCI,2) < TRAINFOLDSIZE_ONE
@@ -70,7 +78,7 @@ for groupDATAId = 1:length(groupDATA)
 fprintf('..........START EXPERIMENT - %s - %s\n', currentModel, groupDATA{groupDATAId});
 
 nameDataSetTrain = append(groupDATA{groupDATAId}, '_TRAIN.mat') ;
-nameDataSetTest = append(groupDATA{groupDATAId}, '_TEST.mat') ;
+nameDataSetTest = append(groupDATATEST{groupDATAId}, '_TEST.mat') ;
 nameDataSetIndex = nameDataSetIndex + 1;
 
 dataTrainUCI = getData2020(nameDataSetTrain);

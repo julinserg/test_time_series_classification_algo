@@ -2,7 +2,6 @@ clc;
 clear;
 
 path = './Multivariate_mat/';
-%DuckDuckGeese
 groupDATA = {'ArticularyWordRecognition' 'AtrialFibrillation' 'BasicMotions' ...
     'CharacterTrajectories' 'Cricket' 'EigenWorms' 'Epilepsy' ...
     'EthanolConcentration' 'ERing' 'FaceDetection' 'FingerMovements' ...
@@ -15,19 +14,22 @@ fprintf('..........BEGIN \n');
 if ~exist('./Multivariate_mat_for_mlstm/', 'dir')
        mkdir('./Multivariate_mat_for_mlstm/')
 end
-for groupDATAId = 1:length(groupDATA)
-    nameDataSet = groupDATA{groupDATAId};
-    fprintf('..........BEGIN %s \n', nameDataSet);
-    [X, Y] = loadMyMatData(path, nameDataSet, '_TRAIN.mat');
-    X_train = X';
-    Y_train = Y';
-    [X, Y] = loadMyMatData(path, nameDataSet, '_TEST.mat');
-    X_test = X';
-    Y_test = Y';      
-    
-    resultFileName = ['./Multivariate_mat_for_mlstm/' nameDataSet '_MLSTM.mat'];
-    save( resultFileName, 'X_train', 'Y_train', 'X_test', 'Y_test');
-    fprintf('..........END %s \n', nameDataSet);
+for indexData = 1:10
+    for groupDATAId = 1:length(groupDATA)
+        nameDataSet = groupDATA{groupDATAId};
+        fprintf('..........BEGIN %s \n', nameDataSet);
+        nameDataSetIndexing = append(nameDataSet, '-', num2str(indexData));
+        [X, Y] = loadMyMatData(path, nameDataSetIndexing, '_TRAIN.mat');
+        X_train = X';
+        Y_train = Y';
+        [X, Y] = loadMyMatData(path, nameDataSet, '_TEST.mat');
+        X_test = X';
+        Y_test = Y';      
+
+        resultFileName = ['./Multivariate_mat_for_mlstm/' nameDataSetIndexing '_MLSTM.mat'];
+        save( resultFileName, 'X_train', 'Y_train', 'X_test', 'Y_test');
+        fprintf('..........END %s \n', nameDataSet);
+    end
 end
 fprintf('..........END \n');
 
@@ -50,9 +52,4 @@ function [X, Y] = loadMyMatData(path, nameDataSet, type)
     end
     clearvars result;
 end
-
-
-%resultFileName = ['d:\\science\\phd_codesource\\Multivariate_mat_for_mlstm\\' nameDataSet '_' trainOrTest '.mat'];
-%save( resultFileName, 'result','-v7.3');
-%fprintf('..........END %s %s \n', trainOrTest, nameDataSet);
 
