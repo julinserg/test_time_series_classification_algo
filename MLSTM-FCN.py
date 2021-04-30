@@ -91,7 +91,7 @@ def squeeze_excite_block(input):
 if not os.path.exists('weights'):
     os.makedirs('weights')
 
-DATA = ('Cricket' , 4)
+DATA = ('JapaneseVowels' , 13)
 TRAINFOLDSIZE  = [ 5, 10, 15, 20, 25, 30, 35, 40, 45, 50, 60, 70, 80, 90, 100]
 
 dataIndex = 0

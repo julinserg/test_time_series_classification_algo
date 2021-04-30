@@ -15,12 +15,14 @@ dictModel['HMM({st})'.format(st = hstate)] = ModelStruct('AccuracySeq(model - HM
 dictModel['NPMPGM_SOM({st})'.format(st = hstate)] = ModelStruct('AccuracySeq(model - NPMPGM_SOM, state-5).csv', 'orange', 'h')
 dictModel['NPMPGM_KMEANS-S0({st})'.format(st = hstate)] = ModelStruct('AccuracySeq(model - NPMPGM_KMEANS-S0, state-5).csv', 'red', 'o')
 dictModel['NPMPGM_KMEANS-S1({st})'.format(st = hstate)] = ModelStruct('AccuracySeq(model - NPMPGM_KMEANS-S1, state-5).csv', 'black', 'v')
+dictModel['NPMPGM_EM({st})'.format(st = hstate)] = ModelStruct('AccuracySeq(model - NPMPGM_EM, state-5).csv', 'yellow', '*')
+dictModel['KNN'] = ModelStruct('AccuracySeq(model - KNN, state-5).csv', 'magenta', 'p')
 dictModel['MLSTM-FCN'] = ModelStruct('AccuracySeq(model - MLSTM-FCN).csv', 'cyan', 'x')
 
 dataSetName = set()
 dictAccuracySeqByModel = {}
 axisX = [5, 10, 15, 20, 25, 30, 35, 40, 45, 50, 60, 70, 80, 90, 100]
-plt.xticks(axisX,axisX)
+
 
 
 for modelName in dictModel:
@@ -41,6 +43,7 @@ for dsName in dataSetName:
             plt.plot(axisX, dictAccuracySeqByModel[modelName][dsName], '-' + dictModel[modelName].marker + 'k',
                      color=dictModel[modelName].color, label = modelName)
     plt.title(dsName)
+    plt.xticks(axisX, axisX)
     plt.xlabel("Количество экземпляров обучающей выборки")
     plt.ylabel("Точность")
     plt.legend()
