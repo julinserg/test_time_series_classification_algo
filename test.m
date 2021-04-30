@@ -54,12 +54,13 @@ end
 % myBestOn 3 - Cricket EigenWorms ERing JapaneseVowels MotorImagery NATOPS
 % myBestOn 9 - ArticularyWordRecognition Cricket EigenWorms ERing
 % JapaneseVowels MotorImagery UWaveGestureLibrary
-groupMODEL = { 'HMM' };
+groupMODEL = { 'DHMM+KMEANS' };
 ResultCellAccuracy = cell(length(groupDATA), length(groupMODEL)+1);
 ResultCellOverfit = cell(length(groupDATA), length(groupMODEL)+1);
 
 TRAINFOLDSIZE  = [ 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, ...
-    17, 18, 19, 20, 25, 30, 35, 40, 45, 50];
+     17, 18, 19, 20, 25, 30, 35, 40, 45, 50];
+ 
 % TRAINFOLDSIZE_ONE = 10;
 % TRAINFOLDSIZE = [TRAINFOLDSIZE_ONE];
 % if size(dataTrainUCI,2) < TRAINFOLDSIZE_ONE
@@ -255,9 +256,9 @@ TableHeader = [ NameDataSetVar groupMODEL];
 TableAccuracy = cell2table(ResultCellAccuracy, 'VariableNames',TableHeader);
 TableOverfit= cell2table(ResultCellOverfit, 'VariableNames',TableHeader);
 % Write the table to a CSV file
-writetable(TableAccuracy,append('Accuracy(state-', int2str(N_STATES), ', size -', ...
+writetable(TableAccuracy,append('Accuracy(dataIndex - ', int2str(INDEX_DATASET), ', state-', int2str(N_STATES), ', size -', ...
 int2str(TRAINFOLDSIZE(end)), ').csv'))
-writetable(TableOverfit,append('Overfit(state-', int2str(N_STATES), ', size -', ...
+writetable(TableOverfit,append('Overfit(dataIndex - ', int2str(INDEX_DATASET), ', state-', int2str(N_STATES), ', size -', ...
 int2str(TRAINFOLDSIZE(end)), ').csv'))
 
 NameArraySizeDataSet = string(TRAINFOLDSIZE);
@@ -266,9 +267,9 @@ TableAccuracySeq = cell2table(RESULTMATRIX_ACCURACY, 'VariableNames',TableHeader
 TableOverfitSeq= cell2table(RESULTMATRIX_OVERFIT, 'VariableNames',TableHeader2);
 strModelName = groupMODEL{size(groupMODEL)};
 writetable(TableAccuracySeq,append('AccuracySeq(model - ', ...
-strModelName ,', state-', int2str(N_STATES), ').csv'))
+strModelName ,', state-', int2str(N_STATES), ', dataIndex-', int2str(INDEX_DATASET), ').csv'))
 writetable(TableOverfitSeq,append('OverfitSeq(model - ', ...
-strModelName ,', state-', int2str(N_STATES), ').csv'))
+strModelName ,', state-', int2str(N_STATES), ', dataIndex-', int2str(INDEX_DATASET), ').csv'))
 
 fprintf('..........STOP EXPERIMENT - MAIN\n');
 
