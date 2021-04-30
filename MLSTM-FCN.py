@@ -93,7 +93,7 @@ if not os.path.exists('weights'):
 
 INDEX_DATASETS_LIST = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
 for INDEX_DATASET in INDEX_DATASETS_LIST:
-    DATA = ('JapaneseVowels' + '-' + str(INDEX_DATASET) , 13 + (INDEX_DATASET-1)*25)
+    DATA = ('ArticularyWordRecognition' + '-' + str(INDEX_DATASET) , 0 + (INDEX_DATASET-1)*25)
 
     TRAINFOLDSIZE  = [ 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16,
         17, 18, 19, 20, 25, 30, 35, 40, 45, 50]
@@ -117,7 +117,7 @@ for INDEX_DATASET in INDEX_DATASETS_LIST:
         TRAINABLE = True
         model = generate_model_2()
 
-        train_model(model, DATASET_INDEX, dataset_prefix=DATASET_NAME, epochs=100, batch_size=128)
+        train_model(model, DATASET_INDEX, dataset_prefix=DATASET_NAME, epochs=1000, batch_size=128)
 
         accuracy, loss = evaluate_model(model, DATASET_INDEX, dataset_prefix=DATASET_NAME, batch_size=128)
         RESULT_ACCURACY.append(accuracy)
