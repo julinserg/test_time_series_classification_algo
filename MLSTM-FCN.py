@@ -91,46 +91,48 @@ def squeeze_excite_block(input):
 if not os.path.exists('weights'):
     os.makedirs('weights')
 
-INDEX_DATASET = 1
-DATA = ('JapaneseVowels' + '-' + str(INDEX_DATASET) , 13 + (INDEX_DATASET-1)*25)
-TRAINFOLDSIZE  = [ 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16,
-    17, 18, 19, 20, 25, 30, 35, 40, 45, 50]
+INDEX_DATASETS_LIST = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
+for INDEX_DATASET in INDEX_DATASETS_LIST:
+    DATA = ('JapaneseVowels' + '-' + str(INDEX_DATASET) , 13 + (INDEX_DATASET-1)*25)
 
-dataIndex = 0
-RESULT_ACCURACY = []
-DATASET_NAME= DATA[0]
-DATASET_INDEX = DATA[1]
-stopFlag = False
-for dataSizePerClass in TRAINFOLDSIZE:
-    if stopFlag == True:
-        RESULT_ACCURACY.append(0)
-        continue
-    stopFlag = generate_dataset.generate_dataset(dataSizePerClass,'./Multivariate_mat_for_mlstm/{dataName}_MLSTM.mat'.format(dataName = DATASET_NAME),
-                                      './numPyData/{dataName}/'.format(dataName = DATASET_NAME))
+    TRAINFOLDSIZE  = [ 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16,
+        17, 18, 19, 20, 25, 30, 35, 40, 45, 50]
 
-    MAX_TIMESTEPS = MAX_TIMESTEPS_LIST[DATASET_INDEX]
-    MAX_NB_VARIABLE = MAX_NB_VARIABLES[DATASET_INDEX]
-    NB_CLASS = NB_CLASSES_LIST[DATASET_INDEX]
-
-    TRAINABLE = True
-    model = generate_model_2()
-
-    train_model(model, DATASET_INDEX, dataset_prefix=DATASET_NAME, epochs=10, batch_size=128)
-
-    accuracy, loss = evaluate_model(model, DATASET_INDEX, dataset_prefix=DATASET_NAME, batch_size=128)
-    RESULT_ACCURACY.append(accuracy)
-
-with open('AccuracySeqMLSTM-FCN({dataName}).csv'.format(dataName = DATASET_NAME), 'w', newline='') as f:
-
-    write = csv.writer(f)
-
-    headerCsv = ['NameDataSet']
+    dataIndex = 0
+    RESULT_ACCURACY = []
+    DATASET_NAME= DATA[0]
+    DATASET_INDEX = DATA[1]
+    stopFlag = False
     for dataSizePerClass in TRAINFOLDSIZE:
-        headerCsv.append(str(dataSizePerClass))
+        if stopFlag == True:
+            RESULT_ACCURACY.append(0)
+            continue
+        stopFlag = generate_dataset.generate_dataset(dataSizePerClass,'./Multivariate_mat_for_mlstm/{dataName}_MLSTM.mat'.format(dataName = DATASET_NAME),
+                                          './numPyData/{dataName}/'.format(dataName = DATASET_NAME))
 
-    accuracyCsv = [DATASET_NAME]
-    for ac in RESULT_ACCURACY:
-        accuracyCsv.append(str(ac))
+        MAX_TIMESTEPS = MAX_TIMESTEPS_LIST[DATASET_INDEX]
+        MAX_NB_VARIABLE = MAX_NB_VARIABLES[DATASET_INDEX]
+        NB_CLASS = NB_CLASSES_LIST[DATASET_INDEX]
 
-    write.writerow(headerCsv)
-    write.writerow(accuracyCsv)
+        TRAINABLE = True
+        model = generate_model_2()
+
+        train_model(model, DATASET_INDEX, dataset_prefix=DATASET_NAME, epochs=100, batch_size=128)
+
+        accuracy, loss = evaluate_model(model, DATASET_INDEX, dataset_prefix=DATASET_NAME, batch_size=128)
+        RESULT_ACCURACY.append(accuracy)
+
+    with open('AccuracySeqMLSTM-FCN({dataName}).csv'.format(dataName = DATASET_NAME), 'w', newline='') as f:
+
+        write = csv.writer(f)
+
+        headerCsv = ['NameDataSet']
+        for dataSizePerClass in TRAINFOLDSIZE:
+            headerCsv.append(str(dataSizePerClass))
+
+        accuracyCsv = [DATASET_NAME]
+        for ac in RESULT_ACCURACY:
+            accuracyCsv.append(str(ac))
+
+        write.writerow(headerCsv)
+        write.writerow(accuracyCsv)
