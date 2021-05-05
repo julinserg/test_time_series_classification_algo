@@ -52,7 +52,7 @@ TRAIN_FILES = [
                '../numPyData/UWaveGestureLibrary-2/',  # 24
                '../numPyData/ArticularyWordRecognition-3/',  # 0
                '../numPyData/AtrialFibrillation-3/',  # 1
-               '../numPyData/BasicMotions-23/',  # 2
+               '../numPyData/BasicMotions-3/',  # 2
                '../numPyData/CharacterTrajectories-3/',  # 3
                '../numPyData/Cricket-3/',  # 4
                '../numPyData/EigenWorms-3/',  # 5
@@ -305,7 +305,7 @@ TEST_FILES = [
                '../numPyData/UWaveGestureLibrary-2/',  # 24
                '../numPyData/ArticularyWordRecognition-3/',  # 0
                '../numPyData/AtrialFibrillation-3/',  # 1
-               '../numPyData/BasicMotions-23/',  # 2
+               '../numPyData/BasicMotions-3/',  # 2
                '../numPyData/CharacterTrajectories-3/',  # 3
                '../numPyData/Cricket-3/',  # 4
                '../numPyData/EigenWorms-3/',  # 5
