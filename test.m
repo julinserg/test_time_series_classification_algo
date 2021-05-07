@@ -58,8 +58,7 @@ groupMODEL = { 'DHMM+KMEANS' };
 ResultCellAccuracy = cell(length(groupDATA), length(groupMODEL)+1);
 ResultCellOverfit = cell(length(groupDATA), length(groupMODEL)+1);
 
-TRAINFOLDSIZE  = [ 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, ...
-                       25, 30, 35, 40, 45, 50];
+TRAINFOLDSIZE  = [ 1, 3, 5, 7, 9, 11, 13, 15, 17, 19, 21, 23, 25];
  
 % TRAINFOLDSIZE_ONE = 10;
 % TRAINFOLDSIZE = [TRAINFOLDSIZE_ONE];
@@ -244,6 +243,8 @@ for ii = 1: size(TRAINFOLDSIZE,2)
         RESULTMATRIX_OVERFIT(nameDataSetIndex, 1) = { groupDATA{groupDATAId}};  
         RESULTMATRIX_ACCURACY(nameDataSetIndex,index + 1) = {1 - errorT};   
         RESULTMATRIX_OVERFIT(nameDataSetIndex,index + 1) = {errorT - errorTR};
+        fprintf('TRAINFOLDSIZE  = %d\n', TRAINFOLDSIZE(ii));
+        fprintf('DATASET  = %s\n', groupDATA{groupDATAId});
     end    
 end
 %%

@@ -24,7 +24,7 @@ cellNetKox = cell(size(dataTrainRaw,1),1);
 % обучение карт Кохонена
 % !!!! обучение карты внутри parfor возможно только наиная с версии R2013a 
 if use_k_means == 0
-    for i=1:size(dataTrainForClass,1)
+    parfor i=1:size(dataTrainForClass,1)
        i % вывод текущего номера класса в консоль
       F = dataTrainForClass{i};
       net = newsom(F,[row_map col_map],'hextop','dist');

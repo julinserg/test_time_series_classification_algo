@@ -92,12 +92,14 @@ def squeeze_excite_block(input):
 if not os.path.exists('weights'):
     os.makedirs('weights')
 
+if not os.path.exists('mlstm_fcn_csv'):
+    os.makedirs('mlstm_fcn_csv')
+
 INDEX_DATASETS_LIST = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
 for INDEX_DATASET in INDEX_DATASETS_LIST:
     DATA = ('ArticularyWordRecognition' + '-' + str(INDEX_DATASET) , 0 + (INDEX_DATASET-1)*25)
 
-    TRAINFOLDSIZE  = [ 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20,
-                       25, 30, 35, 40, 45, 50]
+    TRAINFOLDSIZE  = [ 1, 3, 5, 7, 9, 11, 13, 15, 17, 19, 21, 23, 25]
 
     dataIndex = 0
     RESULT_ACCURACY = []
@@ -123,7 +125,7 @@ for INDEX_DATASET in INDEX_DATASETS_LIST:
         accuracy, loss = evaluate_model(model, DATASET_INDEX, dataset_prefix=DATASET_NAME, batch_size=128)
         RESULT_ACCURACY.append(accuracy)
 
-    with open('AccuracySeqMLSTM-FCN({dataName}).csv'.format(dataName = DATASET_NAME), 'w', newline='') as f:
+    with open('mlstm_fcn_csv/AccuracySeqMLSTM-FCN({dataName}).csv'.format(dataName = DATASET_NAME), 'w', newline='') as f:
 
         write = csv.writer(f)
 
