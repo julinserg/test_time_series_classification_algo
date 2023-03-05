@@ -1,1 +1,3 @@
-https://drive.google.com/file/d/1I5_N5hWGpwv_Jfcp4tHYdECfQSuVDIjY/view?usp=sharing
+System for test and compare algorithms multivariate time series classification (HMM, DHMM, HCRF, LSTM, kNN, NPMPGM(My)).
+test.m - is a main file.  
+Publication: http://www.iapress.org/index.php/soic/article/view/690
